@@ -31,15 +31,34 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    Greeting("Android")
+                    ProductsApp()
                 }
             }
         }
     }
 }
 
+
+
+@Preview(showBackground = true, showSystemUi = true)
 @Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
+fun EvvoliTmPreview() {
+    EvvoliTmTheme(darkTheme = false) {
+        ProductsApp()
+    }
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun EvvoliTmDarkThemePreview() {
+    EvvoliTmTheme(darkTheme = true) {
+        ProductsApp()
+    }
+}
+
+
+@Composable
+fun Sample(name: String, modifier: Modifier = Modifier) {
     Card(modifier = modifier.padding(16.dp)) {
         Column(
             verticalArrangement = Arrangement.Center,
@@ -67,21 +86,5 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
                 )
             }
         }
-    }
-}
-
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun GreetingPreview() {
-    EvvoliTmTheme(darkTheme = false) {
-        Greeting("Android")
-    }
-}
-
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun GreetingDarkThemePreview() {
-    EvvoliTmTheme(darkTheme = true) {
-        Greeting("Android")
     }
 }
