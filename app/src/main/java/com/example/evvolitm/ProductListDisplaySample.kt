@@ -32,40 +32,7 @@ import com.example.evvolitm.data.ProductList
 import com.example.evvolitm.model.Product
 
 
-@Composable
-fun ProductsApp() {
-    Scaffold(
-        topBar = {
-            ProductsTopAppBar()
-        }
-    ) {
-        ProductListDisplay(ProductList.products, contentPadding = it)
-    }
-}
 
-@Composable
-fun ProductsTopAppBar(modifier: Modifier = Modifier) {
-   CustomTopAppBar(modifier = modifier)
-}
-
-@Composable
-fun CustomTopAppBar(modifier: Modifier = Modifier) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Image(
-            modifier = Modifier
-                .size(dimensionResource(R.dimen.logo_size))
-                .padding(dimensionResource(R.dimen.padding_small)),
-            painter = painterResource(R.drawable.evvoli_logo_b1),
-            contentDescription = null
-        )
-        Text(
-            text = stringResource(R.string.evvoli_tvs),
-            style = MaterialTheme.typography.displayLarge
-        )
-    }
-}
 
 @Composable
 fun ProductListDisplay(
@@ -168,7 +135,7 @@ fun ProductButton(modifier: Modifier = Modifier) {
 @Composable
 fun ProductListDisplaySamplePreview() {
     EvvoliTmTheme {
-        ProductsApp()
+        ProductListDisplay(ProductList.products)
     }
 }
 

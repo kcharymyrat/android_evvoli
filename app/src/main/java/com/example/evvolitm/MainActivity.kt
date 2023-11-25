@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -19,6 +20,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.evvolitm.data.ProductList
 import com.example.evvolitm.ui.theme.EvvoliTmTheme
 
 class MainActivity : ComponentActivity() {
@@ -31,20 +33,30 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    ProductsApp()
+                    EvvoliTmApp()
                 }
             }
         }
     }
 }
 
+@Composable
+fun EvvoliTmApp() {
+    Scaffold(
+        topBar = {
+            EvvoliTopBar()
+        }
+    ) {
+        ProductListDisplay(ProductList.products, contentPadding = it)
+    }
+}
 
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun EvvoliTmPreview() {
     EvvoliTmTheme(darkTheme = false) {
-        ProductsApp()
+        EvvoliTmApp()
     }
 }
 
@@ -52,7 +64,7 @@ fun EvvoliTmPreview() {
 @Composable
 fun EvvoliTmDarkThemePreview() {
     EvvoliTmTheme(darkTheme = true) {
-        ProductsApp()
+        EvvoliTmApp()
     }
 }
 
