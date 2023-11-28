@@ -17,4 +17,7 @@
     <string name="title_12">TV 12</string>
     <string name="title_13">TV 13</string>
     <string name="description">Typography plays an important role in giving</string>
+    <string name="loading">Image loading</string>
+    <string name="loading_failed">Loading data failed!</string>
+    <string name="retry">Please retry again!</string>
 </resources>

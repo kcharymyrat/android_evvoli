@@ -1,4 +1,4 @@
-package com.example.evvolitm
+package com.example.evvolitm.ui.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -31,9 +32,15 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.evvolitm.R
+
 
 @Composable
-fun EvvoliTopBar(modifier: Modifier = Modifier) {
+fun EvvoliTopBar(
+    canNavigateBack: Boolean = false,
+    navigateUp: () -> Unit = {},
+    modifier: Modifier = Modifier,
+) {
     var showMenu by remember { mutableStateOf(false) }
     var searchText by remember { mutableStateOf("") }
 
@@ -48,6 +55,15 @@ fun EvvoliTopBar(modifier: Modifier = Modifier) {
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.fillMaxSize(),
         ) {
+            // Add navigation icon if you can navigate back
+            if (canNavigateBack) {
+                IconButton(onClick = navigateUp) {
+                    Icon(
+                        imageVector = Icons.Filled.ArrowBack,
+                        contentDescription = "Back"
+                    )
+                }
+            }
             Image(
                 painter = painterResource(R.drawable.evvoli_logo_b1),
                 contentDescription = "App Logo",
@@ -96,7 +112,6 @@ fun EvvoliTopBar(modifier: Modifier = Modifier) {
         }
     }
 }
-
 
 
 @Preview(showBackground = true, showSystemUi = true)

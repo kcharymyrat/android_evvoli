@@ -20,8 +20,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.evvolitm.data.ProductList
+import com.example.evvolitm.data.SampleProductList
+import com.example.evvolitm.ui.EvvoliTmApp
 import com.example.evvolitm.ui.theme.EvvoliTmTheme
+import com.example.evvolitm.ui.components.EvvoliTopBar
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -40,33 +42,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-@Composable
-fun EvvoliTmApp() {
-    Scaffold(
-        topBar = {
-            EvvoliTopBar()
-        }
-    ) {
-        ProductListDisplay(ProductList.products, contentPadding = it)
-    }
-}
 
-
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun EvvoliTmPreview() {
-    EvvoliTmTheme(darkTheme = false) {
-        EvvoliTmApp()
-    }
-}
-
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun EvvoliTmDarkThemePreview() {
-    EvvoliTmTheme(darkTheme = true) {
-        EvvoliTmApp()
-    }
-}
 
 
 @Composable
