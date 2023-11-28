@@ -8,7 +8,7 @@ import retrofit2.http.Path
 
 interface EvvoliTmApiRepository {
     suspend fun getCategories(): CategoryResponse
-    suspend fun getProducts(@Path("category_slug") categorySlug: String): ProductResponse
+    suspend fun getCategoryProducts(@Path("category_slug") categorySlug: String): ProductResponse
 }
 
 /**
@@ -18,6 +18,6 @@ class NetworkEvvoliTmApiRepository(
     private val evvoliTmApiService: EvvoliTmApiService
 ) : EvvoliTmApiRepository {
     override suspend fun getCategories(): CategoryResponse = evvoliTmApiService.getCategories()
-    override suspend fun getProducts(categorySlug: String): ProductResponse =
-        evvoliTmApiService.getProducts(categorySlug)
+    override suspend fun getCategoryProducts(categorySlug: String): ProductResponse =
+        evvoliTmApiService.getCategoryProducts(categorySlug)
 }

@@ -39,7 +39,7 @@ data class Spec (
 @Serializable
 data class Product(
     val id: String,
-    val category: Category,
+    val category: Product,
     val type: String,
     @SerialName(value = "type_en")
     val typeEn: String,
@@ -59,11 +59,11 @@ data class Product(
     val salePrice: Double,
     @SerialName(value = "on_sale")
     val onSale: Boolean,
-    val description: String,
+    val description: String?,
     @SerialName(value = "description_en")
-    val descriptionEn: String,
+    val descriptionEn: String?,
     @SerialName(value = "description_ru")
-    val descriptionRu: String,
+    val descriptionRu: String?,
     @SerialName(value = "img_url")
     val imageUrl: String,
     @SerialName(value = "thumbnail_url")

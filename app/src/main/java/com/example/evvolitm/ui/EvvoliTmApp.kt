@@ -8,13 +8,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
+import com.example.evvolitm.navigation.Navigation
 import com.example.evvolitm.ui.components.EvvoliTopBar
-import com.example.evvolitm.ui.screens.CategoriesScreen
 import com.example.evvolitm.ui.screens.MainViewModel
 import com.example.evvolitm.ui.theme.EvvoliTmTheme
 
 @Composable
-fun EvvoliTmApp() {
+fun EvvoliTmApp(
+    mainViewModel: MainViewModel = viewModel(),
+    navController: NavHostController = rememberNavController()
+) {
     Scaffold(
         topBar = {
             EvvoliTopBar()
@@ -27,9 +32,13 @@ fun EvvoliTmApp() {
         ) {
             val mainViewModel: MainViewModel =
                 viewModel(factory = MainViewModel.Factory)
-            CategoriesScreen(
-                categoriesUiState = mainViewModel.categoriesUiState,
-                retryAction = mainViewModel::getCategories
+//            CategoriesScreen(
+//                categoriesUiState = mainViewModel.categoriesUiState,
+//                retryAction = mainViewModel::getCategories
+//            )
+            Navigation(
+                mainViewModel = mainViewModel,
+                navController = navController
             )
         }
     }

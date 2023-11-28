@@ -11,5 +11,5 @@ interface EvvoliTmApiService {
     suspend fun getCategories(): CategoryResponse
 
     @GET("api/v1/categories/{category_slug}/products/")
-    suspend fun getProducts(@Path("category_slug") categorySlug: String): ProductResponse
+    suspend fun getCategoryProducts(@Path("category_slug") categorySlug: String): ProductResponse
 }

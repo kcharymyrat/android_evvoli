@@ -27,7 +27,7 @@ sealed interface CategoriesUiState {
 }
 
 sealed interface ProductsUiState {
-    data class Success(val product: List<Product>) : ProductsUiState
+    data class Success(val products: List<Product>) : ProductsUiState
     object Error : ProductsUiState
     object Loading : ProductsUiState
 }
@@ -64,7 +64,7 @@ class MainViewModel(private val evvoliTmApiRepository: EvvoliTmApiRepository): V
         viewModelScope.launch {
             productsUiState = ProductsUiState.Loading
             productsUiState = try {
-                ProductsUiState.Success(evvoliTmApiRepository.getProducts(categorySlug).results)
+                ProductsUiState.Success(evvoliTmApiRepository.getCategoryProducts(categorySlug).results)
             } catch (e: IOException) {
                 ProductsUiState.Error
             } catch (e: HttpException) {

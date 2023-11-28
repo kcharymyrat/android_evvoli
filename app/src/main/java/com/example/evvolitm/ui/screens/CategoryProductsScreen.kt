@@ -29,21 +29,21 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.evvolitm.R
-import com.example.evvolitm.model.Category
+import com.example.evvolitm.model.Product
 import com.example.evvolitm.ui.theme.EvvoliTmTheme
 
 
 @Composable
-fun CategoriesScreen(
-    categoriesUiState: CategoriesUiState, retryAction: () -> Unit, modifier: Modifier = Modifier
+fun CategoryProductsScreen(
+    productsUiState: ProductsUiState, retryAction: () -> Unit, modifier: Modifier = Modifier
 ) {
-    when (categoriesUiState) {
-        is CategoriesUiState.Loading -> LoadingScreen(modifier = modifier.fillMaxSize())
-        is CategoriesUiState.Success -> CategoryListDisplay(
-            categories = categoriesUiState.categories, modifier = modifier.fillMaxWidth()
+    when (productsUiState) {
+        is ProductsUiState.Loading -> LoadingScreenProducts(modifier = modifier.fillMaxSize())
+        is ProductsUiState.Success -> ProductListDisplay(
+            products = productsUiState.products, modifier = modifier.fillMaxWidth()
         )
 
-        is CategoriesUiState.Error -> ErrorScreen(retryAction, modifier = modifier.fillMaxSize())
+        is ProductsUiState.Error -> ErrorScreenProducts(retryAction, modifier = modifier.fillMaxSize())
     }
 }
 
@@ -52,7 +52,7 @@ fun CategoriesScreen(
  * The home screen displaying the loading message.
  */
 @Composable
-fun LoadingScreen(modifier: Modifier = Modifier) {
+fun LoadingScreenProducts(modifier: Modifier = Modifier) {
     Image(
         modifier = modifier.size(200.dp),
         painter = painterResource(R.drawable.loading_img),
@@ -64,7 +64,7 @@ fun LoadingScreen(modifier: Modifier = Modifier) {
  * The home screen displaying error message with re-attempt button.
  */
 @Composable
-fun ErrorScreen(retryAction: () -> Unit, modifier: Modifier = Modifier) {
+fun ErrorScreenProducts(retryAction: () -> Unit, modifier: Modifier = Modifier) {
     Column(
         modifier = modifier,
         verticalArrangement = Arrangement.Center,
@@ -83,8 +83,8 @@ fun ErrorScreen(retryAction: () -> Unit, modifier: Modifier = Modifier) {
 
 
 @Composable
-fun CategoryListDisplay(
-    categories: List<Category>,
+fun ProductListDisplay(
+    products: List<Product>,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp)
 ) {
@@ -92,9 +92,9 @@ fun CategoryListDisplay(
         modifier = modifier,
         contentPadding = contentPadding,
     ) {
-        items(categories) {
-            CategoryItem(
-                category = it,
+        items(products) {
+            ProductItem(
+                product = it,
                 modifier = Modifier
                     .padding(
                         horizontal = dimensionResource(id = R.dimen.padding_medium),
@@ -107,8 +107,8 @@ fun CategoryListDisplay(
 
 
 @Composable
-fun CategoryItem(
-    category: Category,
+fun ProductItem(
+    product: Product,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -116,22 +116,22 @@ fun CategoryItem(
         modifier = modifier
     ) {
         Column {
-            CategoryImage(category = category)
-            CategoryInformation(category = category, modifier = Modifier.padding(start = 16.dp, end = 16.dp))
-            CategoryButton()
+            ProductImage(product = product)
+            ProductInformation(product = product, modifier = Modifier.padding(start = 16.dp, end = 16.dp))
+            ProductButton()
         }
     }
 }
 
 @Composable
-fun CategoryImage(category: Category, modifier: Modifier = Modifier) {
+fun ProductImage(product: Product, modifier: Modifier = Modifier) {
     Box {
         AsyncImage(
-            model = ImageRequest.Builder(context = LocalContext.current).data("http://192.168.1.14:8000/" + category.imageUrl)
+            model = ImageRequest.Builder(context = LocalContext.current).data("http://192.168.1.14:8000/" + product.imageUrl)
                 .crossfade(true).build(),
             error = painterResource(R.drawable.ic_broken_image),
             placeholder = painterResource(R.drawable.loading_img),
-            contentDescription = category.name,
+            contentDescription = product.title,
             contentScale = ContentScale.Crop,
             modifier = Modifier.fillMaxWidth()
         )
@@ -139,18 +139,18 @@ fun CategoryImage(category: Category, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun CategoryInformation(category: Category, modifier: Modifier) {
+fun ProductInformation(product: Product, modifier: Modifier) {
     Column(
         verticalArrangement = Arrangement.Center,
         modifier = modifier
     ) {
         Text(
-            text = category.name,
+            text = product.title,
             style = MaterialTheme.typography.titleLarge,
         )
-        if (category.description != null) {
+        if (product.description != null) {
             Text(
-                text = category.description ?: "",
+                text = product.description ?: "",
                 style = MaterialTheme.typography.labelSmall,
             )
         }
@@ -158,7 +158,7 @@ fun CategoryInformation(category: Category, modifier: Modifier) {
 }
 
 @Composable
-fun CategoryButton(modifier: Modifier = Modifier) {
+fun ProductButton(modifier: Modifier = Modifier) {
     Button(onClick = { /*TODO*/ }) {
         Text(text = "See Product")
     }
@@ -167,38 +167,38 @@ fun CategoryButton(modifier: Modifier = Modifier) {
 
 @Preview(showBackground = true)
 @Composable
-fun LoadingScreenPreview() {
+fun CategoryProductsLoadingScreenPreview() {
     EvvoliTmTheme {
-        LoadingScreen()
+        LoadingScreenProducts()
     }
 }
 
 @Preview(showBackground = true)
 @Composable
-fun ErrorScreenPreview() {
+fun CategoryProductsErrorScreenPreview() {
     EvvoliTmTheme {
-        ErrorScreen({})
+        ErrorScreenProducts({})
     }
 }
 
 @Preview(showBackground = true)
 @Composable
-fun CategoryListScreenPreview() {
+fun CategoryProductListScreenPreview() {
     EvvoliTmTheme {
-        val mockData = List(10) {
-            Category(
-                "$it",
-                "${it.toString()}) name",
-                "${it.toString()}) nameEn",
-                "${it.toString()}) nameRu",
-                "${it.toString()})_slug",
-                "${it.toString()}) desc",
-                "${it.toString()}) descEn",
-                "${it.toString()}) descRu",
-                "${it.toString()}) imageUrl",
-                "${it.toString()}) thumbUrl",
-            ) }
-        CategoryListDisplay(mockData)
+//        val mockData = List(10) {
+//            Product(
+//                "$it",
+//                "${it.toString()}) name",
+//                "${it.toString()}) nameEn",
+//                "${it.toString()}) nameRu",
+//                "${it.toString()})_slug",
+//                "${it.toString()}) desc",
+//                "${it.toString()}) descEn",
+//                "${it.toString()}) descRu",
+//                "${it.toString()}) imageUrl",
+//                "${it.toString()}) thumbUrl",
+//            ) }
+//        ProductListDisplay(mockData)
     }
 }
 
