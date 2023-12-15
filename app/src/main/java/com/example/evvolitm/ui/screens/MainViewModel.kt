@@ -2,8 +2,11 @@ package com.example.evvolitm.ui.screens
 
 import android.util.Log
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -12,6 +15,7 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.evvolitm.EvvoliTmApplication
 import com.example.evvolitm.data.EvvoliTmApiRepository
 import com.example.evvolitm.model.Category
+import com.example.evvolitm.model.CategoryResponse
 import com.example.evvolitm.model.Product
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
@@ -21,7 +25,7 @@ import java.io.IOException
  * UI state for the Categories screen
  */
 sealed interface CategoriesUiState {
-    data class Success(val categories: List<Category>) : CategoriesUiState
+    data class Success(val categoryPage: CategoryResponse) : CategoriesUiState
     object Error : CategoriesUiState
     object Loading : CategoriesUiState
 }
@@ -34,6 +38,8 @@ sealed interface ProductsUiState {
 
 class MainViewModel(private val evvoliTmApiRepository: EvvoliTmApiRepository): ViewModel() {
     /** The mutable State that stores the status of the most recent request */
+    var currentPage = MutableLiveData<Int>(1)
+
     var categoriesUiState: CategoriesUiState by mutableStateOf(CategoriesUiState.Loading)
         private set
 
@@ -41,17 +47,17 @@ class MainViewModel(private val evvoliTmApiRepository: EvvoliTmApiRepository): V
         private set
 
     init {
-        getCategories()
+        getCategories(1)
     }
 
-    fun getCategories() {
+    fun getCategories(page: Int) {
         Log.i("Main", "in getCategories")
         viewModelScope.launch {
             Log.i("Main", "in viewModelScope.launch")
             categoriesUiState = CategoriesUiState.Loading
             Log.i("Main", "categoriesUiState =$categoriesUiState")
             categoriesUiState = try {
-                CategoriesUiState.Success(evvoliTmApiRepository.getCategories().results)
+                CategoriesUiState.Success(evvoliTmApiRepository.getCategories(currentPage.value ?: 1))
             } catch (e: IOException) {
                 CategoriesUiState.Error
             } catch (e: HttpException) {
@@ -61,6 +67,7 @@ class MainViewModel(private val evvoliTmApiRepository: EvvoliTmApiRepository): V
     }
 
     fun getCategoryProducts(categorySlug: String) {
+        println("in MainViewModel::getCategoryProducts:categorySlug = $categorySlug")
         viewModelScope.launch {
             productsUiState = ProductsUiState.Loading
             productsUiState = try {

@@ -18,7 +18,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.example.evvolitm.ui.EvvoliTmApp
+import com.example.evvolitm.ui.screens.MainViewModel
 import com.example.evvolitm.ui.theme.EvvoliTmTheme
 
 class MainActivity : ComponentActivity() {
@@ -31,7 +35,11 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    EvvoliTmApp()
+                    val mainViewModel: MainViewModel = viewModel(factory = MainViewModel.Factory)
+                    val navController: NavHostController = rememberNavController()
+                    EvvoliTmApp(
+                        mainViewModel = mainViewModel, navController = navController
+                    )
                 }
             }
         }

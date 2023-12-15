@@ -17,6 +17,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -26,6 +27,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.evvolitm.R
@@ -35,15 +37,38 @@ import com.example.evvolitm.ui.theme.EvvoliTmTheme
 
 @Composable
 fun CategoryProductsScreen(
-    productsUiState: ProductsUiState, retryAction: () -> Unit, modifier: Modifier = Modifier
+    navController: NavHostController,
+    productsUiState: ProductsUiState,
+    retryAction: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
+    val categorySlug = navController
+        .currentBackStackEntry
+        ?.arguments
+        ?.getString("categorySlug")
+    println("CategoryProductsScreen: categorySlug = $categorySlug")
+    LaunchedEffect(categorySlug) {
+        println("Launched Effect: categorySlug = $categorySlug")
+        categorySlug?.let {
+            retryAction()
+        }
+    }
     when (productsUiState) {
-        is ProductsUiState.Loading -> LoadingScreenProducts(modifier = modifier.fillMaxSize())
+        is ProductsUiState.Loading -> LoadingScreenProducts(
+            navController = navController,
+            modifier = modifier.fillMaxSize()
+        )
         is ProductsUiState.Success -> ProductListDisplay(
-            products = productsUiState.products, modifier = modifier.fillMaxWidth()
+            navController = navController,
+            products = productsUiState.products,
+            modifier = modifier.fillMaxWidth()
         )
 
-        is ProductsUiState.Error -> ErrorScreenProducts(retryAction, modifier = modifier.fillMaxSize())
+        is ProductsUiState.Error -> ErrorScreenProducts(
+            navController = navController,
+            retryAction = retryAction,
+            modifier = modifier.fillMaxSize()
+        )
     }
 }
 
@@ -52,7 +77,7 @@ fun CategoryProductsScreen(
  * The home screen displaying the loading message.
  */
 @Composable
-fun LoadingScreenProducts(modifier: Modifier = Modifier) {
+fun LoadingScreenProducts(navController: NavHostController, modifier: Modifier = Modifier) {
     Image(
         modifier = modifier.size(200.dp),
         painter = painterResource(R.drawable.loading_img),
@@ -64,7 +89,7 @@ fun LoadingScreenProducts(modifier: Modifier = Modifier) {
  * The home screen displaying error message with re-attempt button.
  */
 @Composable
-fun ErrorScreenProducts(retryAction: () -> Unit, modifier: Modifier = Modifier) {
+fun ErrorScreenProducts(navController: NavHostController, retryAction: () -> Unit, modifier: Modifier = Modifier) {
     Column(
         modifier = modifier,
         verticalArrangement = Arrangement.Center,
@@ -84,6 +109,7 @@ fun ErrorScreenProducts(retryAction: () -> Unit, modifier: Modifier = Modifier) 
 
 @Composable
 fun ProductListDisplay(
+    navController: NavHostController,
     products: List<Product>,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp)
@@ -94,6 +120,7 @@ fun ProductListDisplay(
     ) {
         items(products) {
             ProductItem(
+                navController = navController,
                 product = it,
                 modifier = Modifier
                     .padding(
@@ -108,6 +135,7 @@ fun ProductListDisplay(
 
 @Composable
 fun ProductItem(
+    navController: NavHostController,
     product: Product,
     modifier: Modifier = Modifier
 ) {
@@ -118,7 +146,11 @@ fun ProductItem(
         Column {
             ProductImage(product = product)
             ProductInformation(product = product, modifier = Modifier.padding(start = 16.dp, end = 16.dp))
-            ProductButton()
+            ProductButton(
+                navController = navController,
+                product = product,
+
+            )
         }
     }
 }
@@ -158,33 +190,37 @@ fun ProductInformation(product: Product, modifier: Modifier) {
 }
 
 @Composable
-fun ProductButton(modifier: Modifier = Modifier) {
+fun ProductButton(
+    navController: NavHostController,
+    product: Product,
+    modifier: Modifier = Modifier
+) {
     Button(onClick = { /*TODO*/ }) {
         Text(text = "See Product")
     }
 }
 
 
-@Preview(showBackground = true)
-@Composable
-fun CategoryProductsLoadingScreenPreview() {
-    EvvoliTmTheme {
-        LoadingScreenProducts()
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun CategoryProductsErrorScreenPreview() {
-    EvvoliTmTheme {
-        ErrorScreenProducts({})
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun CategoryProductListScreenPreview() {
-    EvvoliTmTheme {
+//@Preview(showBackground = true)
+//@Composable
+//fun CategoryProductsLoadingScreenPreview() {
+//    EvvoliTmTheme {
+//        LoadingScreenProducts()
+//    }
+//}
+//
+//@Preview(showBackground = true)
+//@Composable
+//fun CategoryProductsErrorScreenPreview() {
+//    EvvoliTmTheme {
+//        ErrorScreenProducts({})
+//    }
+//}
+//
+//@Preview(showBackground = true)
+//@Composable
+//fun CategoryProductListScreenPreview() {
+//    EvvoliTmTheme {
 //        val mockData = List(10) {
 //            Product(
 //                "$it",
@@ -199,8 +235,8 @@ fun CategoryProductListScreenPreview() {
 //                "${it.toString()}) thumbUrl",
 //            ) }
 //        ProductListDisplay(mockData)
-    }
-}
+//    }
+//}
 
 
 

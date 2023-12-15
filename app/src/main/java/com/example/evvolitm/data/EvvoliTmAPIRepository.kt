@@ -7,8 +7,8 @@ import com.example.evvolitm.network.EvvoliTmApiService
 import retrofit2.http.Path
 
 interface EvvoliTmApiRepository {
-    suspend fun getCategories(): CategoryResponse
-    suspend fun getCategoryProducts(@Path("category_slug") categorySlug: String): ProductResponse
+    suspend fun getCategories(page:Int): CategoryResponse
+    suspend fun getCategoryProducts(categorySlug: String): ProductResponse
 }
 
 /**
@@ -17,7 +17,9 @@ interface EvvoliTmApiRepository {
 class NetworkEvvoliTmApiRepository(
     private val evvoliTmApiService: EvvoliTmApiService
 ) : EvvoliTmApiRepository {
-    override suspend fun getCategories(): CategoryResponse = evvoliTmApiService.getCategories()
+    override suspend fun getCategories(page: Int): CategoryResponse =
+        evvoliTmApiService.getCategories(page)
+
     override suspend fun getCategoryProducts(categorySlug: String): ProductResponse =
         evvoliTmApiService.getCategoryProducts(categorySlug)
 }

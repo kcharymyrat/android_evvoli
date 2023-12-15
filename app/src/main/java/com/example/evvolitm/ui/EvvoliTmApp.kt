@@ -30,8 +30,6 @@ fun EvvoliTmApp(
                 .fillMaxSize()
                 .padding(it)
         ) {
-            val mainViewModel: MainViewModel =
-                viewModel(factory = MainViewModel.Factory)
 //            CategoriesScreen(
 //                categoriesUiState = mainViewModel.categoriesUiState,
 //                retryAction = mainViewModel::getCategories

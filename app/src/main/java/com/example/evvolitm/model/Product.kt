@@ -1,9 +1,11 @@
+@file:Suppress("PLUGIN_IS_NOT_ENABLED")
+
 package com.example.evvolitm.model
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-
+@Serializable
 data class ProductResponse(
     @SerialName(value = "count") var count: Int? = 0,
     @SerialName(value = "next") var next: String? = null,
@@ -14,7 +16,7 @@ data class ProductResponse(
 @Serializable
 data class Image (
     val id: String? = null,
-    @SerialName(value = "img_url")
+    @SerialName(value = "image_url")
     val imageUrl: String,
     @SerialName(value = "thumbnail_url")
     val thumbnailUrl: String,
@@ -39,7 +41,7 @@ data class Spec (
 @Serializable
 data class Product(
     val id: String,
-    val category: Product,
+    val category: Category,
     val type: String,
     @SerialName(value = "type_en")
     val typeEn: String,
@@ -52,11 +54,11 @@ data class Product(
     @SerialName(value = "title_ru")
     val titleRu: String,
     val slug: String,
-    val price: Double,
+    val price: String,
     @SerialName(value = "sale_percent")
     val salePercent: Int = 0,
     @SerialName(value = "sale_price")
-    val salePrice: Double,
+    val salePrice: String,
     @SerialName(value = "on_sale")
     val onSale: Boolean,
     val description: String?,
@@ -64,10 +66,11 @@ data class Product(
     val descriptionEn: String?,
     @SerialName(value = "description_ru")
     val descriptionRu: String?,
-    @SerialName(value = "img_url")
+    @SerialName(value = "image_url")
     val imageUrl: String,
     @SerialName(value = "thumbnail_url")
     val thumbnailUrl: String,
+    val video: String? = null,
     val images: List<Image> = listOf(),
     val specs: List<Spec> = listOf()
 )

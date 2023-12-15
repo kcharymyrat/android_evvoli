@@ -15,6 +15,8 @@ interface AppContainer {
     val evvoliTmApiRepository: EvvoliTmApiRepository
 }
 
+private val json = Json { ignoreUnknownKeys = true }
+
 /**
  * Implementation for the Dependency Injection container at the application level.
  *
@@ -38,7 +40,8 @@ class DefaultAppContainer : AppContainer {
      * Use the Retrofit builder to build a retrofit object using a kotlinx.serialization converter
      */
     private val retrofit: Retrofit = Retrofit.Builder()
-        .addConverterFactory(Json.asConverterFactory("application/json".toMediaType()))
+        .addConverterFactory(Json { ignoreUnknownKeys = true }
+            .asConverterFactory("application/json".toMediaType()))
         .baseUrl(baseUrl)
         .client(client) // Set your custom client
         .build()
