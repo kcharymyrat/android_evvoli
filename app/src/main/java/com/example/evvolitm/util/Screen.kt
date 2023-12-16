@@ -1,4 +1,4 @@
-package com.example.evvolitm.navigation
+package com.example.evvolitm.util
 
 sealed class Screen(val route: String) {
     object Categories: Screen("categories") // start

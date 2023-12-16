@@ -5,21 +5,22 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.example.evvolitm.navigation.Navigation
+import com.example.evvolitm.presentation.MainViewModel
 import com.example.evvolitm.ui.components.EvvoliTopBar
-import com.example.evvolitm.ui.screens.MainViewModel
 import com.example.evvolitm.ui.theme.EvvoliTmTheme
 
 @Composable
-fun EvvoliTmApp(
-    mainViewModel: MainViewModel = viewModel(),
-    navController: NavHostController = rememberNavController()
+fun EvvoliTmScreenContainer(
+    mainViewModel: MainViewModel,
+    navController: NavHostController,
 ) {
+    val categoryScreenState = mainViewModel.categoryScreenState.collectAsState().value
+
     Scaffold(
         topBar = {
             EvvoliTopBar()
@@ -30,31 +31,28 @@ fun EvvoliTmApp(
                 .fillMaxSize()
                 .padding(it)
         ) {
-//            CategoriesScreen(
-//                categoriesUiState = mainViewModel.categoriesUiState,
-//                retryAction = mainViewModel::getCategories
-//            )
             Navigation(
+                navController = navController,
                 mainViewModel = mainViewModel,
-                navController = navController
+                categoryScreenState = categoryScreenState,
             )
         }
     }
 }
 
 
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun EvvoliTmPreview() {
-    EvvoliTmTheme(darkTheme = false) {
-        EvvoliTmApp()
-    }
-}
-
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun EvvoliTmDarkThemePreview() {
-    EvvoliTmTheme(darkTheme = true) {
-        EvvoliTmApp()
-    }
-}
+//@Preview(showBackground = true, showSystemUi = true)
+//@Composable
+//fun EvvoliTmPreview() {
+//    EvvoliTmTheme(darkTheme = false) {
+//        EvvoliTmScreenContainer()
+//    }
+//}
+//
+//@Preview(showBackground = true, showSystemUi = true)
+//@Composable
+//fun EvvoliTmDarkThemePreview() {
+//    EvvoliTmTheme(darkTheme = true) {
+//        EvvoliTmScreenContainer()
+//    }
+//}

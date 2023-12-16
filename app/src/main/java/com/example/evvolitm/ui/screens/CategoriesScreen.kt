@@ -1,6 +1,7 @@
 package com.example.evvolitm.ui.screens
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,10 +11,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.ImageNotSupported
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -27,78 +31,81 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
+import coil.compose.AsyncImagePainter
+import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.example.evvolitm.R
-import com.example.evvolitm.model.Category
-import com.example.evvolitm.model.CategoryResponse
-import com.example.evvolitm.navigation.Screen
+import com.example.evvolitm.data.remote.EvvoliTmApi
+import com.example.evvolitm.domain.model.Category
+import com.example.evvolitm.presentation.CategoryScreenEvents
+import com.example.evvolitm.presentation.CategoryScreenState
+import com.example.evvolitm.presentation.MainViewModel
+import com.example.evvolitm.util.Screen
 import kotlin.reflect.KFunction1
 
 
 @Composable
 fun CategoriesScreen(
     navController: NavHostController,
-    categoriesUiState: CategoriesUiState,
-    mainViewModel: MainViewModel,
-    retryAction: KFunction1<Int, Unit>,
+    categoryScreenState: CategoryScreenState,
+    onEvent: (CategoryScreenEvents) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    when (categoriesUiState) {
-        is CategoriesUiState.Loading -> LoadingScreen(
-            navController = navController,
-            modifier = modifier.fillMaxSize()
-        )
-        is CategoriesUiState.Success -> CategoryListDisplay(
-            navController = navController,
-            categoryResponse = categoriesUiState.categoryPage,
-            mainViewModel = mainViewModel,
-            modifier = modifier.fillMaxWidth(),
-        )
 
-        is CategoriesUiState.Error -> ErrorScreen(
-            navController = navController,
-            retryAction = { retryAction(mainViewModel.currentPage.value ?: 1) },
-            modifier = modifier.fillMaxSize()
-        )
-    }
-}
-
-
-/**
- * The home screen displaying the loading message.
- */
-@Composable
-fun LoadingScreen(navController: NavHostController, modifier: Modifier = Modifier) {
-    Image(
-        modifier = modifier.size(200.dp),
-        painter = painterResource(R.drawable.loading_img),
-        contentDescription = stringResource(R.string.loading)
-    )
-}
-
-/**
- * The home screen displaying error message with re-attempt button.
- */
-@Composable
-fun ErrorScreen(navController: NavHostController, retryAction: () -> Unit, modifier: Modifier = Modifier) {
-    Column(
-        modifier = modifier,
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Image(
-            painter = painterResource(id = R.drawable.ic_connection_error), contentDescription = ""
-        )
-        Text(text = stringResource(R.string.loading_failed), modifier = Modifier.padding(16.dp))
-        Button(onClick = retryAction) {
-            Text(stringResource(R.string.retry))
+    if (categoryScreenState.categoryList.isEmpty()) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator()
         }
+    } else {
+        CategoryListDisplay(
+            navController = navController,
+            categoryScreenState = categoryScreenState,
+            onEvent = onEvent,
+            modifier = Modifier.fillMaxSize()
+        )
     }
+
+
 }
 
 
+@Composable
+fun CategoryListDisplay(
+    navController: NavHostController,
+    categoryScreenState: CategoryScreenState,
+    onEvent: (CategoryScreenEvents) -> Unit,
+    modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(0.dp)
+) {
+    LazyColumn(
+        modifier = modifier,
+        contentPadding = contentPadding,
+    ) {
+        items(categoryScreenState.categoryList.size) {index ->
+            CategoryItem(
+                navController = navController,
+                category = categoryScreenState.categoryList[index],
+                modifier = Modifier
+                    .padding(
+                        horizontal = dimensionResource(id = R.dimen.padding_medium),
+                        vertical = dimensionResource(id = R.dimen.padding_small)
+                    )
+            )
+            println("category = ${categoryScreenState.categoryList}")
+            println("index = $index")
+            println("categoryScreenState.categoryList.size = ${categoryScreenState.categoryList.size}")
+            println("categoryScreenState.isLoading = ${categoryScreenState.isLoading}")
+            if (index >= categoryScreenState.categoryList.size - 1 && !categoryScreenState.isLoading) {
+                println("should Fire")
+                onEvent(CategoryScreenEvents.OnPaginate())
+            }
+        }
 
-
+    }
+}
 
 
 @Composable
@@ -121,16 +128,33 @@ fun CategoryItem(
 
 @Composable
 fun CategoryImage(category: Category, modifier: Modifier = Modifier) {
-    Box {
-        AsyncImage(
-            model = ImageRequest.Builder(context = LocalContext.current).data("http://192.168.1.14:8000/" + category.imageUrl)
-                .crossfade(true).build(),
-            error = painterResource(R.drawable.ic_broken_image),
-            placeholder = painterResource(R.drawable.loading_img),
-            contentDescription = category.name,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier.fillMaxWidth()
-        )
+    val imageModel = ImageRequest.Builder(context = LocalContext.current)
+        .data(EvvoliTmApi.BASE_URL + category.imageUrl)
+        .crossfade(true)
+        .build()
+
+    val imageState = rememberAsyncImagePainter(model = imageModel).state
+
+    Box(
+        modifier = modifier.clickable {  },
+        contentAlignment = Alignment.Center
+    ) {
+        if (imageState is AsyncImagePainter.State.Error) {
+            Icon(
+                imageVector = Icons.Rounded.ImageNotSupported,
+                contentDescription = category.name
+            )
+        } else {
+            AsyncImage(
+                model = imageModel,
+                error = painterResource(R.drawable.ic_broken_image),
+                placeholder = painterResource(R.drawable.loading_img),
+                contentDescription = category.name,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+
     }
 }
 
@@ -168,77 +192,54 @@ fun CategoryButton(
     }
 }
 
-@Composable
-fun CategoryListDisplay(
-    navController: NavHostController,
-    categoryResponse: CategoryResponse,
-    mainViewModel: MainViewModel,
-    modifier: Modifier = Modifier,
-    contentPadding: PaddingValues = PaddingValues(0.dp)
-) {
-    LazyColumn(
-        modifier = modifier,
-        contentPadding = contentPadding,
-    ) {
-        items(categoryResponse.results) {
-            CategoryItem(
-                navController = navController,
-                category = it,
-                modifier = Modifier
-                    .padding(
-                        horizontal = dimensionResource(id = R.dimen.padding_medium),
-                        vertical = dimensionResource(id = R.dimen.padding_small)
-                    )
-            )
-        }
-
-        if (categoryResponse.next != null) {
-            println("categoryResponse.next  = ${categoryResponse.next }")
-            item {
-                Button(onClick = { mainViewModel.getCategories(2) }) {
-                    Text("Load More")
-                }
-            }
-        }
-    }
-}
-
-//@Preview(showBackground = true)
-//@Composable
-//fun LoadingScreenPreview() {
-//    EvvoliTmTheme {
-//        LoadingScreen()
+//    when (categoryScreenState) {
+//        is CategoriesUiState.Loading -> LoadingScreen(
+//            navController = navController,
+//            modifier = modifier.fillMaxSize()
+//        )
+//        is CategoriesUiState.Success -> CategoryListDisplay(
+//            navController = navController,
+//            categoryResponse = categoryScreenState.categoryPage,
+//            mainViewModel = mainViewModel,
+//            modifier = modifier.fillMaxWidth(),
+//        )
+//
+//        is CategoriesUiState.Error -> ErrorScreen(
+//            navController = navController,
+//            retryAction = { onEvent(mainViewModel.currentPage.value ?: 1) },
+//            modifier = modifier.fillMaxSize()
+//        )
 //    }
+
+
+///**
+// * The home screen displaying the loading message.
+// */
+//@Composable
+//fun LoadingScreen(navController: NavHostController, modifier: Modifier = Modifier) {
+//    Image(
+//        modifier = modifier.size(200.dp),
+//        painter = painterResource(R.drawable.loading_img),
+//        contentDescription = stringResource(R.string.loading)
+//    )
 //}
 //
-//@Preview(showBackground = true)
+///**
+// * The home screen displaying error message with re-attempt button.
+// */
 //@Composable
-//fun ErrorScreenPreview() {
-//    EvvoliTmTheme {
-//        ErrorScreen({})
+//fun ErrorScreen(navController: NavHostController, retryAction: () -> Unit, modifier: Modifier = Modifier) {
+//    Column(
+//        modifier = modifier,
+//        verticalArrangement = Arrangement.Center,
+//        horizontalAlignment = Alignment.CenterHorizontally
+//    ) {
+//        Image(
+//            painter = painterResource(id = R.drawable.ic_connection_error), contentDescription = ""
+//        )
+//        Text(text = stringResource(R.string.loading_failed), modifier = Modifier.padding(16.dp))
+//        Button(onClick = retryAction) {
+//            Text(stringResource(R.string.retry))
+//        }
 //    }
 //}
-//
-//@Preview(showBackground = true)
-//@Composable
-//fun CategoryListScreenPreview() {
-//    EvvoliTmTheme {
-//        val mockData = List(10) {
-//            Category(
-//                "$it",
-//                "${it.toString()}) name",
-//                "${it.toString()}) nameEn",
-//                "${it.toString()}) nameRu",
-//                "${it.toString()})_slug",
-//                "${it.toString()}) desc",
-//                "${it.toString()}) descEn",
-//                "${it.toString()}) descRu",
-//                "${it.toString()}) imageUrl",
-//                "${it.toString()}) thumbUrl",
-//            ) }
-//        CategoryListDisplay(mockData)
-//    }
-//}
-
-
-
