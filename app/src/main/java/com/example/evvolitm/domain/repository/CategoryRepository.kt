@@ -9,7 +9,7 @@ interface CategoryRepository {
 
     suspend fun insertCategoryItem(category: Category)
 
-    suspend fun getCategory(id: String): Category
+    suspend fun getCategory(id: String): Category?
 
     suspend fun getCategories(
         fetchFromRemote: Boolean,

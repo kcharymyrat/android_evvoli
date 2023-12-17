@@ -31,8 +31,8 @@ class CategoryRepositoryImpl @Inject constructor(
         categoryDao.insertCategoryItem(category.toCategoryEntity())
     }
 
-    override suspend fun getCategory(id: String): Category {
-        return categoryDao.getCategoryById(id).toCategory()
+    override suspend fun getCategory(id: String): Category? {
+        return categoryDao.getCategoryById(id)?.toCategory()
     }
 
     override suspend fun getCategories(
@@ -43,20 +43,20 @@ class CategoryRepositoryImpl @Inject constructor(
         return flow {
             emit(Resource.Loading(true))
 
-            val localCategoryList = categoryDao.getCategories()
-
-            val shouldLoadFromCache = !fetchFromRemote && !isRefresh && localCategoryList.isNotEmpty()
-            println("shouldLoadFromCache = $shouldLoadFromCache")
-
-            if (shouldLoadFromCache) {
-                emit(Resource.Success(data = localCategoryList.map { it.toCategory() }))
-                emit(Resource.Loading(false))
-                return@flow
-            }
+//            val localCategoryList = categoryDao.getCategories()
+//
+//            val shouldLoadFromCache = !fetchFromRemote && !isRefresh && localCategoryList.isNotEmpty()
+//            println("shouldLoadFromCache = $shouldLoadFromCache")
+//
+//            if (shouldLoadFromCache) {
+//                emit(Resource.Success(data = localCategoryList.map { it.toCategory() }))
+//                emit(Resource.Loading(false))
+//                return@flow
+//            }
 
             var currentPage = page
             if (isRefresh) {
-                categoryDao.deleteCategoryList()
+//                categoryDao.deleteAllCategories()
                 currentPage = 1
             }
 
@@ -76,10 +76,10 @@ class CategoryRepositoryImpl @Inject constructor(
                 val category: List<Category> = it.map { categoryDto ->
                     categoryDto.toCategory()
                 }
-                val entities: List<CategoryEntity> = it.map {categoryDto ->
-                    categoryDto.toCategoryEntity()
-                }
-                categoryDao.insertCategoryList(entities)
+//                val entities: List<CategoryEntity> = it.map {categoryDto ->
+//                    categoryDto.toCategoryEntity()
+//                }
+//                categoryDao.insertCategoryList(entities)
                 emit(Resource.Success(data = category))
                 emit(Resource.Loading(false))
             }

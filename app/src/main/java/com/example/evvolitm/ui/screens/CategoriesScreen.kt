@@ -1,5 +1,6 @@
 package com.example.evvolitm.ui.screens
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -67,8 +68,6 @@ fun CategoriesScreen(
             modifier = Modifier.fillMaxSize()
         )
     }
-
-
 }
 
 
@@ -84,21 +83,22 @@ fun CategoryListDisplay(
         modifier = modifier,
         contentPadding = contentPadding,
     ) {
-        items(categoryScreenState.categoryList.size) {index ->
+        items(categoryScreenState.categoryList.size) {catIndex ->
             CategoryItem(
                 navController = navController,
-                category = categoryScreenState.categoryList[index],
+                category = categoryScreenState.categoryList[catIndex],
                 modifier = Modifier
                     .padding(
                         horizontal = dimensionResource(id = R.dimen.padding_medium),
                         vertical = dimensionResource(id = R.dimen.padding_small)
                     )
             )
-            println("category = ${categoryScreenState.categoryList}")
-            println("index = $index")
+//            println("category = ${categoryScreenState.categoryList}")
+            println("catIndex = $catIndex")
             println("categoryScreenState.categoryList.size = ${categoryScreenState.categoryList.size}")
             println("categoryScreenState.isLoading = ${categoryScreenState.isLoading}")
-            if (index >= categoryScreenState.categoryList.size - 1 && !categoryScreenState.isLoading) {
+
+            if (catIndex >= categoryScreenState.categoryList.size - 1 && !categoryScreenState.isLoading) {
                 println("should Fire")
                 onEvent(CategoryScreenEvents.OnPaginate())
             }
@@ -119,7 +119,7 @@ fun CategoryItem(
         modifier = modifier
     ) {
         Column {
-            CategoryImage(category = category)
+            CategoryImage(navController = navController, category = category)
             CategoryInformation(category = category, modifier = Modifier.padding(start = 16.dp, end = 16.dp))
             CategoryButton(navController=navController, category = category)
         }
@@ -127,7 +127,7 @@ fun CategoryItem(
 }
 
 @Composable
-fun CategoryImage(category: Category, modifier: Modifier = Modifier) {
+fun CategoryImage(navController: NavHostController, category: Category, modifier: Modifier = Modifier) {
     val imageModel = ImageRequest.Builder(context = LocalContext.current)
         .data(EvvoliTmApi.BASE_URL + category.imageUrl)
         .crossfade(true)
@@ -136,7 +136,7 @@ fun CategoryImage(category: Category, modifier: Modifier = Modifier) {
     val imageState = rememberAsyncImagePainter(model = imageModel).state
 
     Box(
-        modifier = modifier.clickable {  },
+        modifier = modifier.clickable { navController.navigate(Screen.CategoryProducts.route + "/${category.id}") },
         contentAlignment = Alignment.Center
     ) {
         if (imageState is AsyncImagePainter.State.Error) {
@@ -184,32 +184,18 @@ fun CategoryButton(
     modifier: Modifier = Modifier
 ) {
     Button(onClick = {
-            println("Button = ${Screen.CategoryProducts.route} + /${category.slug}}")
-            navController.navigate(Screen.CategoryProducts.route + "/${category.slug}")
+            Log.d("Nav", "ButtonOnClick => categorySlug = ${category.slug}")
+            Log.d("Nav",
+                "ButtonOnClick => Button = ${Screen.CategoryProducts.route}/${category.id}"
+            )
+            Log.d("Nav", "ButtonOnClick => categoryId = ${category.id}")
+            navController.navigate(Screen.CategoryProducts.route + "/${category.id}")
         }
     ) {
         Text(text = "See Product")
     }
 }
 
-//    when (categoryScreenState) {
-//        is CategoriesUiState.Loading -> LoadingScreen(
-//            navController = navController,
-//            modifier = modifier.fillMaxSize()
-//        )
-//        is CategoriesUiState.Success -> CategoryListDisplay(
-//            navController = navController,
-//            categoryResponse = categoryScreenState.categoryPage,
-//            mainViewModel = mainViewModel,
-//            modifier = modifier.fillMaxWidth(),
-//        )
-//
-//        is CategoriesUiState.Error -> ErrorScreen(
-//            navController = navController,
-//            retryAction = { onEvent(mainViewModel.currentPage.value ?: 1) },
-//            modifier = modifier.fillMaxSize()
-//        )
-//    }
 
 
 ///**
