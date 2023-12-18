@@ -1,7 +1,6 @@
 package com.example.evvolitm.ui.screens
 
 import android.util.Log
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -10,7 +9,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ImageNotSupported
@@ -28,7 +26,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
@@ -40,9 +37,7 @@ import com.example.evvolitm.data.remote.EvvoliTmApi
 import com.example.evvolitm.domain.model.Category
 import com.example.evvolitm.presentation.CategoryScreenEvents
 import com.example.evvolitm.presentation.CategoryScreenState
-import com.example.evvolitm.presentation.MainViewModel
 import com.example.evvolitm.util.Screen
-import kotlin.reflect.KFunction1
 
 
 @Composable
@@ -136,7 +131,7 @@ fun CategoryImage(navController: NavHostController, category: Category, modifier
     val imageState = rememberAsyncImagePainter(model = imageModel).state
 
     Box(
-        modifier = modifier.clickable { navController.navigate(Screen.CategoryProducts.route + "/${category.id}") },
+        modifier = modifier.clickable { navController.navigate(Screen.CategoryProductsScreen.route + "/${category.id}") },
         contentAlignment = Alignment.Center
     ) {
         if (imageState is AsyncImagePainter.State.Error) {
@@ -186,10 +181,10 @@ fun CategoryButton(
     Button(onClick = {
             Log.d("Nav", "ButtonOnClick => categorySlug = ${category.slug}")
             Log.d("Nav",
-                "ButtonOnClick => Button = ${Screen.CategoryProducts.route}/${category.id}"
+                "ButtonOnClick => Button = ${Screen.CategoryProductsScreen.route}/${category.id}"
             )
             Log.d("Nav", "ButtonOnClick => categoryId = ${category.id}")
-            navController.navigate(Screen.CategoryProducts.route + "/${category.id}")
+            navController.navigate(Screen.CategoryProductsScreen.route + "/${category.id}")
         }
     ) {
         Text(text = "See Product")

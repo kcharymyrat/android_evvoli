@@ -13,8 +13,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.evvolitm.presentation.CategoryScreenState
 import com.example.evvolitm.presentation.MainViewModel
+import com.example.evvolitm.presentation.ProductDetailScreenState
 import com.example.evvolitm.presentation.ProductScreenState
 import com.example.evvolitm.ui.screens.CategoryProductsScreen
+import com.example.evvolitm.ui.screens.ProductDetailScreen
 import com.example.evvolitm.util.Screen
 
 @Composable
@@ -22,11 +24,12 @@ fun Navigation(
     navController: NavHostController,
     mainViewModel: MainViewModel,
     categoryScreenState: CategoryScreenState,
-    productScreenState: ProductScreenState
+    productScreenState: ProductScreenState,
+    productDetailScreenState: ProductDetailScreenState,
 ) {
-    NavHost(navController = navController, startDestination = Screen.Categories.route) {
+    NavHost(navController = navController, startDestination = Screen.CategoriesScreen.route) {
 
-        composable(route = Screen.Categories.route) {
+        composable(route = Screen.CategoriesScreen.route) {
             CategoriesScreen(
                 navController = navController,
                 categoryScreenState = categoryScreenState,
@@ -36,7 +39,7 @@ fun Navigation(
         }
 
         composable(
-            route = "${Screen.CategoryProducts.route}/{categoryId}",
+            route = "${Screen.CategoryProductsScreen.route}/{categoryId}",
             arguments = listOf(navArgument("categoryId") { type = NavType.StringType })
         ) { backStackEntry ->
             val categoryId = backStackEntry.arguments?.getString("categoryId")
@@ -60,6 +63,31 @@ fun Navigation(
                 modifier = Modifier,
             )
         }
+
+        composable(
+            route = "${Screen.ProductDetailScreen.route}/{productId}",
+            arguments = listOf(navArgument("productId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val productId = backStackEntry.arguments?.getString("productId")
+
+            Log.d("Nav", "inNavigation => productId = $productId")
+            Log.d("Nav", "inNavigation => route = $route")
+
+            LaunchedEffect(productId) {
+                if (productId != null) {
+                    productDetailScreenState.productDetail = null
+                    productDetailScreenState.productImageList = emptyList()
+                    productDetailScreenState.productSpecList = emptyList()
+                    mainViewModel.loadProductDetail(productId = productId, true)
+                }
+            }
+
+            ProductDetailScreen(
+                productDetailScreenState = productDetailScreenState,
+                onScreenProductEvent = mainViewModel::onProductDetailScreenEvent,
+            )
+        }
+
 
 
     }

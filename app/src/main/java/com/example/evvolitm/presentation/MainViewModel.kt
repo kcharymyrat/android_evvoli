@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.evvolitm.domain.repository.CategoryRepository
+import com.example.evvolitm.domain.repository.ProductDetailRepository
 import com.example.evvolitm.domain.repository.ProductRepository
 import com.example.evvolitm.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -20,7 +21,8 @@ import javax.inject.Inject
 class MainViewModel @Inject constructor(
     application: Application,
     private val categoryRepository: CategoryRepository,
-    private val productRepository: ProductRepository
+    private val productRepository: ProductRepository,
+    private val productDetailRepository: ProductDetailRepository,
 ): AndroidViewModel(application) {
     private val _categoryScreenState = MutableStateFlow(CategoryScreenState())
     val categoryScreenState = _categoryScreenState.asStateFlow()
@@ -28,13 +30,13 @@ class MainViewModel @Inject constructor(
     private val _productScreenState = MutableStateFlow(ProductScreenState())
     val productScreenState = _productScreenState.asStateFlow()
 
+    private val _productDetailScreenState = MutableStateFlow(ProductDetailScreenState())
+    val productDetailScreenState = _productDetailScreenState.asStateFlow()
+
     init {
         loadCategories(forceFetchFromRemote = false)
     }
 
-    private fun load(fetchFromRemote: Boolean = false) {
-        loadCategories(fetchFromRemote)
-    }
 
     fun onCategoryScreenEvent(event: CategoryScreenEvents) {
         println("event = $event")
@@ -66,6 +68,17 @@ class MainViewModel @Inject constructor(
 
         }
     }
+
+
+    fun onProductDetailScreenEvent(event: ProductDetailScreenEvents, productId: String) {
+        println("event = $event")
+        when(event) {
+            is ProductDetailScreenEvents.Refresh -> {
+                loadProductDetail(productId = productId, forceFetchFromRemote = true)
+            }
+        }
+    }
+
 
     private fun loadCategories(
         forceFetchFromRemote: Boolean = false,
@@ -143,5 +156,47 @@ class MainViewModel @Inject constructor(
             }
         }
     }
+
+
+    fun loadProductDetail(
+        productId: String,
+        forceFetchFromRemote: Boolean = false,
+        isRefresh: Boolean = false
+    ) {
+        viewModelScope.launch {
+
+            _productDetailScreenState.update {
+                it.copy(isLoading = true)
+            }
+
+            productDetailRepository.getProductDetail(
+                productId = productId,
+                fetchFromRemote = forceFetchFromRemote,
+                isRefresh = isRefresh,
+            ).collect { result ->
+                when (result) {
+                    is Resource.Error -> Unit
+                    is Resource.Success -> {
+                        result.data?.let {productDetail ->
+                            Log.d("Nav", "loadProductDetail => productDetail = $productDetail")
+                            _productDetailScreenState.update {
+                                it.copy(
+                                    productDetail = productDetail,
+                                    productImageList = productDetail.images,
+                                    productSpecList = productDetail.specs
+                                )
+                            }
+                        }
+                    }
+                    is Resource.Loading -> {
+                        _productScreenState.update {
+                            it.copy(isLoading = result.isLoading)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
 
 }

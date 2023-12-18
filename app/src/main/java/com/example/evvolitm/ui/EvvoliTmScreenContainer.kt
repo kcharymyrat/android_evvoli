@@ -21,6 +21,7 @@ fun EvvoliTmScreenContainer(
 ) {
     val categoryScreenState = mainViewModel.categoryScreenState.collectAsState().value
     val productScreenState = mainViewModel.productScreenState.collectAsState().value
+    val productDetailScreenState = mainViewModel.productDetailScreenState.collectAsState().value
 
     Scaffold(
         topBar = {
@@ -37,6 +38,7 @@ fun EvvoliTmScreenContainer(
                 mainViewModel = mainViewModel,
                 categoryScreenState = categoryScreenState,
                 productScreenState = productScreenState,
+                productDetailScreenState = productDetailScreenState,
             )
         }
     }

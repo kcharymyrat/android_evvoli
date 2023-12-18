@@ -3,9 +3,9 @@ package com.example.evvolitm.data.remote.respond.product_dtos
 import com.example.evvolitm.data.remote.respond.category_dtos.CategoryDto
 import com.google.gson.annotations.SerializedName
 
-data class ProductInDetailDto(
+data class ProductDetailDto(
     @SerializedName("id") val id: String,
-    @SerializedName("category") val category: CategoryDto,
+    @SerializedName("category_id") val categoryId: String,
     @SerializedName("type") val type: String,
     @SerializedName("type_en") val typeEn: String,
     @SerializedName("type_ru") val typeRu: String,
@@ -23,7 +23,7 @@ data class ProductInDetailDto(
     @SerializedName("description_ru") val descriptionRu: String?,
     @SerializedName("image_url") val imageUrl: String,
     @SerializedName("thumbnail_url") val thumbnailUrl: String,
-    @SerializedName("video") val video: String?,
+    @SerializedName("video_url") val video: String?,
     @SerializedName("images") val images: List<ProductImageDto>,
     @SerializedName("specs") val specs: List<ProductSpecDto>
 )

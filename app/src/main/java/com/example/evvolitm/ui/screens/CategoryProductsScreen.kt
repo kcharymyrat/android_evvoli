@@ -40,6 +40,7 @@ import com.example.evvolitm.data.remote.EvvoliTmApi
 import com.example.evvolitm.domain.model.Product
 import com.example.evvolitm.presentation.ProductScreenEvents
 import com.example.evvolitm.presentation.ProductScreenState
+import com.example.evvolitm.util.Screen
 
 
 @Composable
@@ -201,7 +202,10 @@ fun ProductButton(
     product: Product,
     modifier: Modifier = Modifier
 ) {
-    Button(onClick = { /*TODO*/ }) {
+    Button(onClick = {
+        Log.d("Nav", "ProductButton => productId = ${product.id}")
+        navController.navigate(Screen.ProductDetailScreen.route + "/${product.id}")
+    }) {
         Text(text = "See Product")
     }
 }

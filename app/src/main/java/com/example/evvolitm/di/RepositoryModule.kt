@@ -1,8 +1,10 @@
 package com.example.evvolitm.di
 
 import com.example.evvolitm.data.repository.CategoryRepositoryImpl
+import com.example.evvolitm.data.repository.ProductDetailRepositoryImpl
 import com.example.evvolitm.data.repository.ProductRepositoryImpl
 import com.example.evvolitm.domain.repository.CategoryRepository
+import com.example.evvolitm.domain.repository.ProductDetailRepository
 import com.example.evvolitm.domain.repository.ProductRepository
 import dagger.Binds
 import dagger.Module
@@ -26,5 +28,12 @@ abstract class RepositoryModule {
     abstract fun bindProductRepository(
         productRepositoryImpl: ProductRepositoryImpl
     ): ProductRepository
+
+
+    @Binds
+    @Singleton
+    abstract fun bindProductDetailRepository(
+        productDetailRepositoryImpl: ProductDetailRepositoryImpl
+    ): ProductDetailRepository
 
 }

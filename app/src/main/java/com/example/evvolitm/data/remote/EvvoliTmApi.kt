@@ -2,6 +2,7 @@ package com.example.evvolitm.data.remote
 
 import com.example.evvolitm.data.remote.respond.category_dtos.CategoryDto
 import com.example.evvolitm.data.remote.respond.category_dtos.CategoriesResponseDto
+import com.example.evvolitm.data.remote.respond.product_dtos.ProductDetailDto
 import com.example.evvolitm.data.remote.respond.product_dtos.ProductsResponseDto
 import retrofit2.http.GET
 import retrofit2.http.Path
@@ -19,6 +20,12 @@ interface EvvoliTmApi {
         @Path("category_id") categoryId: String,
         @Query("page") page: Int
     ): ProductsResponseDto
+
+
+    @GET("api/v1/products/{product_id}/")
+    suspend fun getProductDetail(
+        @Path("product_id") productId: String,
+    ): ProductDetailDto
 
     companion object {
         const val BASE_URL = "http://192.168.1.14:8000/"
