@@ -4,6 +4,7 @@ import android.app.Application
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.evvolitm.domain.repository.CartRepository
 import com.example.evvolitm.domain.repository.CategoryRepository
 import com.example.evvolitm.domain.repository.ProductDetailRepository
 import com.example.evvolitm.domain.repository.ProductRepository
@@ -23,6 +24,7 @@ class MainViewModel @Inject constructor(
     private val categoryRepository: CategoryRepository,
     private val productRepository: ProductRepository,
     private val productDetailRepository: ProductDetailRepository,
+    private val cartRepository: CartRepository,
 ): AndroidViewModel(application) {
     private val _categoryScreenState = MutableStateFlow(CategoryScreenState())
     val categoryScreenState = _categoryScreenState.asStateFlow()
@@ -32,6 +34,11 @@ class MainViewModel @Inject constructor(
 
     private val _productDetailScreenState = MutableStateFlow(ProductDetailScreenState())
     val productDetailScreenState = _productDetailScreenState.asStateFlow()
+
+    private val _cartScreenState = MutableStateFlow(CartScreenState())
+    val cartScreenState = _cartScreenState.asStateFlow()
+
+    var productCategoryId: String? = null
 
     init {
         loadCategories(forceFetchFromRemote = false)
@@ -199,4 +206,82 @@ class MainViewModel @Inject constructor(
     }
 
 
+    // CART LOGIC ------------------------------------
+
+    fun loadCart() {
+        viewModelScope.launch {
+            _cartScreenState.update {
+                it.copy(isLoading = true)
+            }
+
+            var cartId = _cartScreenState.value.id
+            if (cartId == null) {
+                val cartEntity = cartRepository.createEmptyCartEntity()
+                cartId = cartEntity?.id
+                _cartScreenState.value.id = cartId
+            }
+
+            if (cartId != null) {
+                cartRepository.getFlowResourceCartById(
+                    cartId = cartId
+                ).collectLatest { result ->
+                    when (result) {
+                        is Resource.Error -> Unit
+                        is Resource.Success -> {
+                            result.data?.let {
+                                _cartScreenState.value.cartItems = it.cartItems
+                                _cartScreenState.value.cartQty = it.cartItems.sumOf { item -> item.quantity }
+                            }
+                        }
+                        is Resource.Loading -> {
+                            _cartScreenState.update {
+                                it.copy(isLoading = result.isLoading)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    fun updateCart(
+        productId: String,
+        price: String,
+        salePrice: String,
+        isMinus: Boolean = false
+    ) {
+        viewModelScope.launch {
+
+            val quantity = if(isMinus) -1 else 1
+
+            var cartId = _cartScreenState.value.id
+            if (cartId == null) {
+                val cartEntity =
+                    cartRepository.getLatestCartEntity() ?: cartRepository.createEmptyCartEntity()
+                cartId = cartEntity?.id
+                _cartScreenState.value.id = cartId
+            }
+
+            if (cartId != null) {
+                cartRepository.addOrUpdateCartItemEntity(
+                    cartId = cartId,
+                    productId = productId,
+                    price = price,
+                    salePrice = salePrice,
+                    quantity = quantity
+                )
+
+                val cart = cartRepository.getCartById(cartId)
+                _cartScreenState.value.id = cart?.id
+                val carItems = cart?.cartItems
+                _cartScreenState.value.cartItems = carItems ?: mutableListOf()
+                _cartScreenState.value.cartQty = carItems?.size ?: 0
+                _cartScreenState.value.cartTotalPrice = carItems?.sumOf { cartItem ->
+                    (cartItem.product?.salePrice ?: 0.0) * (cartItem.quantity ?: 0)
+                } ?: 0.00
+
+                println("_cartScreenState.value = ${_cartScreenState.value}")
+            }
+        }
+    }
 }

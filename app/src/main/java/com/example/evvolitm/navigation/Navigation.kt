@@ -11,6 +11,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.example.evvolitm.presentation.CartScreenState
 import com.example.evvolitm.presentation.CategoryScreenState
 import com.example.evvolitm.presentation.MainViewModel
 import com.example.evvolitm.presentation.ProductDetailScreenState
@@ -26,6 +27,7 @@ fun Navigation(
     categoryScreenState: CategoryScreenState,
     productScreenState: ProductScreenState,
     productDetailScreenState: ProductDetailScreenState,
+    cartScreenState: CartScreenState,
 ) {
     NavHost(navController = navController, startDestination = Screen.CategoriesScreen.route) {
 
@@ -48,10 +50,12 @@ fun Navigation(
             Log.d("Nav", "inNavigation => route = $route")
 
             LaunchedEffect(categoryId) {
-                if (categoryId != null) {
+                if (categoryId != null && categoryId != mainViewModel.productCategoryId) {
+                    println("In - LaunchedEffect(categoryId)")
                     productScreenState.productList = emptyList()
                     productScreenState.page = 1
                     mainViewModel.loadCategoryProducts(categoryId = categoryId, true)
+                    mainViewModel.productCategoryId = categoryId
                 }
             }
 
@@ -60,6 +64,8 @@ fun Navigation(
                 categoryId = categoryId ?: "",
                 productScreenState = productScreenState,
                 onScreenProductEvent = mainViewModel::onProductScreenEvent,
+                cartScreenState = cartScreenState,
+                onUpdateCartAndItsState = mainViewModel::updateCart,
                 modifier = Modifier,
             )
         }
@@ -87,6 +93,8 @@ fun Navigation(
                 onScreenProductEvent = mainViewModel::onProductDetailScreenEvent,
             )
         }
+
+
 
 
 

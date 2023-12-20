@@ -3,8 +3,11 @@ package com.example.evvolitm.di
 import android.app.Application
 import androidx.room.Room
 import com.example.evvolitm.data.local.EvvoliTmDatabase
+import com.example.evvolitm.data.local.cart.CartItemDao
 import com.example.evvolitm.data.remote.EvvoliTmApi
 import com.example.evvolitm.data.remote.EvvoliTmApi.Companion.BASE_URL
+import com.example.evvolitm.data.repository.CartRepositoryImpl
+import com.example.evvolitm.domain.repository.CartRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

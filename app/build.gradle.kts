@@ -74,7 +74,7 @@ dependencies {
 
     // Dagger - Hilt
     implementation("com.google.dagger:hilt-android:2.48")
-    kapt("com.google.dagger:hilt-compiler:2.47")
+    kapt("com.google.dagger:hilt-compiler:2.48")
     kapt("androidx.hilt:hilt-compiler:1.1.0")
     implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
 
@@ -88,6 +88,10 @@ dependencies {
 
     // system UI Controller
     implementation("com.google.accompanist:accompanist-systemuicontroller:0.27.0")
+
+    implementation("androidx.media3:media3-exoplayer:1.2.0")
+    implementation("androidx.media3:media3-exoplayer-dash:1.2.0")
+    implementation("androidx.media3:media3-ui:1.2.0")
 
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
