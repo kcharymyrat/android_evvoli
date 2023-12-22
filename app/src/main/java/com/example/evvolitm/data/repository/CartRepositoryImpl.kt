@@ -69,6 +69,10 @@ class CartRepositoryImpl  @Inject constructor(
         }
     }
 
+    override suspend fun getCartProductItemById(cartProductItemId: String): CartItemProduct? {
+        return cartItemProductDao.getCartItemProductById(cartProductItemId)?.toCartItemProduct()
+    }
+
 
     override suspend fun getFlowResourceCartById(cartId: Long): Flow<Resource<Cart>> {
         return flow {
@@ -144,50 +148,54 @@ class CartRepositoryImpl  @Inject constructor(
         quantity: Int
     ) {
         withContext(Dispatchers.IO) {
+            try {
+                // Check if the cart item already exists
+                val existingCartItem = cartItemDao.getCartItemByProductIdAndCartId(productId, cartId)
 
-            val existingCartItem = cartItemDao.getCartItemByProductIdAndCartId(productId, cartId)
-            if (existingCartItem != null) {
-                val newQuantity = existingCartItem.quantity + quantity
-                if (newQuantity > 0) {
-                    val updatedCartItem = existingCartItem.copy(quantity = newQuantity)
-                    cartItemDao.updateCartItem(updatedCartItem)
-                } else {
-                    cartItemDao.deleteCartItem(existingCartItem)
-                }
-            } else if (quantity > 0) {
-                // First, check if the cart and product exist
-                val productExists = cartItemProductDao.getCartItemProductById(productId) != null
+                if (existingCartItem != null) {
+                    // If exists and new quantity is greater than 0, update it
+                    val newQuantity = existingCartItem.quantity + quantity
+                    if (newQuantity > 0) {
+                        cartItemDao.updateCartItem(existingCartItem.copy(quantity = newQuantity))
+                    } else {
+                        // If new quantity is 0 or less, delete the cart item
+                        cartItemDao.deleteCartItem(existingCartItem)
+                    }
+                } else if (quantity > 0) {
+                    println(" in else if (quantity > 0): existingCartItem = $existingCartItem")
+                    // Create new CartItemProduct if it doesn't exist
+                    val productExists = cartItemProductDao.getCartItemProductById(productId) != null
+                    if (!productExists) {
+                        cartItemProductDao.insertCartItemProduct(
+                            CartItemProductEntity(
+                                id = productId,
+                                price = price.toDouble(),
+                                salePrice = salePrice.toDouble()
+                            )
+                        )
+                    }
 
-                if (!productExists) {
-                    val newCartItemProduct = CartItemProductEntity(
-                        id = productId,
-                        price = price.toDouble(),
-                        salePrice = salePrice.toDouble()
-                    )
-                    cartItemProductDao.insertCartItemProduct(newCartItemProduct)
-                }
+                    // Create new Cart if it doesn't exist
+                    if (cartDao.getCartById(cartId) == null) {
+                        cartDao.insertCart(CartEntity())
+                    }
 
-                val cartExists = cartDao.getCartById(cartId) != null
-                if (!cartExists) {
-                    val newCartId = CartEntity()
-                    cartDao.insertCart(newCartId)
-                    val newCartItem = CartItemEntity(
-                        productId = productId,
-                        quantity = quantity,
-                        cartOwnerId = cartId,
+                    // Insert new CartItem
+                    cartItemDao.insertCartItem(
+                        CartItemEntity(
+                            productId = productId,
+                            quantity = quantity,
+                            cartOwnerId = cartId
+                        )
                     )
-                    cartItemDao.insertCartItem(newCartItem)
-                } else {
-                    val newCartItem = CartItemEntity(
-                        productId = productId,
-                        quantity = quantity,
-                        cartOwnerId = cartId
-                    )
-                    cartItemDao.insertCartItem(newCartItem)
                 }
+            } catch (e: Exception) {
+                // Handle exceptions, e.g., log error or rethrow a custom exception
+                println("Error in addOrUpdateCartItemEntity: $e")
             }
         }
     }
+
 
     override suspend fun updateCartEntityByCart(cart: Cart) {
         withContext(Dispatchers.IO) {

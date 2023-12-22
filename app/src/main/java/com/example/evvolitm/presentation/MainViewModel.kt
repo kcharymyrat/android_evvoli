@@ -4,10 +4,12 @@ import android.app.Application
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.evvolitm.domain.model.CartItem
 import com.example.evvolitm.domain.repository.CartRepository
 import com.example.evvolitm.domain.repository.CategoryRepository
 import com.example.evvolitm.domain.repository.ProductDetailRepository
 import com.example.evvolitm.domain.repository.ProductRepository
+import com.example.evvolitm.mappers.toCart
 import com.example.evvolitm.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -43,6 +45,7 @@ class MainViewModel @Inject constructor(
     init {
         loadCategories(forceFetchFromRemote = false)
     }
+
 
 
     fun onCategoryScreenEvent(event: CategoryScreenEvents) {
@@ -92,6 +95,14 @@ class MainViewModel @Inject constructor(
         isRefresh: Boolean = false
     ) {
         viewModelScope.launch {
+
+            println("_cartScreenState.value.id = ${_cartScreenState.value.id}")
+            if (_cartScreenState.value.id == null) {
+                createCartScreenState()
+                println("new: _cartScreenState.value = ${_cartScreenState.value}")
+            }
+            println("in loadCategories: _cartScreenState.value = ${_cartScreenState.value}")
+
             _categoryScreenState.update {
                 it.copy(isLoading = true)
             }
@@ -131,6 +142,13 @@ class MainViewModel @Inject constructor(
     ) {
         viewModelScope.launch {
 
+            println("_cartScreenState.value.id = ${_cartScreenState.value.id}")
+            if (_cartScreenState.value.id == null) {
+                createCartScreenState()
+                println("new: _cartScreenState.value = ${_cartScreenState.value}")
+            }
+            println("in loadCategoryProducts: _cartScreenState.value = ${_cartScreenState.value}")
+
             _productScreenState.update {
                 it.copy(isLoading = true)
             }
@@ -144,6 +162,7 @@ class MainViewModel @Inject constructor(
                 when (result) {
                     is Resource.Error -> Unit
                     is Resource.Success -> {
+
                         result.data?.let { productList ->
                             Log.d("Nav", "loadCategoryProducts => productList = $productList")
                             _productScreenState.update {
@@ -171,6 +190,13 @@ class MainViewModel @Inject constructor(
         isRefresh: Boolean = false
     ) {
         viewModelScope.launch {
+
+            println("_cartScreenState.value.id = ${_cartScreenState.value.id}")
+            if (_cartScreenState.value.id == null) {
+                createCartScreenState()
+                println("new: _cartScreenState.value = ${_cartScreenState.value}")
+            }
+            println("in loadCategories: _cartScreenState.value = ${_cartScreenState.value}")
 
             _productDetailScreenState.update {
                 it.copy(isLoading = true)
@@ -251,15 +277,14 @@ class MainViewModel @Inject constructor(
         isMinus: Boolean = false
     ) {
         viewModelScope.launch {
+            println("in updateCart: _cartScreenState.value = ${_cartScreenState.value}")
 
             val quantity = if(isMinus) -1 else 1
 
             var cartId = _cartScreenState.value.id
             if (cartId == null) {
-                val cartEntity =
-                    cartRepository.getLatestCartEntity() ?: cartRepository.createEmptyCartEntity()
-                cartId = cartEntity?.id
-                _cartScreenState.value.id = cartId
+                createCartScreenState()
+                cartId = _cartScreenState.value.id
             }
 
             if (cartId != null) {
@@ -272,16 +297,57 @@ class MainViewModel @Inject constructor(
                 )
 
                 val cart = cartRepository.getCartById(cartId)
-                _cartScreenState.value.id = cart?.id
-                val carItems = cart?.cartItems
-                _cartScreenState.value.cartItems = carItems ?: mutableListOf()
-                _cartScreenState.value.cartQty = carItems?.size ?: 0
-                _cartScreenState.value.cartTotalPrice = carItems?.sumOf { cartItem ->
-                    (cartItem.product?.salePrice ?: 0.0) * (cartItem.quantity ?: 0)
-                } ?: 0.00
+
+                // Create a new instance with the updated values
+                val newCartState = _cartScreenState.value.copy(
+                    cartItems = cart?.cartItems?.toMutableList() ?: mutableListOf(),
+                    cartQty = cart?.cartItems?.sumOf { it.quantity } ?: 0,
+                    cartTotalPrice = cart?.cartItems?.sumOf { cartItem ->
+                        (cartItem.product?.salePrice ?: 0.0) * (cartItem.quantity ?: 0)
+                    } ?: 0.00
+                )
+
+                // Update the state
+                _cartScreenState.value = newCartState
 
                 println("_cartScreenState.value = ${_cartScreenState.value}")
+
+            }
+
+            println("in updateCart: _cartScreenState.value = ${_cartScreenState.value}")
+        }
+    }
+
+
+    private suspend fun createCartScreenState() {
+        val cartEntity = cartRepository.getLatestCartEntity() ?: cartRepository.createEmptyCartEntity()
+        cartEntity?.let {
+            val newCart = cartRepository.getCartById(it.id)
+            newCart?.let { cart ->
+                _cartScreenState.value = _cartScreenState.value.copy(
+                    id = cart.id,
+                    cartItems = cart.cartItems,
+                    cartQty = cart.cartItems.sumOf { item -> item.quantity },
+                    cartTotalPrice = cart.cartItems.sumOf {
+                            item -> item.quantity * (item.product?.salePrice ?: 0.00)
+                    }
+                )
             }
         }
+    }
+
+    fun updateCartScreenState(newCartItems: List<CartItem>) {
+        val newCartQty = newCartItems.sumOf { it.quantity }
+        val newTotalPrice = newCartItems.sumOf { (it.product?.salePrice ?: 0.00 ) * it.quantity }
+
+        // Create a new instance with the updated values
+        val newCartState = _cartScreenState.value.copy(
+            cartItems = newCartItems.toMutableList(),
+            cartQty = newCartQty,
+            cartTotalPrice = newTotalPrice
+        )
+
+        // Update the state
+        _cartScreenState.value = newCartState
     }
 }

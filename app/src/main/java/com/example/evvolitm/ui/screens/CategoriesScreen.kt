@@ -8,8 +8,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ImageNotSupported
 import androidx.compose.material3.Button
@@ -74,9 +76,10 @@ fun CategoryListDisplay(
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp)
 ) {
-    LazyColumn(
+    LazyVerticalGrid(
+        columns = GridCells.Adaptive(150.dp),
         modifier = modifier,
-        contentPadding = contentPadding,
+        contentPadding = PaddingValues(4.dp)
     ) {
         items(categoryScreenState.categoryList.size) {catIndex ->
             CategoryItem(
@@ -84,8 +87,8 @@ fun CategoryListDisplay(
                 category = categoryScreenState.categoryList[catIndex],
                 modifier = Modifier
                     .padding(
-                        horizontal = dimensionResource(id = R.dimen.padding_medium),
-                        vertical = dimensionResource(id = R.dimen.padding_small)
+                        horizontal = dimensionResource(id = R.dimen.padding_x_small),
+                        vertical = dimensionResource(id = R.dimen.padding_x_small)
                     )
             )
 //            println("category = ${categoryScreenState.categoryList}")
@@ -110,13 +113,30 @@ fun CategoryItem(
     modifier: Modifier = Modifier
 ) {
     Card(
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         modifier = modifier
+            .height(160.dp),
     ) {
-        Column {
-            CategoryImage(navController = navController, category = category)
-            CategoryInformation(category = category, modifier = Modifier.padding(start = 16.dp, end = 16.dp))
-            CategoryButton(navController=navController, category = category)
+        Column(
+            verticalArrangement = Arrangement.Center,
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(
+                    horizontal = dimensionResource(id = R.dimen.padding_x_small),
+                    vertical = dimensionResource(id = R.dimen.padding_small)
+                )
+        ) {
+            CategoryImage(
+                navController = navController,
+                category = category,
+                modifier = Modifier.weight(1f)
+            )
+            CategoryInformation(
+                category = category,
+                modifier = Modifier
+                    .padding(horizontal = dimensionResource(id = R.dimen.padding_small))
+            )
+//            CategoryButton(navController=navController, category = category)
         }
     }
 }
@@ -131,7 +151,10 @@ fun CategoryImage(navController: NavHostController, category: Category, modifier
     val imageState = rememberAsyncImagePainter(model = imageModel).state
 
     Box(
-        modifier = modifier.clickable { navController.navigate(Screen.CategoryProductsScreen.route + "/${category.id}") },
+        modifier = modifier
+            .clickable {
+                navController.navigate(Screen.CategoryProductsScreen.route + "/${category.id}")
+            },
         contentAlignment = Alignment.Center
     ) {
         if (imageState is AsyncImagePainter.State.Error) {
@@ -145,7 +168,7 @@ fun CategoryImage(navController: NavHostController, category: Category, modifier
                 error = painterResource(R.drawable.ic_broken_image),
                 placeholder = painterResource(R.drawable.loading_img),
                 contentDescription = category.name,
-                contentScale = ContentScale.Crop,
+                contentScale = ContentScale.FillWidth,
                 modifier = Modifier.fillMaxWidth()
             )
         }
@@ -161,14 +184,14 @@ fun CategoryInformation(category: Category, modifier: Modifier) {
     ) {
         Text(
             text = category.name,
-            style = MaterialTheme.typography.titleLarge,
+            style = MaterialTheme.typography.titleSmall,
         )
-        if (category.description != null) {
-            Text(
-                text = category.description ?: "",
-                style = MaterialTheme.typography.labelSmall,
-            )
-        }
+//        if (category.description != null) {
+//            Text(
+//                text = category.description ?: "",
+//                style = MaterialTheme.typography.labelSmall,
+//            )
+//        }
     }
 }
 

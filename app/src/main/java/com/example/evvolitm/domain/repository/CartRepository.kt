@@ -14,6 +14,8 @@ interface CartRepository {
 
     suspend fun getCartById(cartId: Long): Cart?
 
+    suspend fun getCartProductItemById(cartProductItemId: String): CartItemProduct?
+
     suspend fun getFlowResourceCartById(cartId: Long): Flow<Resource<Cart>>
 
     suspend fun getCartItemListByCartId(cartId: Long): Flow<Resource<List<CartItem>>>

@@ -3,30 +3,41 @@ package com.example.evvolitm.ui.screens
 import android.util.Log
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.rounded.ImageNotSupported
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -34,9 +45,12 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
@@ -51,7 +65,9 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.example.evvolitm.R
 import com.example.evvolitm.data.remote.EvvoliTmApi
+import com.example.evvolitm.domain.model.Product
 import com.example.evvolitm.domain.model.ProductDetail
+import com.example.evvolitm.presentation.CartScreenState
 import com.example.evvolitm.presentation.ProductDetailScreenEvents
 import com.example.evvolitm.presentation.ProductDetailScreenState
 
@@ -59,8 +75,8 @@ import com.example.evvolitm.presentation.ProductDetailScreenState
 @Composable
 fun ProductDetailScreen(
     productDetailScreenState: ProductDetailScreenState,
-    onScreenProductEvent: (ProductDetailScreenEvents, String) -> Unit,
-//    cartUiState: CartUiState,
+    cartScreenState: CartScreenState,
+    onUpdateCartAndItsState: (String, String, String, Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
 
@@ -71,6 +87,20 @@ fun ProductDetailScreen(
     // Get screen width
     val screenWidth = LocalConfiguration.current.screenWidthDp.dp
 
+    // Determine the total number of items
+    var totalItems = productDetailScreenState.productImageList.size
+    if (productDetail?.videoUrl != null) totalItems++ // +1 for video item
+    if (productDetail?.imageUrl != null) totalItems++
+
+    // State to track the current visible item index
+    val listState = rememberLazyListState()
+    val currentItemIndex = remember { mutableIntStateOf(0) }
+
+    // Update the current item index based on the LazyRow scroll state
+    LaunchedEffect(listState.firstVisibleItemIndex) {
+        currentItemIndex.intValue = listState.firstVisibleItemIndex
+    }
+
     if (productDetail == null) {
         Box(
             modifier = Modifier.fillMaxSize(),
@@ -79,19 +109,20 @@ fun ProductDetailScreen(
             CircularProgressIndicator()
         }
     } else {
-        val listState = rememberLazyListState()
 
         Column(
             modifier = Modifier,
         ) {
             LazyRow(
+                state = listState,
                 // You can customize the content padding if needed
                 contentPadding = PaddingValues(0.dp),
                 // Customize the horizontal arrangement of items
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                if (productDetail.videoUrl != null) {
-                    item {
+
+                item {
+                    if (productDetail.videoUrl != null) {
                         Column(
                             verticalArrangement = Arrangement.Center,
                             horizontalAlignment = Alignment.CenterHorizontally,
@@ -129,21 +160,24 @@ fun ProductDetailScreen(
 
             }
 
+            // Dot indicators
+            DotIndicators(totalItems = totalItems, currentIndex = currentItemIndex.intValue)
+
             LazyColumn(
-                state = listState,
                 modifier = modifier,
                 contentPadding = PaddingValues(0.dp),
             ) {
                 item() {
+                    ProductDetailToCartButtons(
+                        cartScreenState = cartScreenState,
+                        onUpdateCartAndItsState = onUpdateCartAndItsState,
+                        productDetail = productDetail
+                    )
                     ProductDetailInformation(
                         productDetail = productDetail,
-                        modifier = Modifier.padding(start = 16.dp, end = 16.dp)
+                        modifier = Modifier
+                            .padding(horizontal = dimensionResource(id = R.dimen.padding_medium))
                     )
-//                ProductToCartButtons(
-//                    mainViewModel = mainViewModel,
-//                    cartUiState = cartUiState,
-//                    productDetail = productDetail
-//                )
                 }
             }
         }
@@ -180,8 +214,8 @@ fun ProductDetailImage(
                 error = painterResource(R.drawable.ic_broken_image),
                 placeholder = painterResource(R.drawable.loading_img),
                 contentDescription = productDetail.title,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxWidth().padding(8.dp)
+                contentScale = ContentScale.Inside,
+                modifier = Modifier.fillMaxWidth()
             )
         }
     }
@@ -199,24 +233,24 @@ fun ProductDetailInformation(productDetail: ProductDetail, modifier: Modifier) {
         )
         Text(
             text = productDetail.description ?: "",
-            style = MaterialTheme.typography.labelSmall,
+            style = MaterialTheme.typography.labelLarge,
         )
         if (productDetail.salePrice < productDetail.price) {
             Row {
                 Text(
                     text = productDetail.price.toString(),
-                    style = MaterialTheme.typography.labelSmall,
+                    style = MaterialTheme.typography.labelLarge,
                     textDecoration = TextDecoration.LineThrough
                 )
                 Text(
                     text = productDetail.salePrice.toString(),
-                    style = MaterialTheme.typography.labelSmall,
+                    style = MaterialTheme.typography.labelLarge,
                 )
             }
         } else {
             Text(
                 text = productDetail.price.toString(),
-                style = MaterialTheme.typography.labelSmall,
+                style = MaterialTheme.typography.labelLarge,
             )
         }
     }
@@ -275,118 +309,200 @@ fun VideoPlayerComposable(videoUrl: String) {
 }
 
 
-//@Composable
-//fun ProductToCartButtons(
-//    mainViewModel: MainViewModel,
-//    cartUiState: CartUiState,
-//    productDetail: ProductDetail,
-//    modifier: Modifier = Modifier
-//) {
-//    var productQty = 0
-//    val cartItems = cartUiState.cart?.cartItems ?: mutableListOf<CartItem>()
-//    cartItems.forEach {
-//        if (it.product == productDetail) {
-//            productQty = it.quantity
-//        }
-//    }
-//    if (productQty > 0) {
-//        MinusQtyPlus(
-//            mainViewModel = mainViewModel,
-//            cartUiState = cartUiState,
-//            productDetail = productDetail,
-//        )
-//    } else {
-//        ProductAddButton(mainViewModel = mainViewModel, productDetail = productDetail)
-//    }
-//}
-//
-//@Composable
-//fun ProductAddButton(
-//    mainViewModel: MainViewModel,
-//    productDetail: ProductDetail,
-//    modifier: Modifier = Modifier
-//) {
-//    Button(onClick = { mainViewModel.addToCart(product = productDetail, qty = 1) }) {
-//        Text(text = "Add Product")
-//    }
-//}
-//
-//@Composable
-//fun MinusQtyPlus(
-//    mainViewModel: MainViewModel,
-//    cartUiState: CartUiState,
-//    productDetail: ProductDetail,
-//    modifier: Modifier = Modifier,
-//    ) {
-//    Row(
-//        verticalAlignment = Alignment.CenterVertically,
-//        horizontalArrangement = Arrangement.SpaceAround,
-//        modifier = modifier
-//            .background(color = colorResource(id = R.color.purple_200), shape = Shapes.extraLarge)
-//            .size(height = 40.dp, width = 120.dp)
-//    ) {
-//        MinusClickable(mainViewModel = mainViewModel, productDetail = productDetail)
-//        ProductQty(cartUiState = cartUiState, productDetail = productDetail)
-//        PlusClickable(mainViewModel = mainViewModel, productDetail = productDetail)
-//    }
-//}
-//
-//@Composable
-//fun ProductQty(
-//    cartUiState: CartUiState,
-//    productDetail: ProductDetail,
-//    modifier: Modifier = Modifier
-//) {
-//    var productQty = 0
-//    for (item in cartUiState.cart?.cartItems ?: mutableListOf<CartItem>()) {
-//        if (productDetail == item.product) {
-//            println("in if (product == item.product) -> item = $item")
-//            productQty = item.quantity ?: 0
-//        }
-//    }
-//    Text(text = productQty.toString(), modifier = modifier)
-//}
-//
-//@Composable
-//fun PlusClickable(
-//    mainViewModel: MainViewModel,
-//    productDetail: ProductDetail,
-//    modifier: Modifier = Modifier
-//) {
-//    Icon(
-//        imageVector = Icons.Filled.KeyboardArrowRight,
-//        contentDescription = "Favorite Icon",
-//        modifier = modifier
-//            .clickable {
-//                mainViewModel.addToCart(product = productDetail, qty = 1)
-//                println("Plus clicked!")
-//            }
-//    )
-//}
-//
-//@Composable
-//fun MinusClickable(
-//    mainViewModel: MainViewModel,
-//    productDetail: Product,
-//    modifier: Modifier = Modifier
-//) {
-//    Icon(
-//        imageVector = Icons.Filled.KeyboardArrowLeft,
-//        contentDescription = "Favorite Icon",
-//        modifier = modifier
-//            .clickable {
-//                mainViewModel.removeFromCart(product = productDetail, qty = 1)
-//                println("Minus clicked!")
-//            }
-//
-//    )
-//}
-//
-//
-//@Preview(showBackground = true, showSystemUi = true)
-//@Composable
-//fun ProductItemPreview() {
-//    EvvoliTmTheme {
-////        ProductItem(product = ProductList.products[0])
-//    }
-//}
+@Composable
+fun ProductDetailToCartButtons(
+    cartScreenState: CartScreenState,
+    onUpdateCartAndItsState: (String, String, String, Boolean) -> Unit,
+    productDetail: ProductDetail,
+    modifier: Modifier = Modifier
+) {
+
+    val productQty = remember { mutableIntStateOf(0) }
+    LaunchedEffect(cartScreenState) {
+        productQty.intValue = cartScreenState.cartItems
+            .firstOrNull { it.productId == productDetail.id }?.quantity ?: 0
+        println("in LaunchedEffect _cart: productQty.intValue = ${productQty.intValue}")
+        println("ProductDetailToCartButtons: _cart : $cartScreenState ")
+    }
+
+    println("ProductDetailToCartButtons: _cart : cartScreenState = $cartScreenState ")
+    println("ProductDetailToCartButtons: _cart : productQty = $productQty")
+
+    if (productQty.intValue > 0) {
+        DetailMinusQtyPlus(
+            cartScreenState = cartScreenState,
+            onUpdateCartAndItsState = onUpdateCartAndItsState,
+            productDetail = productDetail,
+            cartProductQty = productQty.intValue,
+            modifier = modifier
+        )
+    } else {
+        ProductDetailAddButton(
+            cartScreenState = cartScreenState,
+            onUpdateCartAndItsState = onUpdateCartAndItsState,
+            productDetail = productDetail,
+            modifier = modifier
+        )
+    }
+}
+
+
+@Composable
+fun ProductDetailAddButton(
+    cartScreenState: CartScreenState,
+    onUpdateCartAndItsState: (String, String, String, Boolean) -> Unit,
+    productDetail: ProductDetail,
+    modifier: Modifier = Modifier
+) {
+    Button(
+        onClick = {
+            println("in ProductAddButton onClick: product.id = ${productDetail.id}")
+            onUpdateCartAndItsState(productDetail.id, productDetail.price, productDetail.salePrice,false)
+        },
+        elevation = ButtonDefaults.buttonElevation(
+            defaultElevation = 4.dp, // Normal elevation
+            pressedElevation = 8.dp, // Elevation when the button is pressed
+            disabledElevation = 0.dp  // Elevation when the button is disabled
+        )
+    ) {
+        Text(text = "Add Product")
+    }
+}
+
+@Composable
+fun DetailMinusQtyPlus(
+    cartScreenState: CartScreenState,
+    onUpdateCartAndItsState: (String, String, String, Boolean) -> Unit,
+    productDetail: ProductDetail,
+    cartProductQty: Int,
+    modifier: Modifier = Modifier,
+) {
+    Button(
+        onClick = { },
+        colors = ButtonDefaults.buttonColors(
+            containerColor = MaterialTheme.colorScheme.secondary,
+        ),
+        elevation = ButtonDefaults.buttonElevation(
+            defaultElevation = 4.dp, // Normal elevation
+            pressedElevation = 8.dp, // Elevation when the button is pressed
+            disabledElevation = 0.dp  // Elevation when the button is disabled
+        ),
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceAround,
+            modifier = Modifier,
+        ) {
+            DetailMinusClickable(
+                cartScreenState = cartScreenState,
+                onUpdateCartAndItsState = onUpdateCartAndItsState,
+                productDetail = productDetail
+            )
+            Spacer(modifier.width(8.dp))
+            ProductDetailQty(
+                cartScreenState = cartScreenState,
+                productDetail = productDetail,
+                cartProductQty = cartProductQty
+            )
+            Spacer(modifier.width(8.dp))
+            DetailPlusClickable(
+                cartScreenState = cartScreenState,
+                onUpdateCartAndItsState = onUpdateCartAndItsState,
+                productDetail = productDetail
+            )
+        }
+    }
+}
+
+@Composable
+fun ProductDetailQty(
+    cartScreenState: CartScreenState,
+    productDetail: ProductDetail,
+    cartProductQty: Int,
+    modifier: Modifier = Modifier
+) {
+    Text(
+        text = cartProductQty.toString(),
+        modifier = modifier,
+        style = MaterialTheme.typography.labelLarge
+    )
+}
+
+@Composable
+fun DetailPlusClickable(
+    cartScreenState: CartScreenState,
+    onUpdateCartAndItsState: (String, String, String, Boolean) -> Unit,
+    productDetail: ProductDetail,
+    modifier: Modifier = Modifier
+) {
+    Icon(
+        imageVector = Icons.Filled.KeyboardArrowRight,
+        contentDescription = "Favorite Icon",
+        modifier = modifier
+            .clickable {
+                println("in PlusClickable onClick: product.id = ${productDetail.id}")
+                onUpdateCartAndItsState(
+                    productDetail.id,
+                    productDetail.price,
+                    productDetail.salePrice,
+                    false
+                )
+            }
+            .size(24.dp)
+            .clip(CircleShape)
+            .background(Color.Transparent)
+    )
+}
+
+@Composable
+fun DetailMinusClickable(
+    cartScreenState: CartScreenState,
+    onUpdateCartAndItsState: (String, String, String, Boolean) -> Unit,
+    productDetail: ProductDetail,
+    modifier: Modifier = Modifier
+) {
+    Icon(
+        imageVector = Icons.Filled.KeyboardArrowLeft,
+        contentDescription = "Favorite Icon",
+        modifier = modifier
+            .clickable {
+                println("in MinusClickable onClick: product.id = ${productDetail.id}")
+                onUpdateCartAndItsState(
+                    productDetail.id,
+                    productDetail.price,
+                    productDetail.salePrice,
+                    true
+                )
+            }
+            .size(24.dp)
+            .clip(CircleShape)
+            .background(Color.Transparent)
+
+    )
+}
+
+
+@Composable
+fun DotIndicators(totalItems: Int, currentIndex: Int) {
+    Row(
+        horizontalArrangement = Arrangement.Center,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp)
+    ) {
+        for (i in 0 until totalItems) {
+            Dot(isSelected = i == currentIndex)
+        }
+    }
+}
+
+@Composable
+fun Dot(isSelected: Boolean) {
+    Box(
+        modifier = Modifier
+            .padding(horizontal = 4.dp)
+            .size(10.dp)
+            .clip(CircleShape)
+            .background(if (isSelected) Color.Blue else Color.LightGray)
+    )
+}

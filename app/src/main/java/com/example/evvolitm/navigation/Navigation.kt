@@ -90,13 +90,9 @@ fun Navigation(
 
             ProductDetailScreen(
                 productDetailScreenState = productDetailScreenState,
-                onScreenProductEvent = mainViewModel::onProductDetailScreenEvent,
+                cartScreenState = cartScreenState,
+                onUpdateCartAndItsState = mainViewModel::updateCart,
             )
         }
-
-
-
-
-
     }
 }

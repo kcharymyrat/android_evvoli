@@ -5,6 +5,6 @@ data class CartItem(
     val id: Long,
     val productId: String,
     var quantity: Int,
-    val product: CartItemProduct?
+    var product: CartItemProduct?
 )
 

@@ -8,16 +8,20 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.rounded.ImageNotSupported
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -25,13 +29,18 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
@@ -44,7 +53,6 @@ import com.example.evvolitm.domain.model.Product
 import com.example.evvolitm.presentation.CartScreenState
 import com.example.evvolitm.presentation.ProductScreenEvents
 import com.example.evvolitm.presentation.ProductScreenState
-import com.example.evvolitm.ui.theme.Shapes
 import com.example.evvolitm.util.Screen
 import kotlinx.coroutines.FlowPreview
 
@@ -145,8 +153,18 @@ fun ProductItem(
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         modifier = modifier
     ) {
-        Column {
-            ProductImage(product = product)
+        Column(
+            verticalArrangement = Arrangement.Center,
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(vertical = dimensionResource(id = R.dimen.padding_small))
+        ) {
+            ProductImage(
+                product = product,
+                onSeeDetailsButtonClicked = {
+                    navController.navigate(Screen.ProductDetailScreen.route + "/${product.id}")
+                },
+            )
             ProductInformation(product = product, modifier = Modifier.padding(start = 16.dp, end = 16.dp))
             ProductListItemButtons(
                 cartScreenState = cartScreenState,
@@ -161,7 +179,11 @@ fun ProductItem(
 }
 
 @Composable
-fun ProductImage(product: Product, modifier: Modifier = Modifier) {
+fun ProductImage(
+    product: Product,
+    onSeeDetailsButtonClicked: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     val imageModel = ImageRequest.Builder(context = LocalContext.current)
         .data(EvvoliTmApi.BASE_URL + product.imageUrl)
         .crossfade(true)
@@ -170,7 +192,7 @@ fun ProductImage(product: Product, modifier: Modifier = Modifier) {
     val imageState = rememberAsyncImagePainter(model = imageModel).state
 
     Box(
-        modifier = modifier.clickable {  },
+        modifier = modifier.clickable { onSeeDetailsButtonClicked() },
         contentAlignment = Alignment.Center
     ) {
         if (imageState is AsyncImagePainter.State.Error) {
@@ -184,7 +206,7 @@ fun ProductImage(product: Product, modifier: Modifier = Modifier) {
                 error = painterResource(R.drawable.ic_broken_image),
                 placeholder = painterResource(R.drawable.loading_img),
                 contentDescription = product.title,
-                contentScale = ContentScale.Crop,
+                contentScale = ContentScale.FillWidth,
                 modifier = Modifier.fillMaxWidth()
             )
         }
@@ -204,6 +226,25 @@ fun ProductInformation(
             text = product.title,
             style = MaterialTheme.typography.titleLarge,
         )
+        if (product.salePrice < product.price) {
+            Row {
+                Text(
+                    text = product.price.toString() + " m.",
+                    style = MaterialTheme.typography.labelLarge,
+                    textDecoration = TextDecoration.LineThrough
+                )
+                Spacer(modifier = modifier.width(1.dp))
+                Text(
+                    text = product.salePrice.toString() + " m.",
+                    style = MaterialTheme.typography.labelLarge,
+                )
+            }
+        } else {
+            Text(
+                text = product.price.toString() + " m.",
+                style = MaterialTheme.typography.labelLarge,
+            )
+        }
     }
 }
 
@@ -241,7 +282,15 @@ fun SeeProductButton(
 ) {
     Button(
         onClick = onSeeDetailsButtonClicked,
-        modifier = modifier
+        modifier = modifier,
+        colors = ButtonDefaults.buttonColors(
+            containerColor = MaterialTheme.colorScheme.tertiary,
+        ),
+        elevation = ButtonDefaults.buttonElevation(
+            defaultElevation = 4.dp, // Normal elevation
+            pressedElevation = 8.dp, // Elevation when the button is pressed
+            disabledElevation = 0.dp  // Elevation when the button is disabled
+        )
     ) {
         Text(text = "See Product")
     }
@@ -254,18 +303,24 @@ fun ProductToCartButtons(
     product: Product,
     modifier: Modifier = Modifier
 ) {
-    var productQty = 0
-    val cartItems = cartScreenState.cartItems
-    cartItems.forEach {
-        if (it.productId == product.id) {
-            productQty = it.quantity
-        }
+
+    val productQty = remember { mutableIntStateOf(0) }
+    LaunchedEffect(cartScreenState) {
+        productQty.intValue = cartScreenState.cartItems
+            .firstOrNull { it.productId == product.id }?.quantity ?: 0
+        println("in LaunchedEffect _cart: productQty.intValue = ${productQty.intValue}")
+        println("ProductToCartButtons: _cart : $cartScreenState ")
     }
-    if (productQty > 0) {
+
+    println("ProductToCartButtons: _cart : cartScreenState = $cartScreenState ")
+    println("ProductToCartButtons: _cart : productQty = $productQty")
+
+    if (productQty.intValue > 0) {
         MinusQtyPlus(
             cartScreenState = cartScreenState,
             onUpdateCartAndItsState = onUpdateCartAndItsState,
             product = product,
+            cartProductQty = productQty.intValue,
             modifier = modifier
         )
     } else {
@@ -278,6 +333,7 @@ fun ProductToCartButtons(
     }
 }
 
+
 @Composable
 fun ProductAddButton(
     cartScreenState: CartScreenState,
@@ -285,10 +341,17 @@ fun ProductAddButton(
     product: Product,
     modifier: Modifier = Modifier
 ) {
-    Button(onClick = {
-        println("in ProductAddButton onClick: product.id = ${product.id}")
-        onUpdateCartAndItsState(product.id, product.price, product.salePrice,false)
-    }) {
+    Button(
+        onClick = {
+            println("in ProductAddButton onClick: product.id = ${product.id}")
+            onUpdateCartAndItsState(product.id, product.price, product.salePrice,false)
+        },
+        elevation = ButtonDefaults.buttonElevation(
+            defaultElevation = 4.dp, // Normal elevation
+            pressedElevation = 8.dp, // Elevation when the button is pressed
+            disabledElevation = 0.dp  // Elevation when the button is disabled
+        )
+    ) {
         Text(text = "Add Product")
     }
 }
@@ -298,29 +361,43 @@ fun MinusQtyPlus(
     cartScreenState: CartScreenState,
     onUpdateCartAndItsState: (String, String, String, Boolean) -> Unit,
     product: Product,
+    cartProductQty: Int,
     modifier: Modifier = Modifier,
 ) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceAround,
-        modifier = modifier
-            .background(color = colorResource(id = R.color.purple_200), shape = Shapes.extraLarge)
-            .size(height = 40.dp, width = 120.dp)
+    Button(
+        onClick = { },
+        colors = ButtonDefaults.buttonColors(
+            containerColor = MaterialTheme.colorScheme.secondary,
+        ),
+        elevation = ButtonDefaults.buttonElevation(
+            defaultElevation = 4.dp, // Normal elevation
+            pressedElevation = 8.dp, // Elevation when the button is pressed
+            disabledElevation = 0.dp  // Elevation when the button is disabled
+        ),
     ) {
-        MinusClickable(
-            cartScreenState = cartScreenState,
-            onUpdateCartAndItsState = onUpdateCartAndItsState,
-            product = product
-        )
-        ProductQty(
-            cartScreenState = cartScreenState,
-            product = product
-        )
-        PlusClickable(
-            cartScreenState = cartScreenState,
-            onUpdateCartAndItsState = onUpdateCartAndItsState,
-            product = product
-        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceAround,
+            modifier = Modifier,
+        ) {
+            MinusClickable(
+                cartScreenState = cartScreenState,
+                onUpdateCartAndItsState = onUpdateCartAndItsState,
+                product = product
+            )
+            Spacer(modifier.width(8.dp))
+            ProductQty(
+                cartScreenState = cartScreenState,
+                product = product,
+                cartProductQty = cartProductQty
+            )
+            Spacer(modifier.width(8.dp))
+            PlusClickable(
+                cartScreenState = cartScreenState,
+                onUpdateCartAndItsState = onUpdateCartAndItsState,
+                product = product
+            )
+        }
     }
 }
 
@@ -328,17 +405,14 @@ fun MinusQtyPlus(
 fun ProductQty(
     cartScreenState: CartScreenState,
     product: Product,
+    cartProductQty: Int,
     modifier: Modifier = Modifier
 ) {
-    var productQty = 0
-    for (item in cartScreenState.cartItems) {
-        if (product.id == item.productId) {
-            println("in if (product == item.product) -> item = $item")
-            productQty = item.quantity ?: 0
-            break
-        }
-    }
-    Text(text = productQty.toString(), modifier = modifier)
+    Text(
+        text = cartProductQty.toString(),
+        modifier = modifier,
+        style = MaterialTheme.typography.labelLarge
+    )
 }
 
 @Composable
@@ -354,8 +428,11 @@ fun PlusClickable(
         modifier = modifier
             .clickable {
                 println("in PlusClickable onClick: product.id = ${product.id}")
-                onUpdateCartAndItsState(product.id, product.price, product.salePrice,false)
+                onUpdateCartAndItsState(product.id, product.price, product.salePrice, false)
             }
+            .size(24.dp)
+            .clip(CircleShape)
+            .background(Color.Transparent)
     )
 }
 
@@ -372,8 +449,11 @@ fun MinusClickable(
         modifier = modifier
             .clickable {
                 println("in MinusClickable onClick: product.id = ${product.id}")
-                onUpdateCartAndItsState(product.id, product.price, product.salePrice,false)
+                onUpdateCartAndItsState(product.id, product.price, product.salePrice, true)
             }
+            .size(24.dp)
+            .clip(CircleShape)
+            .background(Color.Transparent)
 
     )
 }
