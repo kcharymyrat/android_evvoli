@@ -11,15 +11,15 @@ import androidx.room.Update
 
 @Dao
 interface CartDao {
+    @Transaction
+    @Query("SELECT * FROM carts WHERE cartId = :cartId")
+    suspend fun getCartWithItemsAndProducts(cartId: Long): CartWithCartItemsAndProducts
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertCart(cart: CartEntity): Long
 
     @Query("SELECT * FROM carts WHERE cartId = :id")
     suspend fun getCartById(id: Long): CartEntity?
-
-    @Transaction
-    @Query("SELECT * FROM carts WHERE cartId = :cartId")
-    suspend fun getCartWithCartItems(cartId: Long): CartWithCartItems
 
     @Query("SELECT * FROM carts ORDER BY cartId DESC LIMIT 1")
     suspend fun getLatestCart(): CartEntity?

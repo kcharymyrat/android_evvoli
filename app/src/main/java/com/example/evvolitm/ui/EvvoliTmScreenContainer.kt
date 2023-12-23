@@ -26,7 +26,7 @@ fun EvvoliTmScreenContainer(
 
     Scaffold(
         topBar = {
-            EvvoliTopBar()
+            EvvoliTopBar(cartScreenState = cartScreenState, navController = navController)
         }
     ) {
         Surface(

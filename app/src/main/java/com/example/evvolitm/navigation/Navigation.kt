@@ -16,7 +16,9 @@ import com.example.evvolitm.presentation.CategoryScreenState
 import com.example.evvolitm.presentation.MainViewModel
 import com.example.evvolitm.presentation.ProductDetailScreenState
 import com.example.evvolitm.presentation.ProductScreenState
+import com.example.evvolitm.ui.screens.CartItemsScreen
 import com.example.evvolitm.ui.screens.CategoryProductsScreen
+import com.example.evvolitm.ui.screens.OrderForm
 import com.example.evvolitm.ui.screens.ProductDetailScreen
 import com.example.evvolitm.util.Screen
 
@@ -93,6 +95,24 @@ fun Navigation(
                 cartScreenState = cartScreenState,
                 onUpdateCartAndItsState = mainViewModel::updateCart,
             )
+        }
+
+
+        composable(
+            route = Screen.CartScreen.route
+        ) {
+            CartItemsScreen(
+                navController = navController,
+                cartScreenState = cartScreenState,
+                onUpdateCartAndItsState = mainViewModel::updateCart,
+                onCreateNewCardScreenState = mainViewModel::createCartScreenState,
+            )
+        }
+
+        composable(
+            route = Screen.OrderScreen.route
+        ) {
+            OrderForm()
         }
     }
 }

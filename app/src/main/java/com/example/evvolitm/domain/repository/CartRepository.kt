@@ -1,6 +1,7 @@
 package com.example.evvolitm.domain.repository
 
 import com.example.evvolitm.data.local.cart.CartEntity
+import com.example.evvolitm.data.local.cart.CartWithCartItemsAndProducts
 import com.example.evvolitm.domain.model.Cart
 import com.example.evvolitm.domain.model.CartItem
 import com.example.evvolitm.domain.model.CartItemProduct
@@ -9,6 +10,8 @@ import kotlinx.coroutines.flow.Flow
 
 interface CartRepository {
     suspend fun createEmptyCartEntity(): CartEntity?
+
+    suspend fun getCartWithItemsAndProducts(cartId: Long): CartWithCartItemsAndProducts
 
     suspend fun getLatestCartEntity(): CartEntity?
 
@@ -24,11 +27,8 @@ interface CartRepository {
 
     suspend fun addOrUpdateCartItemEntity(
         cartId: Long,
-        productId: String,
-        imageUrl: String?,
-        price: String,
-        salePrice: String,
-        quantity: Int
+        quantity: Int,
+        cartItemProduct: CartItemProduct,
     )
 
     suspend fun updateCartEntityByCart(cart: Cart)

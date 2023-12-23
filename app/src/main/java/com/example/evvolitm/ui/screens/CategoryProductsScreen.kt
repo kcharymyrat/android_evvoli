@@ -49,6 +49,7 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.example.evvolitm.R
 import com.example.evvolitm.data.remote.EvvoliTmApi
+import com.example.evvolitm.domain.model.CartItemProduct
 import com.example.evvolitm.domain.model.Product
 import com.example.evvolitm.presentation.CartScreenState
 import com.example.evvolitm.presentation.ProductScreenEvents
@@ -64,7 +65,7 @@ fun CategoryProductsScreen(
     productScreenState: ProductScreenState,
     onScreenProductEvent: (ProductScreenEvents, String) -> Unit,
     cartScreenState: CartScreenState,
-    onUpdateCartAndItsState: (String, String?, String, String, Boolean) -> Unit,
+    onUpdateCartAndItsState: (CartItemProduct, Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
 
@@ -99,7 +100,7 @@ fun ProductListDisplay(
     productScreenState: ProductScreenState,
     onProductScreenEvent: (ProductScreenEvents, String) -> Unit,
     cartScreenState: CartScreenState,
-    onUpdateCartAndItsState: (String, String?, String, String, Boolean) -> Unit,
+    onUpdateCartAndItsState: (CartItemProduct, Boolean) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp)
 ) {
@@ -146,7 +147,7 @@ fun ProductItem(
     navController: NavHostController,
     product: Product,
     cartScreenState: CartScreenState,
-    onUpdateCartAndItsState: (String, String?, String, String, Boolean) -> Unit,
+    onUpdateCartAndItsState: (CartItemProduct, Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -251,7 +252,7 @@ fun ProductInformation(
 @Composable
 fun ProductListItemButtons(
     cartScreenState: CartScreenState,
-    onUpdateCartAndItsState: (String, String?, String, String, Boolean) -> Unit,
+    onUpdateCartAndItsState: (CartItemProduct, Boolean) -> Unit,
     product: Product,
     onSeeDetailsButtonClicked: () -> Unit,
     modifier: Modifier = Modifier
@@ -299,15 +300,16 @@ fun SeeProductButton(
 @Composable
 fun ProductToCartButtons(
     cartScreenState: CartScreenState,
-    onUpdateCartAndItsState: (String, String?, String, String, Boolean) -> Unit,
+    onUpdateCartAndItsState: (CartItemProduct, Boolean) -> Unit,
     product: Product,
     modifier: Modifier = Modifier
 ) {
 
     val productQty = remember { mutableIntStateOf(0) }
     LaunchedEffect(cartScreenState) {
-        productQty.intValue = cartScreenState.cartItems
-            .firstOrNull { it.productId == product.id }?.quantity ?: 0
+        productQty.intValue = cartScreenState.cartItems.find {
+            it.product.id == product.id
+        }?.cartItem?.quantity ?: 0
         println("in LaunchedEffect _cart: productQty.intValue = ${productQty.intValue}")
         println("ProductToCartButtons: _cart : $cartScreenState ")
     }
@@ -337,16 +339,25 @@ fun ProductToCartButtons(
 @Composable
 fun ProductAddButton(
     cartScreenState: CartScreenState,
-    onUpdateCartAndItsState: (String, String?, String, String, Boolean) -> Unit,
+    onUpdateCartAndItsState: (CartItemProduct, Boolean) -> Unit,
     product: Product,
     modifier: Modifier = Modifier
 ) {
+    val newCartItemProduct = CartItemProduct(
+        id = product.id,
+        title = product.title,
+        titleEn = product.titleEn,
+        titleRu = product.titleRu,
+        model = product.model,
+        slug = product.slug,
+        imageUrl = product.imageUrl,
+        price = product.price.toDouble(),
+        salePrice = product.salePrice.toDouble(),
+    )
     Button(
         onClick = {
             println("in ProductAddButton onClick: product.id = ${product.id}")
-            onUpdateCartAndItsState(
-                product.id, product.imageUrl, product.price, product.salePrice, false
-            )
+            onUpdateCartAndItsState(newCartItemProduct, false)
         },
         elevation = ButtonDefaults.buttonElevation(
             defaultElevation = 4.dp, // Normal elevation
@@ -361,7 +372,7 @@ fun ProductAddButton(
 @Composable
 fun MinusQtyPlus(
     cartScreenState: CartScreenState,
-    onUpdateCartAndItsState: (String, String?, String, String, Boolean) -> Unit,
+    onUpdateCartAndItsState: (CartItemProduct, Boolean) -> Unit,
     product: Product,
     cartProductQty: Int,
     modifier: Modifier = Modifier,
@@ -420,19 +431,28 @@ fun ProductQty(
 @Composable
 fun PlusClickable(
     cartScreenState: CartScreenState,
-    onUpdateCartAndItsState: (String, String?, String, String, Boolean) -> Unit,
+    onUpdateCartAndItsState: (CartItemProduct, Boolean) -> Unit,
     product: Product,
     modifier: Modifier = Modifier
 ) {
+    val newCartItemProduct = CartItemProduct(
+        id = product.id,
+        title = product.title,
+        titleEn = product.titleEn,
+        titleRu = product.titleRu,
+        model = product.model,
+        slug = product.slug,
+        imageUrl = product.imageUrl,
+        price = product.price.toDouble(),
+        salePrice = product.salePrice.toDouble(),
+    )
     Icon(
         imageVector = Icons.Filled.KeyboardArrowRight,
         contentDescription = "Favorite Icon",
         modifier = modifier
             .clickable {
                 println("in PlusClickable onClick: product.id = ${product.id}")
-                onUpdateCartAndItsState(
-                    product.id, product.imageUrl, product.price, product.salePrice, false
-                )
+                onUpdateCartAndItsState(newCartItemProduct, false)
             }
             .size(24.dp)
             .clip(CircleShape)
@@ -443,19 +463,28 @@ fun PlusClickable(
 @Composable
 fun MinusClickable(
     cartScreenState: CartScreenState,
-    onUpdateCartAndItsState: (String, String?, String, String, Boolean) -> Unit,
+    onUpdateCartAndItsState: (CartItemProduct, Boolean) -> Unit,
     product: Product,
     modifier: Modifier = Modifier
 ) {
+    val newCartItemProduct = CartItemProduct(
+        id = product.id,
+        title = product.title,
+        titleEn = product.titleEn,
+        titleRu = product.titleRu,
+        model = product.model,
+        slug = product.slug,
+        imageUrl = product.imageUrl,
+        price = product.price.toDouble(),
+        salePrice = product.salePrice.toDouble(),
+    )
     Icon(
         imageVector = Icons.Filled.KeyboardArrowLeft,
         contentDescription = "Favorite Icon",
         modifier = modifier
             .clickable {
                 println("in MinusClickable onClick: product.id = ${product.id}")
-                onUpdateCartAndItsState(
-                    product.id, product.imageUrl, product.price, product.salePrice, true
-                )
+                onUpdateCartAndItsState(newCartItemProduct,true)
             }
             .size(24.dp)
             .clip(CircleShape)

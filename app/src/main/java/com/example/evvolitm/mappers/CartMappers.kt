@@ -3,60 +3,74 @@ package com.example.evvolitm.mappers
 import com.example.evvolitm.data.local.cart.CartEntity
 import com.example.evvolitm.data.local.cart.CartItemEntity
 import com.example.evvolitm.data.local.cart.CartItemProductEntity
+import com.example.evvolitm.data.local.cart.CartItemWithProduct
 import com.example.evvolitm.domain.model.Cart
 import com.example.evvolitm.domain.model.CartItem
 import com.example.evvolitm.domain.model.CartItemProduct
 
-fun CartEntity.toCart(
-    cartItems: MutableList<CartItemEntity>,
-    productMap: MutableMap<String?, CartItemProduct?>
-): Cart {
+// Convert from CartEntity to Cart domain model
+fun CartEntity.toDomain(cartItemsWithProduct: List<CartItemWithProduct>): Cart {
     return Cart(
-        id = this.id,
-        cartItems = cartItems.map { it.toCartItem(productMap[it.productId]) }.toMutableList()
+        id = id,
+        cartItems = cartItemsWithProduct.map { it.toDomain() }
     )
 }
 
-fun CartItemEntity.toCartItem(product: CartItemProduct?): CartItem {
+// Convert from CartItemWithProduct to CartItem domain model
+fun CartItemWithProduct.toDomain(): CartItem {
     return CartItem(
+        id = cartItem.id,
+        productId = cartItem.productId,
+        quantity = cartItem.quantity,
+        product = product.toDomain()
+    )
+}
+
+// Convert from CartItemProductEntity to CartItemProduct domain model
+fun CartItemProductEntity.toDomain(): CartItemProduct {
+    return CartItemProduct(
+        id = id,
+        title = title,
+        titleEn = titleEn,
+        titleRu = titleRu,
+        model = model,
+        slug = slug,
+        imageUrl = imageUrl,
+        price = price,
+        salePrice = salePrice
+    )
+}
+
+// Convert from Cart domain model to CartEntity
+fun Cart.toEntity(): CartEntity {
+    return CartEntity(
+        id = id
+    )
+}
+
+// Convert from CartItem domain model to CartItemEntity
+fun CartItem.toEntity(cartOwnerId: Long): CartItemEntity {
+    return CartItemEntity(
         id = id,
         productId = productId,
         quantity = quantity,
-        product = product
+        cartOwnerId = cartOwnerId
     )
 }
 
-fun CartItemProductEntity.toCartItemProduct(): CartItemProduct {
-    return CartItemProduct(
-        id = this.id,
-        imageUrl = this.imageUrl,
-        price = this.price,
-        salePrice = this.salePrice
-    )
-}
-
-
-fun Cart.toCartEntity(): CartEntity {
-    return CartEntity(
-        id = this.id
-    )
-}
-
-fun CartItem.toCartItemEntity(cartId: kotlin.Long): CartItemEntity {
-    return CartItemEntity(
-        id = this.id,
-        productId = this.productId,
-        quantity = this.quantity,
-        cartOwnerId = cartId
-    )
-}
-
-fun CartItemProduct.toCartItemProductEntity(): CartItemProductEntity {
+// Convert from CartItemProduct domain model to CartItemProductEntity
+fun CartItemProduct.toEntity(): CartItemProductEntity {
     return CartItemProductEntity(
-        id = this.id,
-        imageUrl = this.imageUrl,
-        price = this.price,
-        salePrice = this.salePrice
+        id = id,
+        title = title,
+        titleEn = titleEn,
+        titleRu = titleRu,
+        model = model,
+        slug = slug,
+        imageUrl = imageUrl,
+        price = price,
+        salePrice = salePrice
     )
 }
+
 

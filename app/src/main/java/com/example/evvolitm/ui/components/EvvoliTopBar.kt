@@ -1,7 +1,8 @@
 package com.example.evvolitm.ui.components
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -9,12 +10,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ShoppingCart
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -30,15 +30,19 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import com.example.evvolitm.R
+import com.example.evvolitm.presentation.CartScreenState
+import com.example.evvolitm.util.Screen
 
 
 @Composable
 fun EvvoliTopBar(
-    canNavigateBack: Boolean = false,
-    navigateUp: () -> Unit = {},
+    navController: NavHostController,
+    cartScreenState: CartScreenState,
     modifier: Modifier = Modifier,
 ) {
     var showMenu by remember { mutableStateOf(false) }
@@ -53,44 +57,19 @@ fun EvvoliTopBar(
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier.fillMaxSize(),
         ) {
-            // Add navigation icon if you can navigate back
-            if (canNavigateBack) {
-                IconButton(onClick = navigateUp) {
-                    Icon(
-                        imageVector = Icons.Filled.ArrowBack,
-                        contentDescription = "Back"
-                    )
-                }
-            }
             Image(
                 painter = painterResource(R.drawable.evvoli_logo_b1),
                 contentDescription = "App Logo",
                 modifier = Modifier
                     .size(dimensionResource(R.dimen.logo_size))
-                    .padding(dimensionResource(R.dimen.padding_small))
-                    .weight(1f),
+                    .padding(vertical = dimensionResource(R.dimen.padding_small))
             )
-            Text(
-                text = stringResource(R.string.evvoli_tvs),
-                style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier.weight(1f)
-            )
-            // Dropdown menu for categories
-            Box(modifier = Modifier.weight(2f)) {
-                DropdownMenu(
-                    expanded = showMenu,
-                    onDismissRequest = { showMenu = false }
-                ) {
-                    DropdownMenuItem(text = {  Text("Category 1") }, onClick = { /*TODO*/ })
-                    DropdownMenuItem(text = {  Text("Category 2") }, onClick = { /*TODO*/ })
-                    // Add more categories as needed
-                }
-                Text("Categories", modifier = Modifier.clickable { showMenu = true })
-            }
+
             // Search section
-            Box(modifier = Modifier.weight(3f)) {
+            Box(modifier = Modifier.weight(1f)) {
                 BasicTextField(
                     value = searchText,
                     onValueChange = { searchText = it },
@@ -102,25 +81,43 @@ fun EvvoliTopBar(
                     }
                 )
             }
+
             // Cart section
-            IconButton(
-                onClick = { /* Handle cart click */ },
-                modifier = Modifier.weight(1f)
-            ) {
-                Icon(Icons.Filled.ShoppingCart, contentDescription = "Cart")
+            if (cartScreenState.cartQty > 0) {
+                Box(
+                    contentAlignment = Alignment.TopCenter,
+                    modifier = Modifier
+                ) {
+                    IconButton(
+                        onClick = { navController.navigate(Screen.CartScreen.route) },
+                        modifier = Modifier
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.ShoppingCart,
+                            contentDescription = "Cart",
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    }
+                    Text(
+                        text = cartScreenState.cartQty.toString(),
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier
+                            .background(color = Color.White, shape = CircleShape)
+                            .padding(horizontal = 2.dp, vertical = 0.dp)
+                    )
+                }
             }
         }
     }
 }
 
 
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun TopBarPreview() {
-    EvvoliTopBar()
-}
-
-
+//@Preview(showBackground = true, showSystemUi = true)
+//@Composable
+//fun TopBarPreview() {
+//    EvvoliTopBar()
+//}
 //@Composable
 //fun MyAppBar(navController: NavController) {
 //    var showMenu by remember { mutableStateOf(false) }
