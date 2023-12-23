@@ -25,6 +25,7 @@ interface CartRepository {
     suspend fun addOrUpdateCartItemEntity(
         cartId: Long,
         productId: String,
+        imageUrl: String?,
         price: String,
         salePrice: String,
         quantity: Int

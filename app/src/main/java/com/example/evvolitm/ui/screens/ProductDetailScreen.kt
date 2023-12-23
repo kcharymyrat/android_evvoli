@@ -35,7 +35,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableLongStateOf
@@ -65,10 +64,8 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.example.evvolitm.R
 import com.example.evvolitm.data.remote.EvvoliTmApi
-import com.example.evvolitm.domain.model.Product
 import com.example.evvolitm.domain.model.ProductDetail
 import com.example.evvolitm.presentation.CartScreenState
-import com.example.evvolitm.presentation.ProductDetailScreenEvents
 import com.example.evvolitm.presentation.ProductDetailScreenState
 
 
@@ -76,7 +73,7 @@ import com.example.evvolitm.presentation.ProductDetailScreenState
 fun ProductDetailScreen(
     productDetailScreenState: ProductDetailScreenState,
     cartScreenState: CartScreenState,
-    onUpdateCartAndItsState: (String, String, String, Boolean) -> Unit,
+    onUpdateCartAndItsState: (String, String?, String, String, Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
 
@@ -110,76 +107,77 @@ fun ProductDetailScreen(
         }
     } else {
 
-        Column(
-            modifier = Modifier,
+        LazyColumn(
+            modifier = modifier,
+            contentPadding = PaddingValues(0.dp),
         ) {
-            LazyRow(
-                state = listState,
-                // You can customize the content padding if needed
-                contentPadding = PaddingValues(0.dp),
-                // Customize the horizontal arrangement of items
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
+            item {
+                LazyRow(
+                    state = listState,
+                    // You can customize the content padding if needed
+                    contentPadding = PaddingValues(0.dp),
+                    // Customize the horizontal arrangement of items
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
 
-                item {
-                    if (productDetail.videoUrl != null) {
-                        Column(
-                            verticalArrangement = Arrangement.Center,
-                            horizontalAlignment = Alignment.CenterHorizontally,
+                    item {
+                        if (productDetail.videoUrl != null) {
+                            Column(
+                                verticalArrangement = Arrangement.Center,
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                modifier = Modifier
+                                    .width(screenWidth) // Full screen width
+                                    .height(300.dp)
+                            ) {
+                                println("productDetail.videoUrl  = ${productDetail.videoUrl }")
+                                VideoPlayerComposable(videoUrl = productDetail.videoUrl)
+                            }
+                        }
+                    }
+
+                    item {
+                        ProductDetailImage(
+                            productDetail = productDetail,
+                            imageUrl = productDetail.imageUrl,
                             modifier = Modifier
                                 .width(screenWidth) // Full screen width
                                 .height(300.dp)
-                        ) {
-                            println("productDetail.videoUrl  = ${productDetail.videoUrl }")
-                            VideoPlayerComposable(videoUrl = productDetail.videoUrl)
-                        }
+                        )
                     }
-                }
 
-                item {
-                    ProductDetailImage(
-                        productDetail = productDetail,
-                        imageUrl = productDetail.imageUrl,
-                        modifier = Modifier
-                            .width(screenWidth) // Full screen width
-                            .height(300.dp)
-                    )
-                }
+                    items(items = productDetailScreenState.productImageList) { image ->
+                        // Replace this with your custom composable item
+                        val imageUrl = image.imageUrl
+                        ProductDetailImage(
+                            productDetail = productDetail,
+                            imageUrl = imageUrl,
+                            modifier = Modifier
+                                .width(screenWidth) // Full screen width
+                                .height(300.dp)
+                        )
+                    }
 
-                items(items = productDetailScreenState.productImageList) { image ->
-                    // Replace this with your custom composable item
-                    val imageUrl = image.imageUrl
-                    ProductDetailImage(
-                        productDetail = productDetail,
-                        imageUrl = imageUrl,
-                        modifier = Modifier
-                            .width(screenWidth) // Full screen width
-                            .height(300.dp)
-                    )
                 }
-
+                // Dot indicators
+                DotIndicators(totalItems = totalItems, currentIndex = currentItemIndex.intValue)
             }
 
-            // Dot indicators
-            DotIndicators(totalItems = totalItems, currentIndex = currentItemIndex.intValue)
-
-            LazyColumn(
-                modifier = modifier,
-                contentPadding = PaddingValues(0.dp),
-            ) {
-                item() {
-                    ProductDetailToCartButtons(
-                        cartScreenState = cartScreenState,
-                        onUpdateCartAndItsState = onUpdateCartAndItsState,
-                        productDetail = productDetail
-                    )
+            item {
+                Column(
+                    modifier = modifier,
+                ) {
                     ProductDetailInformation(
                         productDetail = productDetail,
+                        cartScreenState = cartScreenState,
+                        onUpdateCartAndItsState = onUpdateCartAndItsState,
                         modifier = Modifier
                             .padding(horizontal = dimensionResource(id = R.dimen.padding_medium))
                     )
                 }
             }
+
+
+
         }
     }
 }
@@ -222,11 +220,17 @@ fun ProductDetailImage(
 }
 
 @Composable
-fun ProductDetailInformation(productDetail: ProductDetail, modifier: Modifier) {
+fun ProductDetailInformation(
+    productDetail: ProductDetail,
+    cartScreenState: CartScreenState,
+    onUpdateCartAndItsState: (String, String?, String, String, Boolean) -> Unit,
+    modifier: Modifier
+) {
     Column(
         verticalArrangement = Arrangement.Center,
         modifier = modifier
     ) {
+
         Text(
             text = productDetail.title,
             style = MaterialTheme.typography.titleLarge,
@@ -235,22 +239,35 @@ fun ProductDetailInformation(productDetail: ProductDetail, modifier: Modifier) {
             text = productDetail.description ?: "",
             style = MaterialTheme.typography.labelLarge,
         )
-        if (productDetail.salePrice < productDetail.price) {
-            Row {
+
+        Row(
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            if (productDetail.salePrice < productDetail.price) {
+                Row {
+                    Text(
+                        text = productDetail.price.toString() + " m.",
+                        style = MaterialTheme.typography.titleLarge,
+                        textDecoration = TextDecoration.LineThrough
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = productDetail.salePrice.toString() + " m.",
+                        style = MaterialTheme.typography.titleLarge,
+                    )
+                }
+            } else {
                 Text(
-                    text = productDetail.price.toString(),
-                    style = MaterialTheme.typography.labelLarge,
-                    textDecoration = TextDecoration.LineThrough
-                )
-                Text(
-                    text = productDetail.salePrice.toString(),
-                    style = MaterialTheme.typography.labelLarge,
+                    text = productDetail.price.toString() + " m.",
+                    style = MaterialTheme.typography.titleLarge,
                 )
             }
-        } else {
-            Text(
-                text = productDetail.price.toString(),
-                style = MaterialTheme.typography.labelLarge,
+            ProductDetailToCartButtons(
+                cartScreenState = cartScreenState,
+                onUpdateCartAndItsState = onUpdateCartAndItsState,
+                productDetail = productDetail
             )
         }
     }
@@ -312,7 +329,7 @@ fun VideoPlayerComposable(videoUrl: String) {
 @Composable
 fun ProductDetailToCartButtons(
     cartScreenState: CartScreenState,
-    onUpdateCartAndItsState: (String, String, String, Boolean) -> Unit,
+    onUpdateCartAndItsState: (String, String?, String, String, Boolean) -> Unit,
     productDetail: ProductDetail,
     modifier: Modifier = Modifier
 ) {
@@ -350,14 +367,20 @@ fun ProductDetailToCartButtons(
 @Composable
 fun ProductDetailAddButton(
     cartScreenState: CartScreenState,
-    onUpdateCartAndItsState: (String, String, String, Boolean) -> Unit,
+    onUpdateCartAndItsState: (String, String?, String, String, Boolean) -> Unit,
     productDetail: ProductDetail,
     modifier: Modifier = Modifier
 ) {
     Button(
         onClick = {
             println("in ProductAddButton onClick: product.id = ${productDetail.id}")
-            onUpdateCartAndItsState(productDetail.id, productDetail.price, productDetail.salePrice,false)
+            onUpdateCartAndItsState(
+                productDetail.id,
+                productDetail.imageUrl,
+                productDetail.price,
+                productDetail.salePrice,
+                false
+            )
         },
         elevation = ButtonDefaults.buttonElevation(
             defaultElevation = 4.dp, // Normal elevation
@@ -372,7 +395,7 @@ fun ProductDetailAddButton(
 @Composable
 fun DetailMinusQtyPlus(
     cartScreenState: CartScreenState,
-    onUpdateCartAndItsState: (String, String, String, Boolean) -> Unit,
+    onUpdateCartAndItsState: (String, String?, String, String, Boolean) -> Unit,
     productDetail: ProductDetail,
     cartProductQty: Int,
     modifier: Modifier = Modifier,
@@ -431,7 +454,7 @@ fun ProductDetailQty(
 @Composable
 fun DetailPlusClickable(
     cartScreenState: CartScreenState,
-    onUpdateCartAndItsState: (String, String, String, Boolean) -> Unit,
+    onUpdateCartAndItsState: (String, String?, String, String, Boolean) -> Unit,
     productDetail: ProductDetail,
     modifier: Modifier = Modifier
 ) {
@@ -443,6 +466,7 @@ fun DetailPlusClickable(
                 println("in PlusClickable onClick: product.id = ${productDetail.id}")
                 onUpdateCartAndItsState(
                     productDetail.id,
+                    productDetail.imageUrl,
                     productDetail.price,
                     productDetail.salePrice,
                     false
@@ -457,7 +481,7 @@ fun DetailPlusClickable(
 @Composable
 fun DetailMinusClickable(
     cartScreenState: CartScreenState,
-    onUpdateCartAndItsState: (String, String, String, Boolean) -> Unit,
+    onUpdateCartAndItsState: (String, String?, String, String, Boolean) -> Unit,
     productDetail: ProductDetail,
     modifier: Modifier = Modifier
 ) {
@@ -469,6 +493,7 @@ fun DetailMinusClickable(
                 println("in MinusClickable onClick: product.id = ${productDetail.id}")
                 onUpdateCartAndItsState(
                     productDetail.id,
+                    productDetail.imageUrl,
                     productDetail.price,
                     productDetail.salePrice,
                     true
@@ -503,6 +528,6 @@ fun Dot(isSelected: Boolean) {
             .padding(horizontal = 4.dp)
             .size(10.dp)
             .clip(CircleShape)
-            .background(if (isSelected) Color.Blue else Color.LightGray)
+            .background(if (isSelected) MaterialTheme.colorScheme.tertiary else Color.LightGray)
     )
 }

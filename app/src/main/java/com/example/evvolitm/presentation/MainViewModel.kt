@@ -272,6 +272,7 @@ class MainViewModel @Inject constructor(
 
     fun updateCart(
         productId: String,
+        imageUrl: String?,
         price: String,
         salePrice: String,
         isMinus: Boolean = false
@@ -291,6 +292,7 @@ class MainViewModel @Inject constructor(
                 cartRepository.addOrUpdateCartItemEntity(
                     cartId = cartId,
                     productId = productId,
+                    imageUrl = imageUrl,
                     price = price,
                     salePrice = salePrice,
                     quantity = quantity

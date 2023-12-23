@@ -143,6 +143,7 @@ class CartRepositoryImpl  @Inject constructor(
     override suspend fun addOrUpdateCartItemEntity(
         cartId: Long,
         productId: String,
+        imageUrl: String?,
         price: String,
         salePrice: String,
         quantity: Int
@@ -170,6 +171,7 @@ class CartRepositoryImpl  @Inject constructor(
                             CartItemProductEntity(
                                 id = productId,
                                 price = price.toDouble(),
+                                imageUrl = imageUrl,
                                 salePrice = salePrice.toDouble()
                             )
                         )

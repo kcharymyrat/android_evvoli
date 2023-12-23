@@ -64,7 +64,7 @@ fun CategoryProductsScreen(
     productScreenState: ProductScreenState,
     onScreenProductEvent: (ProductScreenEvents, String) -> Unit,
     cartScreenState: CartScreenState,
-    onUpdateCartAndItsState: (String, String, String, Boolean) -> Unit,
+    onUpdateCartAndItsState: (String, String?, String, String, Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
 
@@ -99,7 +99,7 @@ fun ProductListDisplay(
     productScreenState: ProductScreenState,
     onProductScreenEvent: (ProductScreenEvents, String) -> Unit,
     cartScreenState: CartScreenState,
-    onUpdateCartAndItsState: (String, String, String, Boolean) -> Unit,
+    onUpdateCartAndItsState: (String, String?, String, String, Boolean) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp)
 ) {
@@ -146,7 +146,7 @@ fun ProductItem(
     navController: NavHostController,
     product: Product,
     cartScreenState: CartScreenState,
-    onUpdateCartAndItsState: (String, String, String, Boolean) -> Unit,
+    onUpdateCartAndItsState: (String, String?, String, String, Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -251,7 +251,7 @@ fun ProductInformation(
 @Composable
 fun ProductListItemButtons(
     cartScreenState: CartScreenState,
-    onUpdateCartAndItsState: (String, String, String, Boolean) -> Unit,
+    onUpdateCartAndItsState: (String, String?, String, String, Boolean) -> Unit,
     product: Product,
     onSeeDetailsButtonClicked: () -> Unit,
     modifier: Modifier = Modifier
@@ -299,7 +299,7 @@ fun SeeProductButton(
 @Composable
 fun ProductToCartButtons(
     cartScreenState: CartScreenState,
-    onUpdateCartAndItsState: (String, String, String, Boolean) -> Unit,
+    onUpdateCartAndItsState: (String, String?, String, String, Boolean) -> Unit,
     product: Product,
     modifier: Modifier = Modifier
 ) {
@@ -337,14 +337,16 @@ fun ProductToCartButtons(
 @Composable
 fun ProductAddButton(
     cartScreenState: CartScreenState,
-    onUpdateCartAndItsState: (String, String, String, Boolean) -> Unit,
+    onUpdateCartAndItsState: (String, String?, String, String, Boolean) -> Unit,
     product: Product,
     modifier: Modifier = Modifier
 ) {
     Button(
         onClick = {
             println("in ProductAddButton onClick: product.id = ${product.id}")
-            onUpdateCartAndItsState(product.id, product.price, product.salePrice,false)
+            onUpdateCartAndItsState(
+                product.id, product.imageUrl, product.price, product.salePrice, false
+            )
         },
         elevation = ButtonDefaults.buttonElevation(
             defaultElevation = 4.dp, // Normal elevation
@@ -359,7 +361,7 @@ fun ProductAddButton(
 @Composable
 fun MinusQtyPlus(
     cartScreenState: CartScreenState,
-    onUpdateCartAndItsState: (String, String, String, Boolean) -> Unit,
+    onUpdateCartAndItsState: (String, String?, String, String, Boolean) -> Unit,
     product: Product,
     cartProductQty: Int,
     modifier: Modifier = Modifier,
@@ -385,13 +387,13 @@ fun MinusQtyPlus(
                 onUpdateCartAndItsState = onUpdateCartAndItsState,
                 product = product
             )
-            Spacer(modifier.width(8.dp))
+            Spacer(modifier.width(dimensionResource(id = R.dimen.padding_small)))
             ProductQty(
                 cartScreenState = cartScreenState,
                 product = product,
                 cartProductQty = cartProductQty
             )
-            Spacer(modifier.width(8.dp))
+            Spacer(modifier.width(dimensionResource(id = R.dimen.padding_small)))
             PlusClickable(
                 cartScreenState = cartScreenState,
                 onUpdateCartAndItsState = onUpdateCartAndItsState,
@@ -418,7 +420,7 @@ fun ProductQty(
 @Composable
 fun PlusClickable(
     cartScreenState: CartScreenState,
-    onUpdateCartAndItsState: (String, String, String, Boolean) -> Unit,
+    onUpdateCartAndItsState: (String, String?, String, String, Boolean) -> Unit,
     product: Product,
     modifier: Modifier = Modifier
 ) {
@@ -428,7 +430,9 @@ fun PlusClickable(
         modifier = modifier
             .clickable {
                 println("in PlusClickable onClick: product.id = ${product.id}")
-                onUpdateCartAndItsState(product.id, product.price, product.salePrice, false)
+                onUpdateCartAndItsState(
+                    product.id, product.imageUrl, product.price, product.salePrice, false
+                )
             }
             .size(24.dp)
             .clip(CircleShape)
@@ -439,7 +443,7 @@ fun PlusClickable(
 @Composable
 fun MinusClickable(
     cartScreenState: CartScreenState,
-    onUpdateCartAndItsState: (String, String, String, Boolean) -> Unit,
+    onUpdateCartAndItsState: (String, String?, String, String, Boolean) -> Unit,
     product: Product,
     modifier: Modifier = Modifier
 ) {
@@ -449,7 +453,9 @@ fun MinusClickable(
         modifier = modifier
             .clickable {
                 println("in MinusClickable onClick: product.id = ${product.id}")
-                onUpdateCartAndItsState(product.id, product.price, product.salePrice, true)
+                onUpdateCartAndItsState(
+                    product.id, product.imageUrl, product.price, product.salePrice, true
+                )
             }
             .size(24.dp)
             .clip(CircleShape)

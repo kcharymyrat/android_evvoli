@@ -29,6 +29,7 @@ fun CartItemEntity.toCartItem(product: CartItemProduct?): CartItem {
 fun CartItemProductEntity.toCartItemProduct(): CartItemProduct {
     return CartItemProduct(
         id = this.id,
+        imageUrl = this.imageUrl,
         price = this.price,
         salePrice = this.salePrice
     )
@@ -53,6 +54,7 @@ fun CartItem.toCartItemEntity(cartId: kotlin.Long): CartItemEntity {
 fun CartItemProduct.toCartItemProductEntity(): CartItemProductEntity {
     return CartItemProductEntity(
         id = this.id,
+        imageUrl = this.imageUrl,
         price = this.price,
         salePrice = this.salePrice
     )
