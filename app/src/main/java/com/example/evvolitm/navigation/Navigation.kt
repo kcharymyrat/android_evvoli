@@ -112,7 +112,11 @@ fun Navigation(
         composable(
             route = Screen.OrderScreen.route
         ) {
-            OrderForm()
+            OrderForm(
+                navController = navController,
+                cartScreenState = cartScreenState,
+                onCreateNewCardScreenState = mainViewModel::createCartScreenState,
+            )
         }
     }
 }

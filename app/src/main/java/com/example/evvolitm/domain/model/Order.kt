@@ -5,6 +5,5 @@ data class Order(
     val customerName: String,
     val phone: String,
     val deliveryDate: String,
-    val email: String?,
     val cart: MutableMap<String, Int>
 )

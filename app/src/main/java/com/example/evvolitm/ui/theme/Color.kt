@@ -2,7 +2,7 @@ package com.example.evvolitm.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val md_theme_light_primary = Color(0xFFB80068)
+val md_theme_light_primary = Color(0xFFEC1D89)
 val md_theme_light_onPrimary = Color(0xFFFFFFFF)
 val md_theme_light_primaryContainer = Color(0xFFFFD9E3)
 val md_theme_light_onPrimaryContainer = Color(0xFF3E001F)
