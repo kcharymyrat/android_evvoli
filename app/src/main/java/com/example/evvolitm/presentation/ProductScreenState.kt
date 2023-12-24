@@ -6,6 +6,7 @@ data class ProductScreenState(
     var isLoading: Boolean = false,
     var page: Int = 1,
     var productList: List<Product> = emptyList(),
+    var query: String = ""
 
 //    var isRefreshing: Boolean = false,
 //    var previousConnectivityState: MutableState<String> = mutableStateOf(""),

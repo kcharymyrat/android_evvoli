@@ -92,12 +92,12 @@ fun CategoryListDisplay(
                     )
             )
 //            println("category = ${categoryScreenState.categoryList}")
-            println("catIndex = $catIndex")
-            println("categoryScreenState.categoryList.size = ${categoryScreenState.categoryList.size}")
-            println("categoryScreenState.isLoading = ${categoryScreenState.isLoading}")
+//            println("catIndex = $catIndex")
+//            println("categoryScreenState.categoryList.size = ${categoryScreenState.categoryList.size}")
+//            println("categoryScreenState.isLoading = ${categoryScreenState.isLoading}")
 
             if (catIndex >= categoryScreenState.categoryList.size - 1 && !categoryScreenState.isLoading) {
-                println("should Fire")
+//                println("should Fire")
                 onEvent(CategoryScreenEvents.OnPaginate())
             }
         }
@@ -202,11 +202,11 @@ fun CategoryButton(
     modifier: Modifier = Modifier
 ) {
     Button(onClick = {
-            Log.d("Nav", "ButtonOnClick => categorySlug = ${category.slug}")
-            Log.d("Nav",
-                "ButtonOnClick => Button = ${Screen.CategoryProductsScreen.route}/${category.id}"
-            )
-            Log.d("Nav", "ButtonOnClick => categoryId = ${category.id}")
+//            Log.d("Nav", "ButtonOnClick => categorySlug = ${category.slug}")
+//            Log.d("Nav",
+//                "ButtonOnClick => Button = ${Screen.CategoryProductsScreen.route}/${category.id}"
+//            )
+//            Log.d("Nav", "ButtonOnClick => categoryId = ${category.id}")
             navController.navigate(Screen.CategoryProductsScreen.route + "/${category.id}")
         }
     ) {

@@ -19,6 +19,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.rounded.ImageNotSupported
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -92,7 +93,6 @@ fun CategoryProductsScreen(
 }
 
 
-@OptIn(FlowPreview::class)
 @Composable
 fun ProductListDisplay(
     navController: NavHostController,
@@ -112,10 +112,7 @@ fun ProductListDisplay(
 
 
         items(productScreenState.productList.size) {productIndex ->
-            Log.d("Nav", "ProductListDisplay " +
-                    "=> productScreenState.productList[index] " +
-                    "= ${productScreenState.productList[productIndex]}"
-            )
+
             ProductItem(
                 navController = navController,
                 product = productScreenState.productList[productIndex],
@@ -127,15 +124,9 @@ fun ProductListDisplay(
                         vertical = dimensionResource(id = R.dimen.padding_small)
                     )
             )
-//            println("productList = ${productScreenState.productList}")
-            println("productIndex = $productIndex")
-//            println("productScreenState.productList.size = ${productScreenState.productList.size}")
-//            println("productScreenState.isLoading = ${productScreenState.isLoading}")
 
             if (productIndex >= productScreenState.productList.size - 1 && !productScreenState.isLoading) {
-                println("should Fire")
                 onProductScreenEvent(ProductScreenEvents.OnPaginate(), categoryId)
-
             }
         }
     }
@@ -310,12 +301,7 @@ fun ProductToCartButtons(
         productQty.intValue = cartScreenState.cartItems.find {
             it.product.id == product.id
         }?.cartItem?.quantity ?: 0
-        println("in LaunchedEffect _cart: productQty.intValue = ${productQty.intValue}")
-        println("ProductToCartButtons: _cart : $cartScreenState ")
     }
-
-    println("ProductToCartButtons: _cart : cartScreenState = $cartScreenState ")
-    println("ProductToCartButtons: _cart : productQty = $productQty")
 
     if (productQty.intValue > 0) {
         MinusQtyPlus(
@@ -356,7 +342,6 @@ fun ProductAddButton(
     )
     Button(
         onClick = {
-            println("in ProductAddButton onClick: product.id = ${product.id}")
             onUpdateCartAndItsState(newCartItemProduct, false)
         },
         elevation = ButtonDefaults.buttonElevation(
@@ -365,7 +350,10 @@ fun ProductAddButton(
             disabledElevation = 0.dp  // Elevation when the button is disabled
         )
     ) {
-        Text(text = "Add Product")
+        Icon(
+            imageVector = Icons.Default.ShoppingCart,
+            contentDescription = "Add to shopping cart"
+        )
     }
 }
 
@@ -451,7 +439,6 @@ fun PlusClickable(
         contentDescription = "Favorite Icon",
         modifier = modifier
             .clickable {
-                println("in PlusClickable onClick: product.id = ${product.id}")
                 onUpdateCartAndItsState(newCartItemProduct, false)
             }
             .size(24.dp)
@@ -483,7 +470,6 @@ fun MinusClickable(
         contentDescription = "Favorite Icon",
         modifier = modifier
             .clickable {
-                println("in MinusClickable onClick: product.id = ${product.id}")
                 onUpdateCartAndItsState(newCartItemProduct,true)
             }
             .size(24.dp)

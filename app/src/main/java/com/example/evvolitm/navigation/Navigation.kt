@@ -20,6 +20,7 @@ import com.example.evvolitm.ui.screens.CartItemsScreen
 import com.example.evvolitm.ui.screens.CategoryProductsScreen
 import com.example.evvolitm.ui.screens.OrderForm
 import com.example.evvolitm.ui.screens.ProductDetailScreen
+import com.example.evvolitm.ui.screens.SearchProductsScreen
 import com.example.evvolitm.util.Screen
 
 @Composable
@@ -28,6 +29,7 @@ fun Navigation(
     mainViewModel: MainViewModel,
     categoryScreenState: CategoryScreenState,
     productScreenState: ProductScreenState,
+    searchProductScreenState: ProductScreenState,
     productDetailScreenState: ProductDetailScreenState,
     cartScreenState: CartScreenState,
 ) {
@@ -66,6 +68,34 @@ fun Navigation(
                 categoryId = categoryId ?: "",
                 productScreenState = productScreenState,
                 onScreenProductEvent = mainViewModel::onProductScreenEvent,
+                cartScreenState = cartScreenState,
+                onUpdateCartAndItsState = mainViewModel::updateCart,
+                modifier = Modifier,
+            )
+        }
+
+        composable(
+            route = "${Screen.SearchProductsScreen.route}/{q}",
+        ) { backStackEntry ->
+            val q = backStackEntry.arguments?.getString("q")
+
+            Log.d("Nav", "inNavigation => q = $q")
+            Log.d("Nav", "inNavigation => route = $route")
+
+            LaunchedEffect(q) {
+                if (searchProductScreenState.query.isEmpty()) {
+                    println("In - LaunchedEffect(categoryId)")
+                    searchProductScreenState.productList = emptyList()
+                    searchProductScreenState.page = 1
+                    searchProductScreenState.query = q ?: ""
+                    mainViewModel.loadSearchProducts(q ?: "",true)
+                }
+            }
+
+            SearchProductsScreen(
+                navController = navController,
+                searchProductScreenState = searchProductScreenState,
+                onSearchProductScreenEvent = mainViewModel::onSearchProductScreenEvent,
                 cartScreenState = cartScreenState,
                 onUpdateCartAndItsState = mainViewModel::updateCart,
                 modifier = Modifier,

@@ -25,9 +25,12 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.rounded.ImageNotSupported
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -110,62 +113,74 @@ fun ProductDetailScreen(
 
         LazyColumn(
             modifier = modifier,
-            contentPadding = PaddingValues(0.dp),
+            contentPadding = PaddingValues(8.dp),
         ) {
             item {
-                LazyRow(
-                    state = listState,
-                    // You can customize the content padding if needed
-                    contentPadding = PaddingValues(0.dp),
-                    // Customize the horizontal arrangement of items
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                Card(
+                    colors = CardDefaults.cardColors(
+                        containerColor = Color.White,
+                        disabledContainerColor = Color.White,
+                    ),
+//                    border = BorderStroke(),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                    modifier = Modifier
+                        .height(350.dp)
                 ) {
+                    LazyRow(
+                        state = listState,
+                        // You can customize the content padding if needed
+                        contentPadding = PaddingValues(0.dp),
+                        // Customize the horizontal arrangement of items
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
 
-                    item {
-                        if (productDetail.videoUrl != null) {
-                            Column(
-                                verticalArrangement = Arrangement.Center,
-                                horizontalAlignment = Alignment.CenterHorizontally,
+                        item {
+                            if (productDetail.videoUrl != null) {
+                                Column(
+                                    verticalArrangement = Arrangement.Center,
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    modifier = Modifier
+                                        .width(screenWidth) // Full screen width
+                                        .height(300.dp)
+                                ) {
+                                    println("productDetail.videoUrl  = ${productDetail.videoUrl }")
+                                    VideoPlayerComposable(videoUrl = productDetail.videoUrl)
+                                }
+                            }
+                        }
+
+                        item {
+                            ProductDetailImage(
+                                productDetail = productDetail,
+                                imageUrl = productDetail.imageUrl,
                                 modifier = Modifier
                                     .width(screenWidth) // Full screen width
                                     .height(300.dp)
-                            ) {
-                                println("productDetail.videoUrl  = ${productDetail.videoUrl }")
-                                VideoPlayerComposable(videoUrl = productDetail.videoUrl)
-                            }
+                            )
                         }
-                    }
 
-                    item {
-                        ProductDetailImage(
-                            productDetail = productDetail,
-                            imageUrl = productDetail.imageUrl,
-                            modifier = Modifier
-                                .width(screenWidth) // Full screen width
-                                .height(300.dp)
-                        )
-                    }
+                        items(items = productDetailScreenState.productImageList) { image ->
+                            // Replace this with your custom composable item
+                            val imageUrl = image.imageUrl
+                            ProductDetailImage(
+                                productDetail = productDetail,
+                                imageUrl = imageUrl,
+                                modifier = Modifier
+                                    .width(screenWidth) // Full screen width
+                                    .height(300.dp)
+                            )
+                        }
 
-                    items(items = productDetailScreenState.productImageList) { image ->
-                        // Replace this with your custom composable item
-                        val imageUrl = image.imageUrl
-                        ProductDetailImage(
-                            productDetail = productDetail,
-                            imageUrl = imageUrl,
-                            modifier = Modifier
-                                .width(screenWidth) // Full screen width
-                                .height(300.dp)
-                        )
                     }
-
+                    // Dot indicators
+                    DotIndicators(totalItems = totalItems, currentIndex = currentItemIndex.intValue)
                 }
-                // Dot indicators
-                DotIndicators(totalItems = totalItems, currentIndex = currentItemIndex.intValue)
             }
 
             item {
                 Column(
-                    modifier = modifier,
+                    modifier = modifier
+                        .padding(top = dimensionResource(id = R.dimen.padding_medium))
                 ) {
                     ProductDetailInformation(
                         productDetail = productDetail,
@@ -233,27 +248,27 @@ fun ProductDetailInformation(
             text = productDetail.title,
             style = MaterialTheme.typography.titleLarge,
         )
-        Text(
-            text = productDetail.description ?: "",
-            style = MaterialTheme.typography.labelLarge,
-        )
-
+        Spacer(modifier = Modifier.height(8.dp))
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.fillMaxWidth()
         ) {
             if (productDetail.salePrice < productDetail.price) {
-                Row {
-                    Text(
-                        text = productDetail.price.toString() + " m.",
-                        style = MaterialTheme.typography.titleLarge,
-                        textDecoration = TextDecoration.LineThrough
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
                     Text(
                         text = productDetail.salePrice.toString() + " m.",
                         style = MaterialTheme.typography.titleLarge,
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = productDetail.price.toString() + " m.",
+                        color = Color.Gray,
+                        style = MaterialTheme.typography.labelMedium,
+                        textDecoration = TextDecoration.LineThrough,
+                        modifier = Modifier.align(alignment = Alignment.CenterVertically)
                     )
                 }
             } else {
@@ -268,6 +283,14 @@ fun ProductDetailInformation(
                 productDetail = productDetail
             )
         }
+        Spacer(modifier = Modifier.height(16.dp))
+        Text(
+            text = productDetail.description ?: "",
+            color = Color.Gray,
+            style = MaterialTheme.typography.labelMedium,
+        )
+
+
     }
 }
 
@@ -393,7 +416,10 @@ fun ProductDetailAddButton(
             disabledElevation = 0.dp  // Elevation when the button is disabled
         )
     ) {
-        Text(text = "Add Product")
+        Icon(
+            imageVector = Icons.Default.ShoppingCart,
+            contentDescription = "Add to shopping cart"
+        )
     }
 }
 
@@ -512,12 +538,11 @@ fun DetailMinusClickable(
         modifier = modifier
             .clickable {
                 println("in MinusClickable onClick: product.id = ${productDetail.id}")
-                onUpdateCartAndItsState(newCartItemProduct,true)
+                onUpdateCartAndItsState(newCartItemProduct, true)
             }
             .size(24.dp)
             .clip(CircleShape)
             .background(Color.Transparent)
-
     )
 }
 

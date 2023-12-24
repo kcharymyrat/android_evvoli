@@ -10,6 +10,7 @@ import com.example.evvolitm.domain.repository.CartRepository
 import com.example.evvolitm.domain.repository.CategoryRepository
 import com.example.evvolitm.domain.repository.ProductDetailRepository
 import com.example.evvolitm.domain.repository.ProductRepository
+import com.example.evvolitm.domain.repository.SearchProductRepository
 import com.example.evvolitm.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,6 +26,7 @@ class MainViewModel @Inject constructor(
     application: Application,
     private val categoryRepository: CategoryRepository,
     private val productRepository: ProductRepository,
+    private val searchProductRepository: SearchProductRepository,
     private val productDetailRepository: ProductDetailRepository,
     private val cartRepository: CartRepository,
 ): AndroidViewModel(application) {
@@ -33,6 +35,9 @@ class MainViewModel @Inject constructor(
 
     private val _productScreenState = MutableStateFlow(ProductScreenState())
     val productScreenState = _productScreenState.asStateFlow()
+
+    private val _searchProductScreenState = MutableStateFlow(ProductScreenState())
+    val searchProductScreenState = _searchProductScreenState.asStateFlow()
 
     private val _productDetailScreenState = MutableStateFlow(ProductDetailScreenState())
     val productDetailScreenState = _productDetailScreenState.asStateFlow()
@@ -45,7 +50,6 @@ class MainViewModel @Inject constructor(
     init {
         loadCategories(forceFetchFromRemote = false)
     }
-
 
 
     fun onCategoryScreenEvent(event: CategoryScreenEvents) {
@@ -74,6 +78,21 @@ class MainViewModel @Inject constructor(
             is ProductScreenEvents.OnPaginate -> {
                 productScreenState.value.page++
                 loadCategoryProducts(categoryId = categoryId, forceFetchFromRemote = true)
+            }
+
+        }
+    }
+
+    fun onSearchProductScreenEvent(event: ProductScreenEvents, query: String) {
+        println("event = $event")
+        when(event) {
+            is ProductScreenEvents.Refresh -> {
+                loadSearchProducts(q = query, forceFetchFromRemote = true)
+            }
+
+            is ProductScreenEvents.OnPaginate -> {
+                searchProductScreenState.value.page++
+                loadSearchProducts(q = query, forceFetchFromRemote = true)
             }
 
         }
@@ -175,6 +194,55 @@ class MainViewModel @Inject constructor(
                     }
                     is Resource.Loading -> {
                         _productScreenState.update {
+                            it.copy(isLoading = result.isLoading)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    fun loadSearchProducts(
+        q:String = "",
+        forceFetchFromRemote: Boolean = false,
+        isRefresh: Boolean = false
+    ) {
+        viewModelScope.launch {
+
+//            println("_cartScreenState.value.id = ${_cartScreenState.value.id}")
+            if (_cartScreenState.value.id == null) {
+                createCartScreenState()
+//                println("new: _cartScreenState.value = ${_cartScreenState.value}")
+            }
+//            println("in loadCategoryProducts: _cartScreenState.value = ${_cartScreenState.value}")
+
+            _searchProductScreenState.update {
+                it.copy(isLoading = true)
+            }
+
+            searchProductRepository.getFoundProducts(
+                fetchFromRemote = forceFetchFromRemote,
+                isRefresh = isRefresh,
+                q = q,
+                page = searchProductScreenState.value.page
+            ).collect { result ->
+                when (result) {
+                    is Resource.Error -> Unit
+                    is Resource.Success -> {
+
+                        result.data?.let { productList ->
+                            Log.d("Nav", "loadSearchProducts => productList = $productList")
+                            _searchProductScreenState.update {
+                                it.copy(
+                                    query = q,
+                                    productList = searchProductScreenState.value.productList
+                                            + productList
+                                )
+                            }
+                        }
+                    }
+                    is Resource.Loading -> {
+                        _searchProductScreenState.update {
                             it.copy(isLoading = result.isLoading)
                         }
                     }

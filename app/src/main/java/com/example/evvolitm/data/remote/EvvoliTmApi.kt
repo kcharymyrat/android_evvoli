@@ -21,6 +21,12 @@ interface EvvoliTmApi {
         @Query("page") page: Int
     ): ProductsResponseDto
 
+    @GET("api/v1/search/")
+    suspend fun getProductSearchList(
+        @Query("q") q: String,
+        @Query("page") page: Int
+    ): ProductsResponseDto
+
 
     @GET("api/v1/products/{product_id}/")
     suspend fun getProductDetail(
