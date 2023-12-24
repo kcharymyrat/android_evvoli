@@ -11,6 +11,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavHostController
 import com.example.evvolitm.navigation.Navigation
 import com.example.evvolitm.presentation.MainViewModel
+import com.example.evvolitm.ui.components.BottomNavigationBar
 import com.example.evvolitm.ui.components.EvvoliTopBar
 import com.example.evvolitm.ui.theme.EvvoliTmTheme
 
@@ -27,6 +28,9 @@ fun EvvoliTmScreenContainer(
     Scaffold(
         topBar = {
             EvvoliTopBar(cartScreenState = cartScreenState, navController = navController)
+        },
+        bottomBar = {
+            BottomNavigationBar(navController, cartScreenState)
         }
     ) {
         Surface(

@@ -71,12 +71,14 @@ fun CartItemsScreen(
     val cartItems = cartScreenState.cartItems
 
     Column(
-        modifier = modifier
+        modifier = modifier.padding(dimensionResource(id = R.dimen.padding_medium))
     ) {
-        CartCheckout(
-            cartPrice = cartPrice,
-            navController = navController
-        )
+        Card {
+            CartCheckout(
+                cartPrice = cartPrice,
+                navController = navController
+            )
+        }
         Spacer(modifier = Modifier.height(8.dp))
         CartItems(
             navController = navController,

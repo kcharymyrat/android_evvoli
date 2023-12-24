@@ -18,6 +18,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material3.Button
@@ -43,6 +45,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.evvolitm.R
@@ -60,6 +64,7 @@ fun OrderForm(
     onCreateNewCardScreenState: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val context = LocalContext.current
     val paymentOptions = listOf("Cash", "Card Terminal")
     val countryCode = "+993" // example country code
 
@@ -80,6 +85,7 @@ fun OrderForm(
     var address by remember { mutableStateOf("") }
     var selectedPaymentOption by remember { mutableStateOf(paymentOptions[0]) }
     var isFocused by remember { mutableStateOf(false) }
+    var selectedDate by remember { mutableStateOf<Date?>(null) }
 
     var isValid by remember { mutableStateOf(true) }
 
@@ -157,6 +163,11 @@ fun OrderForm(
                                 disabledContainerColor = Color.White,
                                 errorContainerColor = Color.White,
                             ),
+                            keyboardOptions = KeyboardOptions.Default.copy(
+                                keyboardType = KeyboardType.Number,
+                                imeAction = ImeAction.Done
+                            ),
+                            keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .onFocusChanged { focusState ->
@@ -171,6 +182,7 @@ fun OrderForm(
                             value = address,
                             onValueChange = { address = it },
                             label = { Text("Address") },
+                            isError =!isValid && address.isEmpty(),
                             colors = TextFieldDefaults.colors(
                                 unfocusedContainerColor = Color.White, // Set background color to white
                                 focusedContainerColor = Color.White,
@@ -179,9 +191,36 @@ fun OrderForm(
                             ),
                             modifier = Modifier.fillMaxWidth()
                         )
+                        if (!isValid && address.isEmpty()) {
+                            Text("Address is required", color = MaterialTheme.colorScheme.error)
+                        }
 
-
-                        DateTimeField()
+                        println("selectedDate = $selectedDate")
+                        println("isValid = $isValid")
+                        OutlinedTextField(
+                            value = selectedDate?.toFormattedString() ?: "",
+                            onValueChange = {},
+                            readOnly = true,
+                            label = { Text("Select Date and Time") },
+                            isError = !isValid && (selectedDate == null),
+                            trailingIcon = {
+                                IconButton(onClick = { showDateTimePicker(context) { date ->
+                                    selectedDate = date
+                                }}) {
+                                    Icon(Icons.Default.CalendarToday, contentDescription = "Select Date")
+                                }
+                            },
+                            colors = TextFieldDefaults.colors(
+                                unfocusedContainerColor = Color.White, // Set background color to white
+                                focusedContainerColor = Color.White,
+                                disabledContainerColor = Color.White,
+                                errorContainerColor = Color.White,
+                            ),
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        if (!isValid && (selectedDate == null)) {
+                            Text("Delivery date is required", color = MaterialTheme.colorScheme.error)
+                        }
                         Spacer(modifier = Modifier.height(8.dp))
                     }
                 }
@@ -190,11 +229,12 @@ fun OrderForm(
         }
 
         Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp)
+            modifier = Modifier.fillMaxWidth()
         ) {
-            Column {
+            Column(
+                modifier = Modifier
+                    .padding(horizontal = dimensionResource(id = R.dimen.padding_small))
+            ) {
                 Row(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     modifier = Modifier
@@ -212,8 +252,8 @@ fun OrderForm(
                 }
                 Button(
                     onClick = {
-                        isValid = validateForm(customerName, phone)
-                        if (isValid) handleSubmit(customerName, phone, address)
+                        isValid = validateForm(customerName, phone, address, selectedDate)
+                        if (isValid) handleSubmit(customerName, phone, address, selectedDate)
                     },
                     modifier = Modifier.fillMaxWidth()
                 ) {
@@ -225,7 +265,7 @@ fun OrderForm(
 }
 
 @Composable
-fun DateTimeField() {
+fun DateTimeField(isValid: Boolean) {
     var selectedDate by remember { mutableStateOf<Date?>(null) }
     val context = LocalContext.current
 
@@ -234,6 +274,7 @@ fun DateTimeField() {
         onValueChange = {},
         readOnly = true,
         label = { Text("Select Date and Time") },
+        isError = !isValid && selectedDate != null,
         trailingIcon = {
             IconButton(onClick = { showDateTimePicker(context) { date ->
                 selectedDate = date
@@ -249,7 +290,11 @@ fun DateTimeField() {
         ),
         modifier = Modifier.fillMaxWidth()
     )
+    if (!isValid && selectedDate != null) {
+        Text("Delivery date is required", color = MaterialTheme.colorScheme.error)
+    }
 }
+
 
 
 fun isValidPhone(phone: String): Boolean {
@@ -257,11 +302,21 @@ fun isValidPhone(phone: String): Boolean {
     return phone.length == 8
 }
 
-fun validateForm(name: String, phone: String): Boolean {
-    return name.isNotEmpty() && isValidPhone(phone)
+fun validateForm(
+    name: String,
+    phone: String,
+    address: String,
+    selectedDate: Date?
+): Boolean {
+    return name.isNotEmpty() && isValidPhone(phone) && address.isNotEmpty() && (selectedDate == null)
 }
 
-fun handleSubmit(customerName: String, phoneNumber: String, address: String) {
+fun handleSubmit(
+    customerName: String,
+    phoneNumber: String,
+    address: String,
+    selectedDate: Date?
+) {
     // Here, you will send data to your server
     // Example:
     // viewModel.submitOrder(customerName, phoneNumber, address)

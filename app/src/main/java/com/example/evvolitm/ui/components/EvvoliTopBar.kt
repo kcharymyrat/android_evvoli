@@ -68,46 +68,19 @@ fun EvvoliTopBar(
                     .padding(vertical = dimensionResource(R.dimen.padding_small))
             )
 
-            // Search section
-            Box(modifier = Modifier.weight(1f)) {
-                BasicTextField(
-                    value = searchText,
-                    onValueChange = { searchText = it },
-                    decorationBox = { innerTextField ->
-                        if (searchText.isEmpty()) {
-                            Text("Search", color = Color.Gray)
-                        }
-                        innerTextField()
-                    }
-                )
-            }
-
-            // Cart section
-            if (cartScreenState.cartQty > 0) {
-                Box(
-                    contentAlignment = Alignment.TopCenter,
-                    modifier = Modifier
-                ) {
-                    IconButton(
-                        onClick = { navController.navigate(Screen.CartScreen.route) },
-                        modifier = Modifier
-                    ) {
-                        Icon(
-                            imageVector = Icons.Filled.ShoppingCart,
-                            contentDescription = "Cart",
-                            modifier = Modifier.fillMaxSize()
-                        )
-                    }
-                    Text(
-                        text = cartScreenState.cartQty.toString(),
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier
-                            .background(color = Color.White, shape = CircleShape)
-                            .padding(horizontal = 2.dp, vertical = 0.dp)
-                    )
-                }
-            }
+//            // Search section
+//            Box(modifier = Modifier.weight(1f)) {
+//                BasicTextField(
+//                    value = searchText,
+//                    onValueChange = { searchText = it },
+//                    decorationBox = { innerTextField ->
+//                        if (searchText.isEmpty()) {
+//                            Text("Search", color = Color.Gray)
+//                        }
+//                        innerTextField()
+//                    }
+//                )
+//            }
         }
     }
 }
