@@ -4,10 +4,11 @@ import android.app.Application
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.evvolitm.domain.model.CartItem
+import com.example.evvolitm.data.remote.respond.order_dtos.OrderDto
 import com.example.evvolitm.domain.model.CartItemProduct
 import com.example.evvolitm.domain.repository.CartRepository
 import com.example.evvolitm.domain.repository.CategoryRepository
+import com.example.evvolitm.domain.repository.OrderRepository
 import com.example.evvolitm.domain.repository.ProductDetailRepository
 import com.example.evvolitm.domain.repository.ProductRepository
 import com.example.evvolitm.domain.repository.SearchProductRepository
@@ -29,6 +30,7 @@ class MainViewModel @Inject constructor(
     private val searchProductRepository: SearchProductRepository,
     private val productDetailRepository: ProductDetailRepository,
     private val cartRepository: CartRepository,
+    private val orderRepository: OrderRepository,
 ): AndroidViewModel(application) {
     private val _categoryScreenState = MutableStateFlow(CategoryScreenState())
     val categoryScreenState = _categoryScreenState.asStateFlow()
@@ -45,16 +47,20 @@ class MainViewModel @Inject constructor(
     private val _cartScreenState = MutableStateFlow(CartScreenState())
     val cartScreenState = _cartScreenState.asStateFlow()
 
+    private val _orderStatus = MutableStateFlow<OrderStatus>(OrderStatus.Idle)
+    val orderStatus = _orderStatus.asStateFlow()
+
     var productCategoryId: String? = null
 
     init {
         loadCategories(forceFetchFromRemote = false)
     }
 
+    // -----------------------------STATE EVENTS LOGIC ------------------------------------
 
     fun onCategoryScreenEvent(event: CategoryScreenEvents) {
         println("event = $event")
-        when(event) {
+        when (event) {
             is CategoryScreenEvents.Refresh -> {
                 loadCategories(forceFetchFromRemote = true)
             }
@@ -67,10 +73,9 @@ class MainViewModel @Inject constructor(
         }
     }
 
-
     fun onProductScreenEvent(event: ProductScreenEvents, categoryId: String) {
         println("event = $event")
-        when(event) {
+        when (event) {
             is ProductScreenEvents.Refresh -> {
                 loadCategoryProducts(categoryId = categoryId, forceFetchFromRemote = true)
             }
@@ -85,7 +90,7 @@ class MainViewModel @Inject constructor(
 
     fun onSearchProductScreenEvent(event: ProductScreenEvents, query: String) {
         println("event = $event")
-        when(event) {
+        when (event) {
             is ProductScreenEvents.Refresh -> {
                 loadSearchProducts(q = query, forceFetchFromRemote = true)
             }
@@ -98,16 +103,16 @@ class MainViewModel @Inject constructor(
         }
     }
 
-
     fun onProductDetailScreenEvent(event: ProductDetailScreenEvents, productId: String) {
         println("event = $event")
-        when(event) {
+        when (event) {
             is ProductDetailScreenEvents.Refresh -> {
                 loadProductDetail(productId = productId, forceFetchFromRemote = true)
             }
         }
     }
 
+    // -----------------------------CATEGORIES LOGIC ------------------------------------
 
     private fun loadCategories(
         forceFetchFromRemote: Boolean = false,
@@ -143,6 +148,7 @@ class MainViewModel @Inject constructor(
                             }
                         }
                     }
+
                     is Resource.Loading -> {
                         _categoryScreenState.update {
                             it.copy(isLoading = result.isLoading)
@@ -153,6 +159,7 @@ class MainViewModel @Inject constructor(
         }
     }
 
+    // -----------------------------PRODUCTS LOGIC ------------------------------------
 
     fun loadCategoryProducts(
         categoryId: String,
@@ -192,6 +199,7 @@ class MainViewModel @Inject constructor(
                             }
                         }
                     }
+
                     is Resource.Loading -> {
                         _productScreenState.update {
                             it.copy(isLoading = result.isLoading)
@@ -202,8 +210,10 @@ class MainViewModel @Inject constructor(
         }
     }
 
+    // -----------------------------SEARCH (PRODUCTS) LOGIC ------------------------------------
+
     fun loadSearchProducts(
-        q:String = "",
+        q: String = "",
         forceFetchFromRemote: Boolean = false,
         isRefresh: Boolean = false
     ) {
@@ -241,6 +251,7 @@ class MainViewModel @Inject constructor(
                             }
                         }
                     }
+
                     is Resource.Loading -> {
                         _searchProductScreenState.update {
                             it.copy(isLoading = result.isLoading)
@@ -251,6 +262,7 @@ class MainViewModel @Inject constructor(
         }
     }
 
+    // -----------------------------DETAIL (PRODUCT) LOGIC ------------------------------------
 
     fun loadProductDetail(
         productId: String,
@@ -278,7 +290,7 @@ class MainViewModel @Inject constructor(
                 when (result) {
                     is Resource.Error -> Unit
                     is Resource.Success -> {
-                        result.data?.let {productDetail ->
+                        result.data?.let { productDetail ->
                             Log.d("Nav", "loadProductDetail => productDetail = $productDetail")
                             _productDetailScreenState.update {
                                 it.copy(
@@ -289,6 +301,7 @@ class MainViewModel @Inject constructor(
                             }
                         }
                     }
+
                     is Resource.Loading -> {
                         _productScreenState.update {
                             it.copy(isLoading = result.isLoading)
@@ -300,43 +313,8 @@ class MainViewModel @Inject constructor(
     }
 
 
-    // CART LOGIC ------------------------------------
+    // -----------------------------CART LOGIC ------------------------------------
 
-//    fun loadCart() {
-//        viewModelScope.launch {
-//            _cartScreenState.update {
-//                it.copy(isLoading = true)
-//            }
-//
-//            var cartId = _cartScreenState.value.id
-//            if (cartId == null) {
-//                val cartEntity = cartRepository.createEmptyCartEntity()
-//                cartId = cartEntity?.id
-//                _cartScreenState.value.id = cartId
-//            }
-//
-//            if (cartId != null) {
-//                cartRepository.getFlowResourceCartById(
-//                    cartId = cartId
-//                ).collectLatest { result ->
-//                    when (result) {
-//                        is Resource.Error -> Unit
-//                        is Resource.Success -> {
-//                            result.data?.let {
-//                                _cartScreenState.value.cartItems = it.cartItems
-//                                _cartScreenState.value.cartQty = it.cartItems.sumOf { item -> item.quantity }
-//                            }
-//                        }
-//                        is Resource.Loading -> {
-//                            _cartScreenState.update {
-//                                it.copy(isLoading = result.isLoading)
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//    }
 
     fun updateCart(
         cartItemProduct: CartItemProduct,
@@ -345,7 +323,7 @@ class MainViewModel @Inject constructor(
         viewModelScope.launch {
             println("in updateCart: _cartScreenState.value = ${_cartScreenState.value}")
 
-            val quantity = if(isMinus) -1 else 1
+            val quantity = if (isMinus) -1 else 1
 
             var cartId = _cartScreenState.value.id
             if (cartId == null) {
@@ -370,9 +348,9 @@ class MainViewModel @Inject constructor(
                     cartItems = cartItems,
                     cartQty = cartItems.sumOf { item -> item.cartItem.quantity },
                     cartTotalPrice = cartItems
-                            .sumOf {
-                                item -> item.cartItem.quantity * (item.product.salePrice ?: 0.00)
-                            }
+                        .sumOf { item ->
+                            item.cartItem.quantity * (item.product.salePrice ?: 0.00)
+                        }
                 )
 
                 // Update the state
@@ -412,18 +390,49 @@ class MainViewModel @Inject constructor(
         }
     }
 
-//    fun updateCartScreenState(newCartItems: List<CartItem>) {
-//        val newCartQty = newCartItems.sumOf { it.quantity }
-//        val newTotalPrice = newCartItems.sumOf { (it.product?.salePrice ?: 0.00 ) * it.quantity }
-//
-//        // Create a new instance with the updated values
-//        val newCartState = _cartScreenState.value.copy(
-//            cartItems = newCartItems.toMutableList(),
-//            cartQty = newCartQty,
-//            cartTotalPrice = newTotalPrice
-//        )
-//
-//        // Update the state
-//        _cartScreenState.value = newCartState
-//    }
+    private fun deleteAllCarts() {
+        viewModelScope.launch {
+            cartRepository.deleteAllCarts()
+        }
+    }
+
+    // -----------------------------ORDER LOGIC ------------------------------------
+
+    fun createOrder(orderDto: OrderDto) {
+        viewModelScope.launch {
+            val response = orderRepository.createOrder(orderDto)
+            println("response = $response")
+            println("response.isSuccessful = ${response.isSuccessful}")
+            println("response.body = ${response.body()}")
+            println("response.message = ${response.message()}")
+            if (response.isSuccessful) {
+                // Order creation successful, navigate to success page
+                _orderStatus.value = OrderStatus.Success("Order Placed Successfully")
+                deleteAllCarts()
+            } else {
+                // Handle error
+                _orderStatus.value = OrderStatus.Error("Failed to place order. Please try again.")
+            }
+        }
+    }
+
+    fun resetOrderStatusAndCartState() {
+        println("_orderStatus.value = ${_orderStatus.value }")
+        println("_cartScreenState.value = ${_cartScreenState.value }")
+
+        _orderStatus.value = OrderStatus.Idle
+        _cartScreenState.update {
+            it.copy(
+                id = null,
+                isLoading = false,
+                cartItems = mutableListOf(),
+                cartQty = 0,
+                cartTotalPrice = 0.00
+            )
+        }
+
+        println("_cartScreenState.value = ${_cartScreenState.value }")
+        println("_orderStatus.value = ${_orderStatus.value }")
+
+    }
 }

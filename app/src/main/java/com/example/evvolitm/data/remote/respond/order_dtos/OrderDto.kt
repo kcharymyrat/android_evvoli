@@ -5,7 +5,8 @@ import com.google.gson.annotations.SerializedName
 data class OrderDto(
     @SerializedName("customer_name") val customerName: String,
     @SerializedName("phone") val phone: String,
-    @SerializedName("delivery_date") val deliveryDate: String,
+    @SerializedName("shipping_address") val shippingAddress: String,
+    @SerializedName("delivery_time") val deliveryTime: String,
     @SerializedName("payment_option") val paymentOption: String,
     val cart: MutableMap<String, Int>  // productId, quantity
 )

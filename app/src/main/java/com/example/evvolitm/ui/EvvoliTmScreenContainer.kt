@@ -29,6 +29,7 @@ fun EvvoliTmScreenContainer(
     val searchProductScreenState = mainViewModel.searchProductScreenState.collectAsState().value
     val productDetailScreenState = mainViewModel.productDetailScreenState.collectAsState().value
     val cartScreenState = mainViewModel.cartScreenState.collectAsState().value
+    val orderStatus = mainViewModel.orderStatus.collectAsState().value
 
     val currentRoute = currentRoute(navController)
 
@@ -62,7 +63,8 @@ fun EvvoliTmScreenContainer(
                 productScreenState = productScreenState,
                 searchProductScreenState = searchProductScreenState,
                 productDetailScreenState = productDetailScreenState,
-                cartScreenState = cartScreenState
+                cartScreenState = cartScreenState,
+                orderStatus = orderStatus,
             )
         }
     }

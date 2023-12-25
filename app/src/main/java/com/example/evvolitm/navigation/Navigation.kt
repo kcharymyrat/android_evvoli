@@ -1,6 +1,7 @@
 package com.example.evvolitm.navigation
 
 import android.util.Log
+import androidx.compose.material3.Text
 import com.example.evvolitm.ui.screens.CategoriesScreen
 //import com.example.evvolitm.ui.screens.CategoryProductsScreen
 import androidx.compose.runtime.Composable
@@ -14,13 +15,16 @@ import androidx.navigation.navArgument
 import com.example.evvolitm.presentation.CartScreenState
 import com.example.evvolitm.presentation.CategoryScreenState
 import com.example.evvolitm.presentation.MainViewModel
+import com.example.evvolitm.presentation.OrderStatus
 import com.example.evvolitm.presentation.ProductDetailScreenState
 import com.example.evvolitm.presentation.ProductScreenState
+import com.example.evvolitm.ui.screens.AboutScreen
 import com.example.evvolitm.ui.screens.CartItemsScreen
 import com.example.evvolitm.ui.screens.CategoryProductsScreen
 import com.example.evvolitm.ui.screens.OrderForm
 import com.example.evvolitm.ui.screens.ProductDetailScreen
 import com.example.evvolitm.ui.screens.SearchProductsScreen
+import com.example.evvolitm.ui.screens.SuccessScreen
 import com.example.evvolitm.util.Screen
 
 @Composable
@@ -32,6 +36,7 @@ fun Navigation(
     searchProductScreenState: ProductScreenState,
     productDetailScreenState: ProductDetailScreenState,
     cartScreenState: CartScreenState,
+    orderStatus: OrderStatus,
 ) {
     NavHost(navController = navController, startDestination = Screen.CategoriesScreen.route) {
 
@@ -141,12 +146,31 @@ fun Navigation(
 
         composable(
             route = Screen.OrderScreen.route
-        ) {
+//            route = "${Screen.OrderScreen.route}/{message}",
+//            arguments = listOf(navArgument("message") { type = NavType.StringType })
+        ) {backStackEntry ->
+//            val message = backStackEntry.arguments?.getString("message") ?: ""
+
             OrderForm(
                 navController = navController,
+                orderStatus = orderStatus,
+                createOrder = mainViewModel::createOrder,
+                resetOrderStatus = mainViewModel::resetOrderStatusAndCartState,
                 cartScreenState = cartScreenState,
                 onCreateNewCardScreenState = mainViewModel::createCartScreenState,
             )
+        }
+
+        composable(
+            route = Screen.SuccessOrderScreen.route
+        ) {
+            SuccessScreen()
+        }
+
+        composable(
+            route = Screen.AboutScreen.route
+        ) {
+            AboutScreen()
         }
     }
 }

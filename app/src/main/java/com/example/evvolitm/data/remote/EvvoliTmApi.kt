@@ -2,9 +2,13 @@ package com.example.evvolitm.data.remote
 
 import com.example.evvolitm.data.remote.respond.category_dtos.CategoryDto
 import com.example.evvolitm.data.remote.respond.category_dtos.CategoriesResponseDto
+import com.example.evvolitm.data.remote.respond.order_dtos.OrderDto
 import com.example.evvolitm.data.remote.respond.product_dtos.ProductDetailDto
 import com.example.evvolitm.data.remote.respond.product_dtos.ProductsResponseDto
+import retrofit2.Response
+import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
 
@@ -32,6 +36,9 @@ interface EvvoliTmApi {
     suspend fun getProductDetail(
         @Path("product_id") productId: String,
     ): ProductDetailDto
+
+    @POST("api/v1/create-order/")
+    suspend fun createOrder(@Body orderDto: OrderDto): Response<Unit>
 
     companion object {
         const val BASE_URL = "http://192.168.1.14:8000/"

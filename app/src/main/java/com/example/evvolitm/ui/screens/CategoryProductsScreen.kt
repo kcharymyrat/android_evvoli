@@ -17,8 +17,10 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.rounded.ImageNotSupported
 import androidx.compose.material3.Button
@@ -27,6 +29,8 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -55,6 +59,7 @@ import com.example.evvolitm.domain.model.Product
 import com.example.evvolitm.presentation.CartScreenState
 import com.example.evvolitm.presentation.ProductScreenEvents
 import com.example.evvolitm.presentation.ProductScreenState
+import com.example.evvolitm.ui.theme.Shapes
 import com.example.evvolitm.util.Screen
 import kotlinx.coroutines.FlowPreview
 
@@ -157,15 +162,24 @@ fun ProductItem(
                     navController.navigate(Screen.ProductDetailScreen.route + "/${product.id}")
                 },
             )
-            ProductInformation(product = product, modifier = Modifier.padding(start = 16.dp, end = 16.dp))
-            ProductListItemButtons(
-                cartScreenState = cartScreenState,
-                onUpdateCartAndItsState = onUpdateCartAndItsState,
-                product = product,
-                onSeeDetailsButtonClicked = {
-                    navController.navigate(Screen.ProductDetailScreen.route + "/${product.id}")
-                }
-            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = dimensionResource(id = R.dimen.padding_small))
+            ) {
+                ProductInformation(
+                    product = product,
+                    modifier = Modifier
+                        .weight(1f)
+                )
+                ProductToCartButtons(
+                    cartScreenState = cartScreenState,
+                    onUpdateCartAndItsState = onUpdateCartAndItsState,
+                    product = product
+                )
+            }
         }
     }
 }
@@ -219,18 +233,15 @@ fun ProductInformation(
             style = MaterialTheme.typography.titleLarge,
         )
         if (product.salePrice < product.price) {
-            Row {
-                Text(
-                    text = product.price.toString() + " m.",
-                    style = MaterialTheme.typography.labelLarge,
-                    textDecoration = TextDecoration.LineThrough
-                )
-                Spacer(modifier = modifier.width(1.dp))
-                Text(
-                    text = product.salePrice.toString() + " m.",
-                    style = MaterialTheme.typography.labelLarge,
-                )
-            }
+            Text(
+                text = product.price.toString() + " m.",
+                style = MaterialTheme.typography.labelLarge,
+                textDecoration = TextDecoration.LineThrough
+            )
+            Text(
+                text = product.salePrice.toString() + " m.",
+                style = MaterialTheme.typography.labelLarge,
+            )
         } else {
             Text(
                 text = product.price.toString() + " m.",
@@ -240,53 +251,6 @@ fun ProductInformation(
     }
 }
 
-@Composable
-fun ProductListItemButtons(
-    cartScreenState: CartScreenState,
-    onUpdateCartAndItsState: (CartItemProduct, Boolean) -> Unit,
-    product: Product,
-    onSeeDetailsButtonClicked: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceAround,
-        modifier = modifier.fillMaxWidth()
-    ) {
-        SeeProductButton(
-            product = product,
-            onSeeDetailsButtonClicked = onSeeDetailsButtonClicked,
-        )
-        ProductToCartButtons(
-            cartScreenState = cartScreenState,
-            onUpdateCartAndItsState = onUpdateCartAndItsState,
-            product = product
-        )
-
-    }
-}
-
-@Composable
-fun SeeProductButton(
-    product: Product,
-    onSeeDetailsButtonClicked: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Button(
-        onClick = onSeeDetailsButtonClicked,
-        modifier = modifier,
-        colors = ButtonDefaults.buttonColors(
-            containerColor = MaterialTheme.colorScheme.tertiary,
-        ),
-        elevation = ButtonDefaults.buttonElevation(
-            defaultElevation = 4.dp, // Normal elevation
-            pressedElevation = 8.dp, // Elevation when the button is pressed
-            disabledElevation = 0.dp  // Elevation when the button is disabled
-        )
-    ) {
-        Text(text = "See Product")
-    }
-}
 
 @Composable
 fun ProductToCartButtons(
@@ -303,21 +267,33 @@ fun ProductToCartButtons(
         }?.cartItem?.quantity ?: 0
     }
 
-    if (productQty.intValue > 0) {
-        MinusQtyPlus(
-            cartScreenState = cartScreenState,
-            onUpdateCartAndItsState = onUpdateCartAndItsState,
-            product = product,
-            cartProductQty = productQty.intValue,
-            modifier = modifier
-        )
-    } else {
-        ProductAddButton(
-            cartScreenState = cartScreenState,
-            onUpdateCartAndItsState = onUpdateCartAndItsState,
-            product = product,
-            modifier = modifier
-        )
+    Box(
+        modifier = Modifier
+            .background(
+                color = MaterialTheme.colorScheme.primary,
+                shape = Shapes.medium
+            )
+    ) {
+        Row(
+            modifier = Modifier
+        ) {
+            if (productQty.intValue > 0) {
+                MinusQtyPlus(
+                    cartScreenState = cartScreenState,
+                    onUpdateCartAndItsState = onUpdateCartAndItsState,
+                    product = product,
+                    cartProductQty = productQty.intValue,
+                    modifier = modifier
+                )
+            } else {
+                ProductAddButton(
+                    cartScreenState = cartScreenState,
+                    onUpdateCartAndItsState = onUpdateCartAndItsState,
+                    product = product,
+                    modifier = modifier
+                )
+            }
+        }
     }
 }
 
@@ -340,14 +316,12 @@ fun ProductAddButton(
         price = product.price.toDouble(),
         salePrice = product.salePrice.toDouble(),
     )
-    Button(
+    IconButton(
         onClick = {
             onUpdateCartAndItsState(newCartItemProduct, false)
         },
-        elevation = ButtonDefaults.buttonElevation(
-            defaultElevation = 4.dp, // Normal elevation
-            pressedElevation = 8.dp, // Elevation when the button is pressed
-            disabledElevation = 0.dp  // Elevation when the button is disabled
+        colors = IconButtonDefaults.iconButtonColors(
+            contentColor = Color.White
         )
     ) {
         Icon(
@@ -365,40 +339,28 @@ fun MinusQtyPlus(
     cartProductQty: Int,
     modifier: Modifier = Modifier,
 ) {
-    Button(
-        onClick = { },
-        colors = ButtonDefaults.buttonColors(
-            containerColor = MaterialTheme.colorScheme.secondary,
-        ),
-        elevation = ButtonDefaults.buttonElevation(
-            defaultElevation = 4.dp, // Normal elevation
-            pressedElevation = 8.dp, // Elevation when the button is pressed
-            disabledElevation = 0.dp  // Elevation when the button is disabled
-        ),
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceAround,
+        modifier = Modifier,
     ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceAround,
-            modifier = Modifier,
-        ) {
-            MinusClickable(
-                cartScreenState = cartScreenState,
-                onUpdateCartAndItsState = onUpdateCartAndItsState,
-                product = product
-            )
-            Spacer(modifier.width(dimensionResource(id = R.dimen.padding_small)))
-            ProductQty(
-                cartScreenState = cartScreenState,
-                product = product,
-                cartProductQty = cartProductQty
-            )
-            Spacer(modifier.width(dimensionResource(id = R.dimen.padding_small)))
-            PlusClickable(
-                cartScreenState = cartScreenState,
-                onUpdateCartAndItsState = onUpdateCartAndItsState,
-                product = product
-            )
-        }
+        MinusClickable(
+            cartScreenState = cartScreenState,
+            onUpdateCartAndItsState = onUpdateCartAndItsState,
+            product = product
+        )
+
+        ProductQty(
+            cartScreenState = cartScreenState,
+            product = product,
+            cartProductQty = cartProductQty
+        )
+
+        PlusClickable(
+            cartScreenState = cartScreenState,
+            onUpdateCartAndItsState = onUpdateCartAndItsState,
+            product = product
+        )
     }
 }
 
@@ -412,7 +374,8 @@ fun ProductQty(
     Text(
         text = cartProductQty.toString(),
         modifier = modifier,
-        style = MaterialTheme.typography.labelLarge
+        color = Color.White,
+        style = MaterialTheme.typography.bodyLarge
     )
 }
 
@@ -434,17 +397,17 @@ fun PlusClickable(
         price = product.price.toDouble(),
         salePrice = product.salePrice.toDouble(),
     )
-    Icon(
-        imageVector = Icons.Filled.KeyboardArrowRight,
-        contentDescription = "Favorite Icon",
-        modifier = modifier
-            .clickable {
-                onUpdateCartAndItsState(newCartItemProduct, false)
-            }
-            .size(24.dp)
-            .clip(CircleShape)
-            .background(Color.Transparent)
-    )
+    IconButton(
+        onClick = {
+            println("in PlusClickable onClick: product.id = ${product.id}")
+            onUpdateCartAndItsState(newCartItemProduct, false)
+        },
+        colors = IconButtonDefaults.iconButtonColors(
+            contentColor = Color.White
+        )
+    ) {
+        Icon(Icons.Default.Add, contentDescription = "Decrease")
+    }
 }
 
 @Composable
@@ -465,18 +428,17 @@ fun MinusClickable(
         price = product.price.toDouble(),
         salePrice = product.salePrice.toDouble(),
     )
-    Icon(
-        imageVector = Icons.Filled.KeyboardArrowLeft,
-        contentDescription = "Favorite Icon",
-        modifier = modifier
-            .clickable {
-                onUpdateCartAndItsState(newCartItemProduct,true)
-            }
-            .size(24.dp)
-            .clip(CircleShape)
-            .background(Color.Transparent)
-
-    )
+    IconButton(
+        onClick = {
+            println("in MinusClickable onClick: product.id = ${product.id}")
+            onUpdateCartAndItsState(newCartItemProduct,true)
+        },
+        colors = IconButtonDefaults.iconButtonColors(
+            contentColor = Color.White
+        )
+    ) {
+        Icon(Icons.Default.Remove, contentDescription = "Increase")
+    }
 }
 
 

@@ -4,6 +4,7 @@ package com.example.evvolitm.ui.screens
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -34,6 +35,7 @@ import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -50,8 +52,11 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.evvolitm.R
+import com.example.evvolitm.data.remote.respond.order_dtos.OrderDto
 import com.example.evvolitm.presentation.CartScreenState
+import com.example.evvolitm.presentation.OrderStatus
 import com.example.evvolitm.ui.theme.Shapes
+import com.example.evvolitm.util.Screen
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
@@ -60,6 +65,9 @@ import java.util.Locale
 @Composable
 fun OrderForm(
     navController: NavHostController,
+    orderStatus: OrderStatus,
+    createOrder: (OrderDto) -> Unit,
+    resetOrderStatus: () -> Unit,
     cartScreenState: CartScreenState,
     onCreateNewCardScreenState: () -> Unit,
     modifier: Modifier = Modifier,
@@ -80,7 +88,6 @@ fun OrderForm(
     val focusManager = LocalFocusManager.current
 
     var customerName by remember { mutableStateOf("") }
-    var email by remember { mutableStateOf("") }
     var phone by remember { mutableStateOf("") }
     var address by remember { mutableStateOf("") }
     var selectedPaymentOption by remember { mutableStateOf(paymentOptions[0]) }
@@ -92,7 +99,10 @@ fun OrderForm(
     Column(
         modifier = Modifier
             .fillMaxSize() // Fill the maximum available space
-            .padding(dimensionResource(id = R.dimen.padding_medium))
+            .padding(
+                horizontal = dimensionResource(id = R.dimen.padding_medium),
+                vertical = dimensionResource(id = R.dimen.padding_small)
+            )
     ) {
         LazyColumn(
             modifier = Modifier.weight(1f) // Take all available space minus the space needed for the button
@@ -253,7 +263,21 @@ fun OrderForm(
                 Button(
                     onClick = {
                         isValid = validateForm(customerName, phone, address, selectedDate)
-                        if (isValid) handleSubmit(customerName, phone, address, selectedDate)
+                        println("$customerName, $phone, $address, $selectedDate")
+                        println("isValid = $isValid")
+                        if (isValid) {
+                            handleSubmit(
+                                navController = navController,
+                                createOrder = createOrder,
+                                cartScreenState = cartScreenState,
+                                onCreateNewCardScreenState = onCreateNewCardScreenState,
+                                customerName = customerName,
+                                phone = phone,
+                                address = address,
+                                selectedDate = selectedDate,
+                                selectedPaymentOption = selectedPaymentOption,
+                            )
+                        }
                     },
                     modifier = Modifier.fillMaxWidth()
                 ) {
@@ -262,39 +286,30 @@ fun OrderForm(
             }
         }
     }
-}
 
-@Composable
-fun DateTimeField(isValid: Boolean) {
-    var selectedDate by remember { mutableStateOf<Date?>(null) }
-    val context = LocalContext.current
-
-    OutlinedTextField(
-        value = selectedDate?.toFormattedString() ?: "",
-        onValueChange = {},
-        readOnly = true,
-        label = { Text("Select Date and Time") },
-        isError = !isValid && selectedDate != null,
-        trailingIcon = {
-            IconButton(onClick = { showDateTimePicker(context) { date ->
-                selectedDate = date
-            }}) {
-                Icon(Icons.Default.CalendarToday, contentDescription = "Select Date")
+    // Observe orderStatus
+    when (orderStatus) {
+        is OrderStatus.Success -> {
+            // Navigate to success screen
+            LaunchedEffect(orderStatus) {
+                navController.navigate(Screen.SuccessOrderScreen.route)
+                resetOrderStatus() // Reset the status after handling
             }
-        },
-        colors = TextFieldDefaults.colors(
-            unfocusedContainerColor = Color.White, // Set background color to white
-            focusedContainerColor = Color.White,
-            disabledContainerColor = Color.White,
-            errorContainerColor = Color.White,
-        ),
-        modifier = Modifier.fillMaxWidth()
-    )
-    if (!isValid && selectedDate != null) {
-        Text("Delivery date is required", color = MaterialTheme.colorScheme.error)
+        }
+
+        is OrderStatus.Error -> {
+            // Show error message
+            val errorMessage = (orderStatus as OrderStatus.Error).errorMessage
+            LaunchedEffect(orderStatus) {
+                Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
+                resetOrderStatus() // Reset the status after handling
+            }
+        }
+
+        else -> { /* Idle state, do nothing */
+        }
     }
 }
-
 
 
 fun isValidPhone(phone: String): Boolean {
@@ -308,18 +323,36 @@ fun validateForm(
     address: String,
     selectedDate: Date?
 ): Boolean {
-    return name.isNotEmpty() && isValidPhone(phone) && address.isNotEmpty() && (selectedDate == null)
+    return name.isNotEmpty() && isValidPhone(phone) && address.isNotEmpty() && (selectedDate != null)
 }
 
 fun handleSubmit(
+    navController: NavHostController,
+    createOrder: (OrderDto) -> Unit,
+    cartScreenState: CartScreenState,
+    onCreateNewCardScreenState: () -> Unit,
     customerName: String,
-    phoneNumber: String,
+    phone: String,
     address: String,
-    selectedDate: Date?
+    selectedDate: Date?,
+    selectedPaymentOption: String,
 ) {
-    // Here, you will send data to your server
-    // Example:
-    // viewModel.submitOrder(customerName, phoneNumber, address)
+
+    val cartItemsMap = mutableMapOf<String, Int>()
+    for (item in cartScreenState.cartItems) {
+        cartItemsMap[item.cartItem.productId] = item.cartItem.quantity
+    }
+    val orderDto = OrderDto(
+        customerName = customerName,
+        phone = phone,
+        shippingAddress = address,
+        deliveryTime = serializeDateTime(selectedDate),
+        paymentOption = selectedPaymentOption.lowercase(),
+        cart = cartItemsMap
+    )
+    println("orderDto = $orderDto")
+
+    createOrder(orderDto)
 }
 
 fun showDateTimePicker(context: Context, onDateTimeSelected: (Date) -> Unit) {

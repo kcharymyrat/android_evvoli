@@ -15,21 +15,11 @@ interface CartRepository {
 
     suspend fun getLatestCartEntity(): CartEntity?
 
-    suspend fun getCartById(cartId: Long): Cart?
-
-    suspend fun getCartProductItemById(cartProductItemId: String): CartItemProduct?
-
-    suspend fun getFlowResourceCartById(cartId: Long): Flow<Resource<Cart>>
-
-    suspend fun getCartItemListByCartId(cartId: Long): Flow<Resource<List<CartItem>>>
-
-    suspend fun getCartItemProductListByProductIdList(ids: List<String>): List<CartItemProduct?>
-
     suspend fun addOrUpdateCartItemEntity(
         cartId: Long,
         quantity: Int,
         cartItemProduct: CartItemProduct,
     )
 
-    suspend fun updateCartEntityByCart(cart: Cart)
+    suspend fun deleteAllCarts()
 }

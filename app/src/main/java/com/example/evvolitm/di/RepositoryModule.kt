@@ -3,11 +3,13 @@ package com.example.evvolitm.di
 import com.example.evvolitm.data.local.cart.CartItemDao
 import com.example.evvolitm.data.repository.CartRepositoryImpl
 import com.example.evvolitm.data.repository.CategoryRepositoryImpl
+import com.example.evvolitm.data.repository.OrderRepositoryImpl
 import com.example.evvolitm.data.repository.ProductDetailRepositoryImpl
 import com.example.evvolitm.data.repository.ProductRepositoryImpl
 import com.example.evvolitm.data.repository.SearchProductRepositoryImpl
 import com.example.evvolitm.domain.repository.CartRepository
 import com.example.evvolitm.domain.repository.CategoryRepository
+import com.example.evvolitm.domain.repository.OrderRepository
 import com.example.evvolitm.domain.repository.ProductDetailRepository
 import com.example.evvolitm.domain.repository.ProductRepository
 import com.example.evvolitm.domain.repository.SearchProductRepository
@@ -49,8 +51,16 @@ abstract class RepositoryModule {
 
     @Binds
     @Singleton
-    abstract fun binCartRepository(
+    abstract fun bindCartRepository(
         cartRepositoryImpl: CartRepositoryImpl
     ): CartRepository
+
+
+    @Binds
+    @Singleton
+    abstract fun bindOrderRepository(
+        orderRepositoryImpl: OrderRepositoryImpl
+    ): OrderRepository
+
 
 }
