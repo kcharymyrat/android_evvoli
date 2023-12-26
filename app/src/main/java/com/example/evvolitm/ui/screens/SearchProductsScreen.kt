@@ -71,10 +71,7 @@ fun SearchProductListDisplay(
 
 
         items(searchProductScreenState.productList.size) {productIndex ->
-            Log.d("Nav", "SearchProductListDisplay " +
-                    "=> searchProductScreenState.productList[index] " +
-                    "= ${searchProductScreenState.productList[productIndex]}"
-            )
+
             ProductItem(
                 navController = navController,
                 product = searchProductScreenState.productList[productIndex],
@@ -86,13 +83,8 @@ fun SearchProductListDisplay(
                         vertical = dimensionResource(id = R.dimen.padding_small)
                     )
             )
-//            println("productList = ${productScreenState.productList}")
-            println("productIndex = $productIndex")
-            println("productScreenState.productList.size = ${searchProductScreenState.productList.size}")
-            println("productScreenState.isLoading = ${searchProductScreenState.isLoading}")
 
             if (productIndex >= searchProductScreenState.productList.size - 1 && !searchProductScreenState.isLoading) {
-                println("should Fire")
                 onSearchProductScreenEvent(ProductScreenEvents.OnPaginate(), searchProductScreenState.query)
             }
         }

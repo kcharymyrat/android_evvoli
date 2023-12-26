@@ -1,6 +1,5 @@
 package com.example.evvolitm.ui.screens
 
-import android.util.Log
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.compose.foundation.background
@@ -83,8 +82,6 @@ fun ProductDetailScreen(
 
     val productDetail: ProductDetail? = productDetailScreenState.productDetail
 
-    Log.d("Nav", "ProductDetailScreen => productDetail = $productDetail")
-
     // Get screen width
     val screenWidth = LocalConfiguration.current.screenWidthDp.dp
 
@@ -121,7 +118,6 @@ fun ProductDetailScreen(
                         containerColor = Color.White,
                         disabledContainerColor = Color.White,
                     ),
-//                    border = BorderStroke(),
                     elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
                     modifier = Modifier
                         .height(350.dp)
@@ -143,7 +139,6 @@ fun ProductDetailScreen(
                                         .width(screenWidth) // Full screen width
                                         .height(300.dp)
                                 ) {
-                                    println("productDetail.videoUrl  = ${productDetail.videoUrl }")
                                     VideoPlayerComposable(videoUrl = productDetail.videoUrl)
                                 }
                             }
@@ -360,12 +355,12 @@ fun ProductDetailToCartButtons(
         productQty.intValue = cartScreenState.cartItems.find {
             it.product.id == productDetail.id
         }?.cartItem?.quantity ?: 0
-        println("in LaunchedEffect _cart: productQty.intValue = ${productQty.intValue}")
-        println("ProductDetailToCartButtons: _cart : $cartScreenState ")
+//        println("in LaunchedEffect _cart: productQty.intValue = ${productQty.intValue}")
+//        println("ProductDetailToCartButtons: _cart : $cartScreenState ")
     }
 
-    println("ProductDetailToCartButtons: _cart : cartScreenState = $cartScreenState ")
-    println("ProductDetailToCartButtons: _cart : productQty = $productQty")
+//    println("ProductDetailToCartButtons: _cart : cartScreenState = $cartScreenState ")
+//    println("ProductDetailToCartButtons: _cart : productQty = $productQty")
 
     if (productQty.intValue > 0) {
         DetailMinusQtyPlus(
@@ -407,7 +402,6 @@ fun ProductDetailAddButton(
 
     Button(
         onClick = {
-            println("in ProductAddButton onClick: product.id = ${productDetail.id}")
             onUpdateCartAndItsState(newCartItemProduct, false)
         },
         elevation = ButtonDefaults.buttonElevation(
@@ -505,7 +499,6 @@ fun DetailPlusClickable(
         contentDescription = "Favorite Icon",
         modifier = modifier
             .clickable {
-                println("in PlusClickable onClick: product.id = ${productDetail.id}")
                 onUpdateCartAndItsState(newCartItemProduct, false)
             }
             .size(24.dp)
@@ -537,7 +530,6 @@ fun DetailMinusClickable(
         contentDescription = "Favorite Icon",
         modifier = modifier
             .clickable {
-                println("in MinusClickable onClick: product.id = ${productDetail.id}")
                 onUpdateCartAndItsState(newCartItemProduct, true)
             }
             .size(24.dp)

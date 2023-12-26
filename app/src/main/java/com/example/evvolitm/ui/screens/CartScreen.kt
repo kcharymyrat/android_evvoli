@@ -188,7 +188,9 @@ fun CartItemProductComposable(
         ) {
             CartItemProductImage(
                 product = product,
-                onSeeDetailsButtonClicked = {},
+                onSeeDetailsButtonClicked = {
+                    navController.navigate("${Screen.ProductDetailScreen.route}/${product.id}")
+                },
                 modifier = Modifier.weight(1f)
             )
             Column(modifier = Modifier

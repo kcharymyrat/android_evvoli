@@ -399,7 +399,6 @@ fun PlusClickable(
     )
     IconButton(
         onClick = {
-            println("in PlusClickable onClick: product.id = ${product.id}")
             onUpdateCartAndItsState(newCartItemProduct, false)
         },
         colors = IconButtonDefaults.iconButtonColors(
@@ -430,7 +429,6 @@ fun MinusClickable(
     )
     IconButton(
         onClick = {
-            println("in MinusClickable onClick: product.id = ${product.id}")
             onUpdateCartAndItsState(newCartItemProduct,true)
         },
         colors = IconButtonDefaults.iconButtonColors(

@@ -120,12 +120,9 @@ class MainViewModel @Inject constructor(
     ) {
         viewModelScope.launch {
 
-            println("_cartScreenState.value.id = ${_cartScreenState.value.id}")
             if (_cartScreenState.value.id == null) {
                 createCartScreenState()
-                println("new: _cartScreenState.value = ${_cartScreenState.value}")
             }
-            println("in loadCategories: _cartScreenState.value = ${_cartScreenState.value}")
 
             _categoryScreenState.update {
                 it.copy(isLoading = true)
@@ -168,12 +165,9 @@ class MainViewModel @Inject constructor(
     ) {
         viewModelScope.launch {
 
-            println("_cartScreenState.value.id = ${_cartScreenState.value.id}")
             if (_cartScreenState.value.id == null) {
                 createCartScreenState()
-                println("new: _cartScreenState.value = ${_cartScreenState.value}")
             }
-            println("in loadCategoryProducts: _cartScreenState.value = ${_cartScreenState.value}")
 
             _productScreenState.update {
                 it.copy(isLoading = true)
@@ -190,7 +184,6 @@ class MainViewModel @Inject constructor(
                     is Resource.Success -> {
 
                         result.data?.let { productList ->
-                            Log.d("Nav", "loadCategoryProducts => productList = $productList")
                             _productScreenState.update {
                                 it.copy(
                                     productList = productScreenState.value.productList
@@ -219,12 +212,9 @@ class MainViewModel @Inject constructor(
     ) {
         viewModelScope.launch {
 
-//            println("_cartScreenState.value.id = ${_cartScreenState.value.id}")
             if (_cartScreenState.value.id == null) {
                 createCartScreenState()
-//                println("new: _cartScreenState.value = ${_cartScreenState.value}")
             }
-//            println("in loadCategoryProducts: _cartScreenState.value = ${_cartScreenState.value}")
 
             _searchProductScreenState.update {
                 it.copy(isLoading = true)
@@ -241,7 +231,6 @@ class MainViewModel @Inject constructor(
                     is Resource.Success -> {
 
                         result.data?.let { productList ->
-                            Log.d("Nav", "loadSearchProducts => productList = $productList")
                             _searchProductScreenState.update {
                                 it.copy(
                                     query = q,
@@ -271,12 +260,9 @@ class MainViewModel @Inject constructor(
     ) {
         viewModelScope.launch {
 
-            println("_cartScreenState.value.id = ${_cartScreenState.value.id}")
             if (_cartScreenState.value.id == null) {
                 createCartScreenState()
-                println("new: _cartScreenState.value = ${_cartScreenState.value}")
             }
-            println("in loadCategories: _cartScreenState.value = ${_cartScreenState.value}")
 
             _productDetailScreenState.update {
                 it.copy(isLoading = true)
@@ -291,7 +277,6 @@ class MainViewModel @Inject constructor(
                     is Resource.Error -> Unit
                     is Resource.Success -> {
                         result.data?.let { productDetail ->
-                            Log.d("Nav", "loadProductDetail => productDetail = $productDetail")
                             _productDetailScreenState.update {
                                 it.copy(
                                     productDetail = productDetail,
@@ -321,7 +306,7 @@ class MainViewModel @Inject constructor(
         isMinus: Boolean = false
     ) {
         viewModelScope.launch {
-            println("in updateCart: _cartScreenState.value = ${_cartScreenState.value}")
+//            println("in updateCart: _cartScreenState.value = ${_cartScreenState.value}")
 
             val quantity = if (isMinus) -1 else 1
 
@@ -356,18 +341,18 @@ class MainViewModel @Inject constructor(
                 // Update the state
                 _cartScreenState.value = newCartState
 
-                println("_cartScreenState.value = ${_cartScreenState.value}")
+//                println("_cartScreenState.value = ${_cartScreenState.value}")
 
             }
 
-            println("in updateCart: _cartScreenState.value = ${_cartScreenState.value}")
+//            println("in updateCart: _cartScreenState.value = ${_cartScreenState.value}")
         }
     }
 
 
     fun createCartScreenState() {
         viewModelScope.launch {
-            println("in createCartScreenState: _cartScreenState.value = ${_cartScreenState.value}")
+//            println("in createCartScreenState: _cartScreenState.value = ${_cartScreenState.value}")
             val cartEntity =
                 cartRepository.getLatestCartEntity() ?: cartRepository.createEmptyCartEntity()
             cartEntity?.let {
@@ -386,7 +371,7 @@ class MainViewModel @Inject constructor(
                     )
                 }
             }
-            println("in createCartScreenState: _cartScreenState.value = ${_cartScreenState.value}")
+//            println("in createCartScreenState: _cartScreenState.value = ${_cartScreenState.value}")
         }
     }
 
@@ -401,10 +386,10 @@ class MainViewModel @Inject constructor(
     fun createOrder(orderDto: OrderDto) {
         viewModelScope.launch {
             val response = orderRepository.createOrder(orderDto)
-            println("response = $response")
-            println("response.isSuccessful = ${response.isSuccessful}")
-            println("response.body = ${response.body()}")
-            println("response.message = ${response.message()}")
+//            println("response = $response")
+//            println("response.isSuccessful = ${response.isSuccessful}")
+//            println("response.body = ${response.body()}")
+//            println("response.message = ${response.message()}")
             if (response.isSuccessful) {
                 // Order creation successful, navigate to success page
                 _orderStatus.value = OrderStatus.Success("Order Placed Successfully")
@@ -417,8 +402,8 @@ class MainViewModel @Inject constructor(
     }
 
     fun resetOrderStatusAndCartState() {
-        println("_orderStatus.value = ${_orderStatus.value }")
-        println("_cartScreenState.value = ${_cartScreenState.value }")
+//        println("_orderStatus.value = ${_orderStatus.value }")
+//        println("_cartScreenState.value = ${_cartScreenState.value }")
 
         _orderStatus.value = OrderStatus.Idle
         _cartScreenState.update {
@@ -431,8 +416,8 @@ class MainViewModel @Inject constructor(
             )
         }
 
-        println("_cartScreenState.value = ${_cartScreenState.value }")
-        println("_orderStatus.value = ${_orderStatus.value }")
+//        println("_cartScreenState.value = ${_cartScreenState.value }")
+//        println("_orderStatus.value = ${_orderStatus.value }")
 
     }
 }

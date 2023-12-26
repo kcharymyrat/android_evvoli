@@ -16,7 +16,7 @@ import com.example.evvolitm.navigation.Navigation
 import com.example.evvolitm.presentation.MainViewModel
 import com.example.evvolitm.ui.components.BottomNavigationBar
 import com.example.evvolitm.ui.components.EvvoliTopBar
-import com.example.evvolitm.ui.components.SearchScreen
+import com.example.evvolitm.ui.components.CustomSearchBar
 import com.example.evvolitm.util.Screen
 
 @Composable
@@ -42,8 +42,8 @@ fun EvvoliTmScreenContainer(
                 EvvoliTopBar(cartScreenState = cartScreenState, navController = navController)
                 // Conditionally display SearchScreen
                 if (currentRoute == Screen.CategoriesScreen.route ||
-                    currentRoute?.split("/")?.first() == Screen.CategoryProductsScreen.route) {
-                    SearchScreen(navController)
+                    currentRoute?.split("/")?.first() == Screen.CategoryProductsScreen.route ||  currentRoute?.split("/")?.first() == Screen.SearchProductsScreen.route) {
+                    CustomSearchBar(navController)
                 }
             }
         },

@@ -6,6 +6,10 @@ import com.example.evvolitm.ui.screens.CategoriesScreen
 //import com.example.evvolitm.ui.screens.CategoryProductsScreen
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -38,6 +42,8 @@ fun Navigation(
     cartScreenState: CartScreenState,
     orderStatus: OrderStatus,
 ) {
+    var query by remember { mutableStateOf("") }
+
     NavHost(navController = navController, startDestination = Screen.CategoriesScreen.route) {
 
         composable(route = Screen.CategoriesScreen.route) {
@@ -54,9 +60,6 @@ fun Navigation(
             arguments = listOf(navArgument("categoryId") { type = NavType.StringType })
         ) { backStackEntry ->
             val categoryId = backStackEntry.arguments?.getString("categoryId")
-
-            Log.d("Nav", "inNavigation => categoryId = $categoryId")
-            Log.d("Nav", "inNavigation => route = $route")
 
             LaunchedEffect(categoryId) {
                 if (categoryId != null && categoryId != mainViewModel.productCategoryId) {
@@ -84,12 +87,9 @@ fun Navigation(
         ) { backStackEntry ->
             val q = backStackEntry.arguments?.getString("q")
 
-            Log.d("Nav", "inNavigation => q = $q")
-            Log.d("Nav", "inNavigation => route = $route")
-
             LaunchedEffect(q) {
-                if (searchProductScreenState.query.isEmpty()) {
-                    println("In - LaunchedEffect(categoryId)")
+                if (searchProductScreenState.query.isEmpty() || q.toString() != query) {
+                    query = q.toString()
                     searchProductScreenState.productList = emptyList()
                     searchProductScreenState.page = 1
                     searchProductScreenState.query = q ?: ""
@@ -112,9 +112,6 @@ fun Navigation(
             arguments = listOf(navArgument("productId") { type = NavType.StringType })
         ) { backStackEntry ->
             val productId = backStackEntry.arguments?.getString("productId")
-
-            Log.d("Nav", "inNavigation => productId = $productId")
-            Log.d("Nav", "inNavigation => route = $route")
 
             LaunchedEffect(productId) {
                 if (productId != null) {
