@@ -40,6 +40,7 @@ fun CustomSearchBar(navController: NavHostController) {
         onQueryChange = { query = it },
         onSearch = {
             active = false
+            if (query.isEmpty()) query = " "
             navController.navigate(Screen.SearchProductsScreen.route + "/${query}") {
                 // Ensure a new instance of the destination is created
                 launchSingleTop = true

@@ -1,13 +1,23 @@
 package com.example.evvolitm.ui.screens
 
 import android.util.Log
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
@@ -19,6 +29,7 @@ import com.example.evvolitm.presentation.CartScreenState
 import com.example.evvolitm.presentation.ProductScreenEvents
 import com.example.evvolitm.presentation.ProductScreenState
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.delay
 
 @Composable
 fun SearchProductsScreen(
@@ -30,13 +41,21 @@ fun SearchProductsScreen(
     modifier: Modifier = Modifier,
 ) {
 
-    if (searchProductScreenState.productList.isEmpty()) {
+    var isWaitedEnough by remember { mutableStateOf(false) }
+
+    if (searchProductScreenState.productList.isEmpty() && searchProductScreenState.isLoading) {
         Box(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
             CircularProgressIndicator()
         }
+    } else if (searchProductScreenState.productList.isEmpty()) {
+        EmptyOrRetryScreen(
+            message = "No products found. Try a different search.",
+//            onRetry = { onSearchProductScreenEvent(ProductScreenEvents.Refresh, searchProductScreenState.query) }
+            onRetry = { }
+        )
     } else {
         SearchProductListDisplay(
             navController = navController,
@@ -47,12 +66,24 @@ fun SearchProductsScreen(
             modifier = Modifier.fillMaxSize()
         )
     }
+}
 
-
+@Composable
+fun EmptyOrRetryScreen(message: String, onRetry: () -> Unit) {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text(text = message)
+        Spacer(modifier = Modifier.height(16.dp))
+        Button(onClick = onRetry) {
+            Text("Retry")
+        }
+    }
 }
 
 
-@OptIn(FlowPreview::class)
 @Composable
 fun SearchProductListDisplay(
     navController: NavHostController,

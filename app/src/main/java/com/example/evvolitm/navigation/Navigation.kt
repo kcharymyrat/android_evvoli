@@ -84,8 +84,9 @@ fun Navigation(
 
         composable(
             route = "${Screen.SearchProductsScreen.route}/{q}",
+            arguments = listOf(navArgument("q") { type = NavType.StringType })
         ) { backStackEntry ->
-            val q = backStackEntry.arguments?.getString("q")
+            val q = backStackEntry.arguments?.getString("q").toString()
 
             LaunchedEffect(q) {
                 if (searchProductScreenState.query.isEmpty() || q.toString() != query) {
