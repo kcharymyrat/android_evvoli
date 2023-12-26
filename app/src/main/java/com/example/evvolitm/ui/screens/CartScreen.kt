@@ -56,6 +56,7 @@ import com.example.evvolitm.data.local.cart.CartItemWithProduct
 import com.example.evvolitm.data.remote.EvvoliTmApi
 import com.example.evvolitm.domain.model.CartItemProduct
 import com.example.evvolitm.presentation.CartScreenState
+import com.example.evvolitm.ui.components.EmptyCartScreen
 import com.example.evvolitm.ui.theme.Shapes
 import com.example.evvolitm.util.Screen
 
@@ -75,24 +76,30 @@ fun CartItemsScreen(
     val cartPrice = cartScreenState.cartTotalPrice
     val cartItems = cartScreenState.cartItems
 
-    Column(
-        modifier = modifier.padding(horizontal = dimensionResource(id = R.dimen.padding_medium))
-    ) {
-        Card {
-            CartCheckout(
-                cartPrice = cartPrice,
-                navController = navController
+    if (cartItems.isEmpty()) {
+        EmptyCartScreen(navController = navController)
+    } else {
+        Column(
+            modifier = modifier.padding(horizontal = dimensionResource(id = R.dimen.padding_medium))
+        ) {
+            Card {
+                CartCheckout(
+                    cartPrice = cartPrice,
+                    navController = navController
+                )
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+            CartItems(
+                navController = navController,
+                cartScreenState = cartScreenState,
+                onUpdateCartAndItsState = onUpdateCartAndItsState,
+                cartItems = cartItems,
             )
-        }
-        Spacer(modifier = Modifier.height(8.dp))
-        CartItems(
-            navController = navController,
-            cartScreenState = cartScreenState,
-            onUpdateCartAndItsState = onUpdateCartAndItsState,
-            cartItems = cartItems,
-        )
 
+        }
     }
+
+
 }
 
 @Composable

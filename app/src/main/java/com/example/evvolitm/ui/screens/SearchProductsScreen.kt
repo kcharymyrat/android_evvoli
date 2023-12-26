@@ -28,6 +28,7 @@ import com.example.evvolitm.domain.model.CartItemProduct
 import com.example.evvolitm.presentation.CartScreenState
 import com.example.evvolitm.presentation.ProductScreenEvents
 import com.example.evvolitm.presentation.ProductScreenState
+import com.example.evvolitm.ui.components.NoSearchResultsScreen
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.delay
 
@@ -51,11 +52,7 @@ fun SearchProductsScreen(
             CircularProgressIndicator()
         }
     } else if (searchProductScreenState.productList.isEmpty()) {
-        EmptyOrRetryScreen(
-            message = "No products found. Try a different search.",
-//            onRetry = { onSearchProductScreenEvent(ProductScreenEvents.Refresh, searchProductScreenState.query) }
-            onRetry = { }
-        )
+        NoSearchResultsScreen()
     } else {
         SearchProductListDisplay(
             navController = navController,
@@ -65,21 +62,6 @@ fun SearchProductsScreen(
             onUpdateCartAndItsState = onUpdateCartAndItsState,
             modifier = Modifier.fillMaxSize()
         )
-    }
-}
-
-@Composable
-fun EmptyOrRetryScreen(message: String, onRetry: () -> Unit) {
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Text(text = message)
-        Spacer(modifier = Modifier.height(16.dp))
-        Button(onClick = onRetry) {
-            Text("Retry")
-        }
     }
 }
 
