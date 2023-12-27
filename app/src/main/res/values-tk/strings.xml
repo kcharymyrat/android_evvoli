@@ -3,4 +3,17 @@
     <string name="app_name">EvvoliTm</string>
     <string name="about_us">Biz Barada</string>
     <string name="proceed_to_checkout">Sargydy taýýarlamak</string>
+    <string name="cash">Nagt</string>
+    <string name="card_terminal">Bank Karty</string>
+    <string name="payment_option">Töleg Şekili</string>
+    <string name="name">Adyňyz</string>
+    <string name="name_is_required">Adyňyzy yazmagyňyzy haýyş edýäris</string>
+    <string name="phone_number">Telefon belgiňiz</string>
+    <string name="invalid_phone_number">Dogry telefon belgiňizi yazmagyňyzy haýyş edýäris</string>
+    <string name="shipping_address">Salgyňyz</string>
+    <string name="address_is_required">Salgyňyzy yazmagyňyzy haýyş edýäris</string>
+    <string name="select_date_and_time">Eltip berme wagty</string>
+    <string name="delivery_date_is_required">Eltip berme senesini we wagtyny bellemegiňizi haýyş edýäris</string>
+    <string name="total">JEMI</string>
+    <string name="submit_order">Sargyt et</string>
 </resources>

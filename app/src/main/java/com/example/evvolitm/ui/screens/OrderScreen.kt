@@ -47,6 +47,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -73,8 +74,9 @@ fun OrderForm(
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
-    val paymentOptions = listOf("Cash", "Card Terminal")
-    val countryCode = "+993" // example country code
+    val paymentOptions = listOf(stringResource(R.string.cash),
+        stringResource(R.string.card_terminal))
+    val countryCode = stringResource(R.string.tkm_country_code) // example country code
 
 
     if (cartScreenState.id == null) {
@@ -115,7 +117,7 @@ fun OrderForm(
                         modifier = modifier.padding(horizontal = 16.dp)
                     ) {
                         Text(
-                            text = "Payment option",
+                            text = stringResource(R.string.payment_option),
                             style = MaterialTheme.typography.titleSmall,
                         )
                         paymentOptions.forEach { option ->
@@ -145,7 +147,7 @@ fun OrderForm(
                         OutlinedTextField(
                             value = customerName,
                             onValueChange = { customerName = it },
-                            label = { Text("Name") },
+                            label = { Text(stringResource(R.string.name)) },
                             isError = !isValid && customerName.isEmpty(),
                             colors = TextFieldDefaults.colors(
                                 unfocusedContainerColor = Color.White, // Set background color to white
@@ -156,13 +158,17 @@ fun OrderForm(
                             modifier = Modifier.fillMaxWidth()
                         )
                         if (!isValid && customerName.isEmpty()) {
-                            Text("Name is required", color = MaterialTheme.colorScheme.error)
+                            Text(
+                                stringResource(R.string.name_is_required),
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.error
+                            )
                         }
 
                         OutlinedTextField(
                             value = phone,
                             onValueChange = { phone = it },
-                            label = { Text("Phone") },
+                            label = { Text(stringResource(R.string.phone_number)) },
                             isError = !isValid && !isValidPhone(phone),
                             leadingIcon = if (isFocused) {
                                 { Text(countryCode, modifier = Modifier.padding(end = 4.dp)) }
@@ -185,13 +191,17 @@ fun OrderForm(
                                 }
                         )
                         if (!isValid && !isValidPhone(phone)) {
-                            Text("Invalid phone number", color = MaterialTheme.colorScheme.error)
+                            Text(
+                                stringResource(R.string.invalid_phone_number),
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.error
+                            )
                         }
 
                         OutlinedTextField(
                             value = address,
                             onValueChange = { address = it },
-                            label = { Text("Address") },
+                            label = { Text(stringResource(R.string.shipping_address)) },
                             isError =!isValid && address.isEmpty(),
                             colors = TextFieldDefaults.colors(
                                 unfocusedContainerColor = Color.White, // Set background color to white
@@ -202,26 +212,31 @@ fun OrderForm(
                             modifier = Modifier.fillMaxWidth()
                         )
                         if (!isValid && address.isEmpty()) {
-                            Text("Address is required", color = MaterialTheme.colorScheme.error)
+                            Text(
+                                stringResource(R.string.address_is_required),
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.error
+                            )
                         }
 
-                        println("selectedDate = $selectedDate")
-                        println("isValid = $isValid")
                         OutlinedTextField(
                             value = selectedDate?.toFormattedString() ?: "",
                             onValueChange = {},
                             readOnly = true,
-                            label = { Text("Select Date and Time") },
+                            label = { Text(stringResource(R.string.select_date_and_time)) },
                             isError = !isValid && (selectedDate == null),
                             trailingIcon = {
                                 IconButton(onClick = { showDateTimePicker(context) { date ->
                                     selectedDate = date
                                 }}) {
-                                    Icon(Icons.Default.CalendarToday, contentDescription = "Select Date")
+                                    Icon(
+                                        Icons.Default.CalendarToday,
+                                        contentDescription = stringResource(R.string.select_date_and_time)
+                                    )
                                 }
                             },
                             colors = TextFieldDefaults.colors(
-                                unfocusedContainerColor = Color.White, // Set background color to white
+                                unfocusedContainerColor = Color.White,
                                 focusedContainerColor = Color.White,
                                 disabledContainerColor = Color.White,
                                 errorContainerColor = Color.White,
@@ -229,7 +244,11 @@ fun OrderForm(
                             modifier = Modifier.fillMaxWidth()
                         )
                         if (!isValid && (selectedDate == null)) {
-                            Text("Delivery date is required", color = MaterialTheme.colorScheme.error)
+                            Text(
+                                stringResource(R.string.delivery_date_is_required),
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.error
+                            )
                         }
                         Spacer(modifier = Modifier.height(8.dp))
                     }
@@ -252,7 +271,7 @@ fun OrderForm(
                         .padding(8.dp),
                 ) {
                     Text(
-                        text = "TOTAL",
+                        text = stringResource(R.string.total),
                         style = MaterialTheme.typography.titleLarge,
                     )
                     Text(
@@ -281,7 +300,7 @@ fun OrderForm(
                     },
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text("Submit Order")
+                    Text(stringResource(R.string.submit_order))
                 }
             }
         }
@@ -350,8 +369,6 @@ fun handleSubmit(
         paymentOption = selectedPaymentOption.lowercase(),
         cart = cartItemsMap
     )
-    println("orderDto = $orderDto")
-
     createOrder(orderDto)
 }
 

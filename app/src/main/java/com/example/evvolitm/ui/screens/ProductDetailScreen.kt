@@ -2,6 +2,7 @@ package com.example.evvolitm.ui.screens
 
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -67,9 +68,26 @@ import coil.request.ImageRequest
 import com.example.evvolitm.R
 import com.example.evvolitm.data.remote.EvvoliTmApi
 import com.example.evvolitm.domain.model.CartItemProduct
+import com.example.evvolitm.domain.model.Product
 import com.example.evvolitm.domain.model.ProductDetail
 import com.example.evvolitm.presentation.CartScreenState
 import com.example.evvolitm.presentation.ProductDetailScreenState
+
+fun getProductDetailTitle(productDetail: ProductDetail): String {
+    return when (AppCompatDelegate.getApplicationLocales()[0]?.language) {
+        "tk" -> productDetail.title
+        "ru" -> productDetail.titleRu
+        else -> productDetail.titleEn
+    }
+}
+
+fun getProductDetailDescription(productDetail: ProductDetail): String {
+    return when (AppCompatDelegate.getApplicationLocales()[0]?.language) {
+        "tk" -> productDetail.description
+        "ru" -> productDetail.descriptionRu
+        else -> productDetail.descriptionEn
+    } ?: productDetail.description.toString()
+}
 
 
 @Composable
@@ -212,14 +230,14 @@ fun ProductDetailImage(
         if (imageState is AsyncImagePainter.State.Error) {
             Icon(
                 imageVector = Icons.Rounded.ImageNotSupported,
-                contentDescription = productDetail.title
+                contentDescription = getProductDetailTitle(productDetail)
             )
         } else {
             AsyncImage(
                 model = imageModel,
                 error = painterResource(R.drawable.ic_broken_image),
                 placeholder = painterResource(R.drawable.loading_img),
-                contentDescription = productDetail.title,
+                contentDescription = getProductDetailTitle(productDetail),
                 contentScale = ContentScale.Inside,
                 modifier = Modifier.fillMaxWidth()
             )
@@ -240,7 +258,7 @@ fun ProductDetailInformation(
     ) {
 
         Text(
-            text = productDetail.title,
+            text = getProductDetailTitle(productDetail),
             style = MaterialTheme.typography.titleLarge,
         )
         Spacer(modifier = Modifier.height(8.dp))
@@ -280,7 +298,7 @@ fun ProductDetailInformation(
         }
         Spacer(modifier = Modifier.height(16.dp))
         Text(
-            text = productDetail.description ?: "",
+            text = getProductDetailDescription(productDetail),
             color = Color.Gray,
             style = MaterialTheme.typography.labelMedium,
         )

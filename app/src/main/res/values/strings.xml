@@ -1,5 +1,20 @@
 <resources>
     <string name="app_name">EvvoliTm</string>
+    <string name="tkm_country_code" translatable="false">+993</string>
+
     <string name="about_us">About Us</string>
     <string name="proceed_to_checkout">Proceed to Checkout</string>
+    <string name="cash">Cash</string>
+    <string name="card_terminal">Card Terminal</string>
+    <string name="payment_option">Payment option</string>
+    <string name="name_is_required">Please enter your name</string>
+    <string name="phone_number">Phone Number</string>
+    <string name="invalid_phone_number">Please enter a correct phone number</string>
+    <string name="shipping_address">Shipping Address</string>
+    <string name="address_is_required">Please enter your delivery address</string>
+    <string name="select_date_and_time">Select Date and Time</string>
+    <string name="delivery_date_is_required">Please indicate delivery date and time</string>
+    <string name="total">TOTAL</string>
+    <string name="submit_order">Submit Order</string>
+    <string name="name">Name</string>
 </resources>

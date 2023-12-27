@@ -3,4 +3,17 @@
     <string name="app_name">EvvoliTm</string>
     <string name="about_us">О нас</string>
     <string name="proceed_to_checkout">Перейти к оформлению заказа</string>
+    <string name="cash">Наличные</string>
+    <string name="card_terminal">Банковская платежная карта</string>
+    <string name="payment_option">Вариант оплаты</string>
+    <string name="name">Ваше имя</string>
+    <string name="name_is_required">Пожалуйста, введите ваше имя</string>
+    <string name="phone_number">Номер телефона</string>
+    <string name="invalid_phone_number">Пожалуйста, введите правильный номер телефона</string>
+    <string name="shipping_address">Адрес доставки</string>
+    <string name="address_is_required">Пожалуйста, введите ваш адрес доставки</string>
+    <string name="select_date_and_time">Время доставки</string>
+    <string name="delivery_date_is_required">Пожалуйста, укажите дату и время доставки</string>
+    <string name="total">ИТОГО</string>
+    <string name="submit_order">Подтвердить заказ</string>
 </resources>
