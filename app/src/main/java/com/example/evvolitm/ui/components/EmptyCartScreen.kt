@@ -8,6 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -29,7 +30,7 @@ fun EmptyCartScreen(navController: NavHostController) {
         ) {
             Icon(
                 imageVector = Icons.Default.AddShoppingCart,
-                contentDescription = "Add to shopping Cart",
+                contentDescription = stringResource(R.string.add_to_shopping_cart),
                 modifier = Modifier.size(120.dp)
             )
             Spacer(modifier = Modifier.height(24.dp))
@@ -43,7 +44,7 @@ fun EmptyCartScreen(navController: NavHostController) {
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = "Looks like you haven't added anything to your cart yet",
+                text = stringResource(R.string.haven_t_added_anything_to_your_cart_yet),
                 style = MaterialTheme.typography.bodyMedium.copy(
                     fontSize = 16.sp,
                     color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
@@ -57,7 +58,7 @@ fun EmptyCartScreen(navController: NavHostController) {
                     contentColor = MaterialTheme.colorScheme.onPrimary
                 )
             ) {
-                Text("Start Shopping")
+                Text(stringResource(R.string.start_shopping))
             }
         }
     }

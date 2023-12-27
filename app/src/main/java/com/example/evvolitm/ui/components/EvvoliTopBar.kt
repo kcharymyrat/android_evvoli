@@ -32,6 +32,7 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -43,12 +44,9 @@ import com.example.evvolitm.util.Screen
 @Composable
 fun EvvoliTopBar(
     navController: NavHostController,
-    cartScreenState: CartScreenState,
+    currentRoute: String?,
     modifier: Modifier = Modifier,
 ) {
-    var showMenu by remember { mutableStateOf(false) }
-    var searchText by remember { mutableStateOf("") }
-
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier
@@ -63,167 +61,51 @@ fun EvvoliTopBar(
         ) {
             Image(
                 painter = painterResource(R.drawable.evvoli_logo_b1),
-                contentDescription = "App Logo",
+                contentDescription = stringResource(R.string.evvoli_logo),
                 modifier = Modifier
                     .size(dimensionResource(R.dimen.logo_size))
                     .padding(vertical = dimensionResource(R.dimen.padding_small))
             )
-            IconButton(onClick = {
-                navController.navigate(Screen.SettingsScreen.route)
-            }) {
-                Icon(imageVector = Icons.Default.Settings, contentDescription = "settings")
+
+            val currentScreenTitle = if (currentRoute == Screen.CategoriesScreen.route){
+                stringResource(R.string.categories)
+            } else if (currentRoute?.split("/")?.first() == Screen.CategoryProductsScreen.route) {
+                stringResource(R.string.products)
+            } else if (currentRoute?.split("/")?.first() == Screen.SearchProductsScreen.route) {
+                stringResource(R.string.products_search)
+            } else if (currentRoute?.split("/")?.first() == Screen.ProductDetailScreen.route) {
+                stringResource(R.string.product_details)
+            } else if (currentRoute == Screen.CartScreen.route) {
+                stringResource(R.string.cart)
+            } else if (currentRoute == Screen.OrderScreen.route) {
+                stringResource(R.string.order)
+            } else if (currentRoute == Screen.SuccessOrderScreen.route) {
+                stringResource(R.string.success)
+            } else if (currentRoute == Screen.AboutScreen.route) {
+                stringResource(R.string.evvoli_turkmenistan)
+            } else if (currentRoute == Screen.SettingsScreen.route) {
+                stringResource(R.string.settings)
+            } else {
+                ""
             }
 
-//            // Search section
-//            Box(modifier = Modifier.weight(1f)) {
-//                BasicTextField(
-//                    value = searchText,
-//                    onValueChange = { searchText = it },
-//                    decorationBox = { innerTextField ->
-//                        if (searchText.isEmpty()) {
-//                            Text("Search", color = Color.Gray)
-//                        }
-//                        innerTextField()
-//                    }
-//                )
-//            }
+            Text(
+                text = currentScreenTitle,
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier.weight(1f),
+                textAlign = TextAlign.Center
+            )
+
+            IconButton(
+                onClick = {
+                navController.navigate(Screen.SettingsScreen.route)
+                },
+                modifier = Modifier
+                    .size(dimensionResource(R.dimen.logo_size))
+                    .padding(vertical = dimensionResource(R.dimen.padding_small))
+            ) {
+                Icon(imageVector = Icons.Default.Settings, contentDescription = "settings")
+            }
         }
     }
 }
-
-
-//@Preview(showBackground = true, showSystemUi = true)
-//@Composable
-//fun TopBarPreview() {
-//    EvvoliTopBar()
-//}
-//@Composable
-//fun MyAppBar(navController: NavController) {
-//    var showMenu by remember { mutableStateOf(false) }
-//    var searchText by remember { mutableStateOf("") }
-//
-//    // Custom app bar layout
-//    Box(
-//        modifier = Modifier
-//            .fillMaxWidth()
-//            .height(56.dp) // Standard app bar height
-//            .padding(4.dp),
-//        contentAlignment = Alignment.Center
-//    ) {
-//        Row(
-//            modifier = Modifier.fillMaxSize(),
-//            verticalAlignment = Alignment.CenterVertically
-//        ) {
-//            // Logo
-//            Image(
-//                painter = painterResource(id = R.drawable.logo),
-//                contentDescription = "App Logo",
-//                modifier = Modifier.weight(1f)
-//            )
-//            // Dropdown menu for categories
-//            Box(modifier = Modifier.weight(2f)) {
-//                DropdownMenu(
-//                    expanded = showMenu,
-//                    onDismissRequest = { showMenu = false }
-//                ) {
-//                    DropdownMenuItem(onClick = { /* Handle click */ }) {
-//                        Text("Category 1")
-//                    }
-//                    DropdownMenuItem(onClick = { /* Handle click */ }) {
-//                        Text("Category 2")
-//                    }
-//                    // Add more categories as needed
-//                }
-//                Text("Categories", modifier = Modifier.clickable { showMenu = true })
-//            }
-//            // Search section
-//            Box(modifier = Modifier.weight(3f)) {
-//                BasicTextField(
-//                    value = searchText,
-//                    onValueChange = { searchText = it },
-//                    decorationBox = { innerTextField ->
-//                        if (searchText.isEmpty()) {
-//                            Text("Search", color = Color.Gray)
-//                        }
-//                        innerTextField()
-//                    }
-//                )
-//            }
-//            // Cart section
-//            IconButton(
-//                onClick = { /* Handle cart click */ },
-//                modifier = Modifier.weight(1f)
-//            ) {
-//                Icon(Icons.Filled.ShoppingCart, contentDescription = "Cart")
-//            }
-//        }
-//    }
-//}
-
-//@Composable
-//fun MainScreen() {
-//    val navController = rememberNavController()
-//    Scaffold(
-//        topBar = { MyAppBar(navController) }
-//    ) {
-//        // Content of your main screen goes here
-//    }
-//}
-//
-//object MainDestinations {
-//    const val MAIN_ROUTE = "main"
-//    const val CART_ROUTE = "cart"
-//    // Define other routes as needed
-//}
-//
-//@Composable
-//fun AppNavHost(navController: NavController) {
-//    NavHost(navController, startDestination = MainDestinations.MAIN_ROUTE) {
-//        composable(MainDestinations.MAIN_ROUTE) {
-//            MainScreen(navController)
-//        }
-//        composable(MainDestinations.CART_ROUTE) {
-//            CartScreen() // Replace with your actual cart screen composable
-//        }
-//        // Add more destinations as needed
-//    }
-//}
-//
-//
-//@Composable
-//fun MainScreen(navController: NavController) {
-//    Scaffold(
-//        topBar = { MyAppBar(navController) }
-//    ) {
-//        AppNavHost(navController)
-//    }
-//}
-//
-//
-//@Composable
-//fun MyAppBar(navController: NavController) {
-//    // ... existing code ...
-//
-//    // Cart section
-//    IconButton(
-//        onClick = { navController.navigate(MainDestinations.CART_ROUTE) },
-//        modifier = Modifier.weight(1f)
-//    ) {
-//        Icon(Icons.Filled.ShoppingCart, contentDescription = "Cart")
-//    }
-//}
-//
-//class MainActivity : ComponentActivity() {
-//    override fun onCreate(savedInstanceState: Bundle?) {
-//        super.onCreate(savedInstanceState)
-//        setContent {
-//            val navController = rememberNavController()
-//            MainScreen(navController)
-//        }
-//    }
-//}
-//
-//dependencies {
-//    implementation "androidx.navigation:navigation-compose:x.x.x" // Use the latest version
-//    // Other dependencies...
-//}

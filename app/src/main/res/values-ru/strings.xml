@@ -23,5 +23,25 @@
         Спасибо за ваш заказ.\nС вами скоро свяжутся.
     </string>
 
+    <string name="search">Поиск</string>
+    <string name="search_icon">Иконка Поиска</string>
+    <string name="close_icon">Иконка Закрыть</string>
+
+    <string name="add_to_shopping_cart">Добавить в корзину</string>
+    <string name="haven_t_added_anything_to_your_cart_yet">
+        Похоже, вы еще ничего не добавили в корзину.
+    </string>
+    <string name="start_shopping">Начать покупки</string>
+
+    <string name="categories">Категории</string>
+    <string name="products">Товары</string>
+    <string name="products_search">Поиск товаров</string>
+    <string name="product_details">Информация о товаре</string>
+    <string name="cart">Корзина</string>
+    <string name="order">Заказ</string>
+    <string name="success">Успех</string>
+    <string name="evvoli_turkmenistan">Evvoli Туркменистан</string>
+    <string name="settings">Настройки</string>
+
 
 </resources>

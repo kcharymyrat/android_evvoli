@@ -35,14 +35,14 @@ fun EvvoliTmScreenContainer(
 
     Scaffold(
         topBar = {
-            println("currentRoute = $currentRoute")
-            Log.d("Nav", "currentRoute = $currentRoute")
-
             Column {
-                EvvoliTopBar(cartScreenState = cartScreenState, navController = navController)
+                EvvoliTopBar(navController = navController, currentRoute = currentRoute)
+
                 // Conditionally display SearchScreen
                 if (currentRoute == Screen.CategoriesScreen.route ||
-                    currentRoute?.split("/")?.first() == Screen.CategoryProductsScreen.route ||  currentRoute?.split("/")?.first() == Screen.SearchProductsScreen.route) {
+                    currentRoute?.split("/")?.first() == Screen.CategoryProductsScreen.route ||
+                    currentRoute?.split("/")?.first() == Screen.SearchProductsScreen.route)
+                {
                     CustomSearchBar(navController)
                 }
             }
@@ -76,19 +76,3 @@ fun currentRoute(navController: NavHostController): String? {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     return navBackStackEntry?.destination?.route
 }
-
-//@Preview(showBackground = true, showSystemUi = true)
-//@Composable
-//fun EvvoliTmPreview() {
-//    EvvoliTmTheme(darkTheme = false) {
-//        EvvoliTmScreenContainer()
-//    }
-//}
-//
-//@Preview(showBackground = true, showSystemUi = true)
-//@Composable
-//fun EvvoliTmDarkThemePreview() {
-//    EvvoliTmTheme(darkTheme = true) {
-//        EvvoliTmScreenContainer()
-//    }
-//}

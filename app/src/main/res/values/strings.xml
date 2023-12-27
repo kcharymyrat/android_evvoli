@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">EvvoliTm</string>
+    <string name="evvoli_logo" translatable="false">Evvoli Logo</string>
     <string name="tkm_country_code" translatable="false">+993</string>
 
     <string name="about_us">About Us</string>
@@ -23,5 +24,25 @@
     <string name="thank_you_for_your_order_you_will_be_contacted_soon">
         Thank you for your order.\nYou will be contacted soon.
     </string>
+
+    <string name="search">Search</string>
+    <string name="search_icon">Search Icon</string>
+    <string name="close_icon">Close Icon</string>
+
+    <string name="add_to_shopping_cart">Add to shopping cart</string>
+    <string name="haven_t_added_anything_to_your_cart_yet">
+        Looks like you haven\'t added anything to your cart yet
+    </string>
+    <string name="start_shopping">Start Shopping</string>
+
+    <string name="categories">Categories</string>
+    <string name="products">Products</string>
+    <string name="products_search">Products Search</string>
+    <string name="product_details">Product Details</string>
+    <string name="cart">Cart</string>
+    <string name="order">Order</string>
+    <string name="success">Success</string>
+    <string name="evvoli_turkmenistan">Evvoli Turkmenistan</string>
+    <string name="settings">Settings</string>
 
 </resources>

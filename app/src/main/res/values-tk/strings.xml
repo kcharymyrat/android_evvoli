@@ -23,5 +23,24 @@
         Sargyt üçin köp sag boluň.\nGyzga wagtda siz bilen habarlaşylar.
     </string>
 
+    <string name="search">Gözläň</string>
+    <string name="search_icon">Gözleg nyşany</string>
+    <string name="close_icon">Ýapyň nyşany</string>
+
+    <string name="add_to_shopping_cart">Sebede goşuň</string>
+    <string name="haven_t_added_anything_to_your_cart_yet">
+        Arabaňyza entek hiç zat goşmadyk ýaly.
+    </string>
+    <string name="start_shopping">Söwda edip başlaň</string>
+
+    <string name="categories">Kategoriýalar</string>
+    <string name="products">Harytlar</string>
+    <string name="products_search">Haryt gözlegi</string>
+    <string name="product_details">Haryt maglumatlary</string>
+    <string name="cart">Sebet</string>
+    <string name="order">Заказ</string>
+    <string name="success">Sargyt</string>
+    <string name="evvoli_turkmenistan">Evvoli Türkmenistan</string>
+    <string name="settings">Sazlamalar</string>
 
 </resources>

@@ -145,10 +145,7 @@ fun Navigation(
 
         composable(
             route = Screen.OrderScreen.route
-//            route = "${Screen.OrderScreen.route}/{message}",
-//            arguments = listOf(navArgument("message") { type = NavType.StringType })
         ) {backStackEntry ->
-//            val message = backStackEntry.arguments?.getString("message") ?: ""
 
             OrderForm(
                 navController = navController,
