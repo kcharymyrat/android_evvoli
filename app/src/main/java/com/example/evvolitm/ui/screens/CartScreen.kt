@@ -1,6 +1,6 @@
 package com.example.evvolitm.ui.screens
 
-import androidx.compose.foundation.background
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -10,22 +10,17 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.KeyboardArrowLeft
-import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.rounded.ImageNotSupported
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
@@ -37,12 +32,12 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -55,10 +50,18 @@ import com.example.evvolitm.data.local.cart.CartItemProductEntity
 import com.example.evvolitm.data.local.cart.CartItemWithProduct
 import com.example.evvolitm.data.remote.EvvoliTmApi
 import com.example.evvolitm.domain.model.CartItemProduct
+import com.example.evvolitm.domain.model.Category
 import com.example.evvolitm.presentation.CartScreenState
 import com.example.evvolitm.ui.components.EmptyCartScreen
-import com.example.evvolitm.ui.theme.Shapes
 import com.example.evvolitm.util.Screen
+
+fun getCartItemProductEntityTitle(product: CartItemProductEntity): String {
+    return when (AppCompatDelegate.getApplicationLocales()[0]?.language) {
+        "tk" -> product.title
+        "ru" -> product.titleRu
+        else -> product.titleEn
+    }
+}
 
 @Composable
 fun CartItemsScreen(
@@ -141,7 +144,7 @@ fun CartCheckout(
                 .padding(8.dp),
         ) {
             Text(
-                text = "Proceed to Checkout",
+                text = stringResource(R.string.proceed_to_checkout),
             )
         }
     }
@@ -185,7 +188,6 @@ fun CartItemProductComposable(
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         modifier = modifier
     ) {
-        val productSlug = "product.titleResId"
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
@@ -238,14 +240,14 @@ fun CartItemProductImage(
         if (imageState is AsyncImagePainter.State.Error) {
             Icon(
                 imageVector = Icons.Rounded.ImageNotSupported,
-                contentDescription = "product.title"
+                contentDescription = getCartItemProductEntityTitle(product)
             )
         } else {
             AsyncImage(
                 model = imageModel,
                 error = painterResource(R.drawable.ic_broken_image),
                 placeholder = painterResource(R.drawable.loading_img),
-                contentDescription = "product.title",
+                contentDescription = getCartItemProductEntityTitle(product),
                 contentScale = ContentScale.FillWidth,
             )
         }
@@ -259,7 +261,7 @@ fun CartItemProductInfo(product: CartItemProductEntity, modifier: Modifier = Mod
         modifier = modifier
     ) {
         Text(
-            text = product.title,
+            text = getCartItemProductEntityTitle(product),
             style = MaterialTheme.typography.labelLarge,
         )
         if (product.salePrice < product.price) {

@@ -2,4 +2,5 @@
 <resources>
     <string name="app_name">EvvoliTm</string>
     <string name="about_us">Biz Barada</string>
+    <string name="proceed_to_checkout">Sargydy taýýarlamak</string>
 </resources>

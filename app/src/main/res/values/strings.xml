@@ -1,9 +1,5 @@
 <resources>
     <string name="app_name">EvvoliTm</string>
     <string name="about_us">About Us</string>
-
-    <!-- TO BE DELETED LATER   -->
-    <string name="loading">Image loading</string>
-    <string name="loading_failed">Loading data failed!</string>
-    <string name="retry">Please retry again!</string>
+    <string name="proceed_to_checkout">Proceed to Checkout</string>
 </resources>

@@ -1,6 +1,6 @@
 package com.example.evvolitm.ui.screens
 
-import android.util.Log
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -41,6 +41,14 @@ import com.example.evvolitm.presentation.CategoryScreenEvents
 import com.example.evvolitm.presentation.CategoryScreenState
 import com.example.evvolitm.util.Screen
 
+
+fun getCategoryName(category: Category): String {
+    return when (AppCompatDelegate.getApplicationLocales()[0]?.language) {
+        "tk" -> category.name
+        "ru" -> category.nameRu
+        else -> category.nameEn // default to English
+    }
+}
 
 @Composable
 fun CategoriesScreen(
@@ -155,14 +163,14 @@ fun CategoryImage(navController: NavHostController, category: Category, modifier
         if (imageState is AsyncImagePainter.State.Error) {
             Icon(
                 imageVector = Icons.Rounded.ImageNotSupported,
-                contentDescription = category.name
+                contentDescription = getCategoryName(category)
             )
         } else {
             AsyncImage(
                 model = imageModel,
                 error = painterResource(R.drawable.ic_broken_image),
                 placeholder = painterResource(R.drawable.loading_img),
-                contentDescription = category.name,
+                contentDescription = getCategoryName(category),
                 contentScale = ContentScale.FillWidth,
                 modifier = Modifier.fillMaxWidth()
             )
@@ -178,7 +186,7 @@ fun CategoryInformation(category: Category, modifier: Modifier) {
         modifier = modifier
     ) {
         Text(
-            text = category.name,
+            text = getCategoryName(category),
             style = MaterialTheme.typography.titleSmall,
         )
 //        if (category.description != null) {
