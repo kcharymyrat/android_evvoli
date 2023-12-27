@@ -16,4 +16,12 @@
     <string name="delivery_date_is_required">Пожалуйста, укажите дату и время доставки</string>
     <string name="total">ИТОГО</string>
     <string name="submit_order">Подтвердить заказ</string>
+
+    <string name="order_success">Успешный заказ</string>
+    <string name="order_successful">Заказ успешен!</string>
+    <string name="thank_you_for_your_order_you_will_be_contacted_soon">
+        Спасибо за ваш заказ.\nС вами скоро свяжутся.
+    </string>
+
+
 </resources>

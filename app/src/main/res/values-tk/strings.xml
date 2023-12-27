@@ -16,4 +16,12 @@
     <string name="delivery_date_is_required">Eltip berme senesini we wagtyny bellemegiňizi haýyş edýäris</string>
     <string name="total">JEMI</string>
     <string name="submit_order">Sargyt et</string>
+
+    <string name="order_success">Üstünlikli sargyt</string>
+    <string name="order_successful">Sargyt üstünlikli kabul edildi!</string>
+    <string name="thank_you_for_your_order_you_will_be_contacted_soon">
+        Sargyt üçin köp sag boluň.\nGyzga wagtda siz bilen habarlaşylar.
+    </string>
+
+
 </resources>

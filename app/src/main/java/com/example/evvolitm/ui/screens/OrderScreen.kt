@@ -4,6 +4,7 @@ package com.example.evvolitm.ui.screens
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.content.Context
+import android.provider.Settings.Global.getString
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -74,8 +75,10 @@ fun OrderForm(
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
-    val paymentOptions = listOf(stringResource(R.string.cash),
-        stringResource(R.string.card_terminal))
+    val paymentOptions = listOf(
+        stringResource(R.string.cash),
+        stringResource(R.string.card_terminal)
+    )
     val countryCode = stringResource(R.string.tkm_country_code) // example country code
 
 
@@ -284,6 +287,13 @@ fun OrderForm(
                         isValid = validateForm(customerName, phone, address, selectedDate)
                         println("$customerName, $phone, $address, $selectedDate")
                         println("isValid = $isValid")
+
+                        val paymentOption = if (selectedPaymentOption == paymentOptions[0]) {
+                            "cash"
+                        } else {
+                            "card terminal"
+                        }
+
                         if (isValid) {
                             handleSubmit(
                                 navController = navController,
@@ -294,7 +304,7 @@ fun OrderForm(
                                 phone = phone,
                                 address = address,
                                 selectedDate = selectedDate,
-                                selectedPaymentOption = selectedPaymentOption,
+                                selectedPaymentOption = paymentOption,
                             )
                         }
                     },
@@ -356,7 +366,6 @@ fun handleSubmit(
     selectedDate: Date?,
     selectedPaymentOption: String,
 ) {
-
     val cartItemsMap = mutableMapOf<String, Int>()
     for (item in cartScreenState.cartItems) {
         cartItemsMap[item.cartItem.productId] = item.cartItem.quantity

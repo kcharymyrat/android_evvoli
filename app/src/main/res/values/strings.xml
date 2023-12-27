@@ -7,6 +7,7 @@
     <string name="cash">Cash</string>
     <string name="card_terminal">Card Terminal</string>
     <string name="payment_option">Payment option</string>
+    <string name="name">Name</string>
     <string name="name_is_required">Please enter your name</string>
     <string name="phone_number">Phone Number</string>
     <string name="invalid_phone_number">Please enter a correct phone number</string>
@@ -16,5 +17,11 @@
     <string name="delivery_date_is_required">Please indicate delivery date and time</string>
     <string name="total">TOTAL</string>
     <string name="submit_order">Submit Order</string>
-    <string name="name">Name</string>
+
+    <string name="order_success">Order Success</string>
+    <string name="order_successful">Order Successful!</string>
+    <string name="thank_you_for_your_order_you_will_be_contacted_soon">
+        Thank you for your order.\nYou will be contacted soon.
+    </string>
+
 </resources>

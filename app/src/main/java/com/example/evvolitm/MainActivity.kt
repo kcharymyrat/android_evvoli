@@ -1,7 +1,6 @@
 package com.example.evvolitm
 
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,8 +10,8 @@ import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.example.evvolitm.ui.EvvoliTmScreenContainer
 import com.example.evvolitm.presentation.MainViewModel
+import com.example.evvolitm.ui.EvvoliTmScreenContainer
 import com.example.evvolitm.ui.theme.EvvoliTmTheme
 import dagger.hilt.android.AndroidEntryPoint
 
