@@ -24,20 +24,25 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.example.evvolitm.R
 import com.example.evvolitm.presentation.CartScreenState
 import com.example.evvolitm.util.Screen
 
+const val CATEGORIES = "Categories"
+const val CART = "Cart"
+const val ABOUT_US = "About Us"
 
 sealed class BottomNavItem(val screen: Screen, val icon: ImageVector, val label: String) {
-    object Categories : BottomNavItem(Screen.CategoriesScreen, Icons.Default.Home, "Categories")
-    object Cart : BottomNavItem(Screen.CartScreen, Icons.Default.ShoppingCart, "Cart")
-    object About : BottomNavItem(Screen.AboutScreen, Icons.Default.Info, "About")
+    object Categories : BottomNavItem(Screen.CategoriesScreen, Icons.Default.Home, CATEGORIES)
+    object Cart : BottomNavItem(Screen.CartScreen, Icons.Default.ShoppingCart, CART)
+    object About : BottomNavItem(Screen.AboutScreen, Icons.Default.Info, ABOUT_US)
 }
 
 
@@ -89,7 +94,13 @@ fun BottomNavigationBar(navController: NavHostController, cartScreenState: CartS
                         )
                     }
                 },
-                label = { Text(item.label) },
+                label = {
+                    when (item.label) {
+                        CATEGORIES -> Text(text = stringResource(id = R.string.categories))
+                        CART -> Text(text = stringResource(id = R.string.cart))
+                        ABOUT_US -> Text(text = stringResource(id = R.string.about_us))
+                    }
+                },
                 selected = currentRoute == item.screen.route,
                 onClick = {
                     navController.navigate(item.screen.route) {
