@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">EvvoliTm</string>
+    <string name="select_language">Выберите язык</string>
+
     <string name="about_us">О нас</string>
     <string name="proceed_to_checkout">Перейти к оформлению заказа</string>
     <string name="cash">Наличные</string>

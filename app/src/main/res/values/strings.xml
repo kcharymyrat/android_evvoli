@@ -3,6 +3,8 @@
     <string name="evvoli_logo" translatable="false">Evvoli Logo</string>
     <string name="tkm_country_code" translatable="false">+993</string>
 
+    <string name="select_language">Select Language</string>
+
     <string name="about_us">About Us</string>
     <string name="proceed_to_checkout">Proceed to Checkout</string>
     <string name="cash">Cash</string>

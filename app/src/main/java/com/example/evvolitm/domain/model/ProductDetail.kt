@@ -3,9 +3,9 @@ package com.example.evvolitm.domain.model
 data class ProductDetail(
     val id: String,
     val categoryId: String,
-    val type: String,
-    val typeEn: String,
-    val typeRu: String,
+    val type: String?,
+    val typeEn: String?,
+    val typeRu: String?,
     val model: String,
     val title: String,
     val titleEn: String,

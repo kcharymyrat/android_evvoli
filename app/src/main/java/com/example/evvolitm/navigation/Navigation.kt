@@ -26,6 +26,7 @@ import com.example.evvolitm.ui.screens.AboutScreen
 import com.example.evvolitm.ui.screens.CartItemsScreen
 import com.example.evvolitm.ui.screens.CategoryProductsScreen
 import com.example.evvolitm.ui.screens.LanguageChangeScreen
+import com.example.evvolitm.ui.screens.LanguageSelectionScreen
 import com.example.evvolitm.ui.screens.OrderForm
 import com.example.evvolitm.ui.screens.ProductDetailScreen
 import com.example.evvolitm.ui.screens.SearchProductsScreen
@@ -171,7 +172,7 @@ fun Navigation(
         composable(
             route = Screen.SettingsScreen.route
         ) {
-            LanguageChangeScreen()
+            LanguageSelectionScreen()
         }
     }
 }

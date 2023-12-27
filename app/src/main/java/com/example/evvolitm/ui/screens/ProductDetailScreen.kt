@@ -23,8 +23,10 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.rounded.ImageNotSupported
 import androidx.compose.material3.Button
@@ -33,6 +35,8 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -54,6 +58,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -72,6 +77,7 @@ import com.example.evvolitm.domain.model.Product
 import com.example.evvolitm.domain.model.ProductDetail
 import com.example.evvolitm.presentation.CartScreenState
 import com.example.evvolitm.presentation.ProductDetailScreenState
+import com.example.evvolitm.ui.theme.Shapes
 
 fun getProductDetailTitle(productDetail: ProductDetail): String {
     return when (AppCompatDelegate.getApplicationLocales()[0]?.language) {
@@ -87,6 +93,14 @@ fun getProductDetailDescription(productDetail: ProductDetail): String {
         "ru" -> productDetail.descriptionRu
         else -> productDetail.descriptionEn
     } ?: productDetail.description.toString()
+}
+
+fun getProductDetailType(productDetail: ProductDetail): String {
+    return when (AppCompatDelegate.getApplicationLocales()[0]?.language) {
+        "tk" -> productDetail.type
+        "ru" -> productDetail.typeEn
+        else -> productDetail.typeRu
+    } ?: productDetail.type.toString()
 }
 
 
@@ -257,10 +271,20 @@ fun ProductDetailInformation(
         modifier = modifier
     ) {
 
-        Text(
-            text = getProductDetailTitle(productDetail),
-            style = MaterialTheme.typography.titleLarge,
-        )
+        Column(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(
+                text = getProductDetailTitle(productDetail),
+                style = MaterialTheme.typography.titleLarge,
+            )
+            Text(
+                text = getProductDetailType(productDetail),
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.primary
+            )
+        }
+
         Spacer(modifier = Modifier.height(8.dp))
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -373,28 +397,35 @@ fun ProductDetailToCartButtons(
         productQty.intValue = cartScreenState.cartItems.find {
             it.product.id == productDetail.id
         }?.cartItem?.quantity ?: 0
-//        println("in LaunchedEffect _cart: productQty.intValue = ${productQty.intValue}")
-//        println("ProductDetailToCartButtons: _cart : $cartScreenState ")
     }
 
-//    println("ProductDetailToCartButtons: _cart : cartScreenState = $cartScreenState ")
-//    println("ProductDetailToCartButtons: _cart : productQty = $productQty")
-
-    if (productQty.intValue > 0) {
-        DetailMinusQtyPlus(
-            cartScreenState = cartScreenState,
-            onUpdateCartAndItsState = onUpdateCartAndItsState,
-            productDetail = productDetail,
-            cartProductQty = productQty.intValue,
-            modifier = modifier
-        )
-    } else {
-        ProductDetailAddButton(
-            cartScreenState = cartScreenState,
-            onUpdateCartAndItsState = onUpdateCartAndItsState,
-            productDetail = productDetail,
-            modifier = modifier
-        )
+    Box(
+        modifier = Modifier
+            .background(
+                color = MaterialTheme.colorScheme.primary,
+                shape = Shapes.medium
+            )
+    ) {
+        Row(
+            modifier = Modifier
+        ) {
+            if (productQty.intValue > 0) {
+                DetailMinusQtyPlus(
+                    cartScreenState = cartScreenState,
+                    onUpdateCartAndItsState = onUpdateCartAndItsState,
+                    productDetail = productDetail,
+                    cartProductQty = productQty.intValue,
+                    modifier = modifier
+                )
+            } else {
+                ProductDetailAddButton(
+                    cartScreenState = cartScreenState,
+                    onUpdateCartAndItsState = onUpdateCartAndItsState,
+                    productDetail = productDetail,
+                    modifier = modifier
+                )
+            }
+        }
     }
 }
 
@@ -418,19 +449,17 @@ fun ProductDetailAddButton(
         salePrice = productDetail.salePrice.toDouble(),
     )
 
-    Button(
+    IconButton(
         onClick = {
             onUpdateCartAndItsState(newCartItemProduct, false)
         },
-        elevation = ButtonDefaults.buttonElevation(
-            defaultElevation = 4.dp, // Normal elevation
-            pressedElevation = 8.dp, // Elevation when the button is pressed
-            disabledElevation = 0.dp  // Elevation when the button is disabled
+        colors = IconButtonDefaults.iconButtonColors(
+            contentColor = Color.White
         )
     ) {
         Icon(
             imageVector = Icons.Default.ShoppingCart,
-            contentDescription = "Add to shopping cart"
+            contentDescription = stringResource(id = R.string.add_to_shopping_cart)
         )
     }
 }
@@ -443,40 +472,28 @@ fun DetailMinusQtyPlus(
     cartProductQty: Int,
     modifier: Modifier = Modifier,
 ) {
-    Button(
-        onClick = { },
-        colors = ButtonDefaults.buttonColors(
-            containerColor = MaterialTheme.colorScheme.secondary,
-        ),
-        elevation = ButtonDefaults.buttonElevation(
-            defaultElevation = 4.dp, // Normal elevation
-            pressedElevation = 8.dp, // Elevation when the button is pressed
-            disabledElevation = 0.dp  // Elevation when the button is disabled
-        ),
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceAround,
+        modifier = modifier,
     ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceAround,
-            modifier = Modifier,
-        ) {
-            DetailMinusClickable(
-                cartScreenState = cartScreenState,
-                onUpdateCartAndItsState = onUpdateCartAndItsState,
-                productDetail = productDetail
-            )
-            Spacer(modifier.width(8.dp))
-            ProductDetailQty(
-                cartScreenState = cartScreenState,
-                productDetail = productDetail,
-                cartProductQty = cartProductQty
-            )
-            Spacer(modifier.width(8.dp))
-            DetailPlusClickable(
-                cartScreenState = cartScreenState,
-                onUpdateCartAndItsState = onUpdateCartAndItsState,
-                productDetail = productDetail
-            )
-        }
+        DetailMinusClickable(
+            cartScreenState = cartScreenState,
+            onUpdateCartAndItsState = onUpdateCartAndItsState,
+            productDetail = productDetail
+        )
+
+        ProductDetailQty(
+            cartScreenState = cartScreenState,
+            productDetail = productDetail,
+            cartProductQty = cartProductQty
+        )
+
+        DetailPlusClickable(
+            cartScreenState = cartScreenState,
+            onUpdateCartAndItsState = onUpdateCartAndItsState,
+            productDetail = productDetail
+        )
     }
 }
 
@@ -490,7 +507,8 @@ fun ProductDetailQty(
     Text(
         text = cartProductQty.toString(),
         modifier = modifier,
-        style = MaterialTheme.typography.labelLarge
+        color = Color.White,
+        style = MaterialTheme.typography.bodyLarge
     )
 }
 
@@ -512,17 +530,16 @@ fun DetailPlusClickable(
         price = productDetail.price.toDouble(),
         salePrice = productDetail.salePrice.toDouble(),
     )
-    Icon(
-        imageVector = Icons.Filled.KeyboardArrowRight,
-        contentDescription = "Favorite Icon",
-        modifier = modifier
-            .clickable {
-                onUpdateCartAndItsState(newCartItemProduct, false)
-            }
-            .size(24.dp)
-            .clip(CircleShape)
-            .background(Color.Transparent)
-    )
+    IconButton(
+        onClick = {
+            onUpdateCartAndItsState(newCartItemProduct, false)
+        },
+        colors = IconButtonDefaults.iconButtonColors(
+            contentColor = Color.White
+        )
+    ) {
+        Icon(Icons.Default.Add, contentDescription = "Decrease")
+    }
 }
 
 @Composable
@@ -543,17 +560,17 @@ fun DetailMinusClickable(
         price = productDetail.price.toDouble(),
         salePrice = productDetail.salePrice.toDouble(),
     )
-    Icon(
-        imageVector = Icons.Filled.KeyboardArrowLeft,
-        contentDescription = "Favorite Icon",
-        modifier = modifier
-            .clickable {
-                onUpdateCartAndItsState(newCartItemProduct, true)
-            }
-            .size(24.dp)
-            .clip(CircleShape)
-            .background(Color.Transparent)
-    )
+
+    IconButton(
+        onClick = {
+            onUpdateCartAndItsState(newCartItemProduct,true)
+        },
+        colors = IconButtonDefaults.iconButtonColors(
+            contentColor = Color.White
+        )
+    ) {
+        Icon(Icons.Default.Remove, contentDescription = "Increase")
+    }
 }
 
 

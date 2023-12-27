@@ -8,9 +8,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -36,6 +38,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -48,6 +51,7 @@ import com.example.evvolitm.data.remote.EvvoliTmApi
 import com.example.evvolitm.domain.model.CartItemProduct
 import com.example.evvolitm.domain.model.Category
 import com.example.evvolitm.domain.model.Product
+import com.example.evvolitm.domain.model.ProductDetail
 import com.example.evvolitm.presentation.CartScreenState
 import com.example.evvolitm.presentation.ProductScreenEvents
 import com.example.evvolitm.presentation.ProductScreenState
@@ -61,6 +65,14 @@ fun getCategoryProductTitle(product: Product): String {
         "ru" -> product.titleRu
         else -> product.titleEn
     }
+}
+
+fun getCategoryProductType(product: Product): String {
+    return when (AppCompatDelegate.getApplicationLocales()[0]?.language) {
+        "tk" -> product.type
+        "ru" -> product.typeEn
+        else -> product.typeRu
+    } ?: product.type.toString()
 }
 
 @Composable
@@ -227,10 +239,23 @@ fun ProductInformation(
         verticalArrangement = Arrangement.Center,
         modifier = modifier
     ) {
-        Text(
-            text = getCategoryProductTitle(product),
-            style = MaterialTheme.typography.titleLarge,
-        )
+
+        Column(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(
+                text = getCategoryProductTitle(product),
+                style = MaterialTheme.typography.titleLarge,
+            )
+            Text(
+                text = getCategoryProductType(product),
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.primary
+            )
+        }
+
+
+
         if (product.salePrice < product.price) {
             Text(
                 text = product.price.toString() + " m.",
@@ -325,7 +350,7 @@ fun ProductAddButton(
     ) {
         Icon(
             imageVector = Icons.Default.ShoppingCart,
-            contentDescription = "Add to shopping cart"
+            contentDescription = stringResource(id = R.string.add_to_shopping_cart)
         )
     }
 }
