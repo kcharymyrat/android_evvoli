@@ -61,6 +61,4 @@ abstract class RepositoryModule {
     abstract fun bindOrderRepository(
         orderRepositoryImpl: OrderRepositoryImpl
     ): OrderRepository
-
-
 }

@@ -53,6 +53,11 @@ android {
 
 dependencies {
 
+
+    implementation("androidx.appcompat:appcompat:1.6.1")
+    // For loading and tinting drawables on older versions of the platform
+    implementation("androidx.appcompat:appcompat-resources:1.6.1")
+    implementation("androidx.datastore:datastore-preferences:1.0.0")
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.2")

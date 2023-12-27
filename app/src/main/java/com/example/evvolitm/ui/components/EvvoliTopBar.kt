@@ -14,6 +14,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -67,6 +68,11 @@ fun EvvoliTopBar(
                     .size(dimensionResource(R.dimen.logo_size))
                     .padding(vertical = dimensionResource(R.dimen.padding_small))
             )
+            IconButton(onClick = {
+                navController.navigate(Screen.SettingsScreen.route)
+            }) {
+                Icon(imageVector = Icons.Default.Settings, contentDescription = "settings")
+            }
 
 //            // Search section
 //            Box(modifier = Modifier.weight(1f)) {

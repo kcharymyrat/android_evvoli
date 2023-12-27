@@ -1,5 +1,6 @@
 package com.example.evvolitm.ui.screens
 
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
@@ -12,6 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.evvolitm.R
@@ -19,9 +21,12 @@ import com.example.evvolitm.R
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AboutScreen() {
+    println(AppCompatDelegate.getApplicationLocales())
+    println("AppCompatDelegate.getApplicationLocales()[0]?.language " +
+            "= ${AppCompatDelegate.getApplicationLocales()[0]?.language}")
     Scaffold(
         topBar = {
-            CenterAlignedTopAppBar(title = { Text("About Us") })
+            CenterAlignedTopAppBar(title = { Text(stringResource(R.string.about_us)) })
         }
     ) { paddingValues ->
         Column(

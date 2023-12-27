@@ -91,13 +91,8 @@ fun CategoryListDisplay(
                         vertical = dimensionResource(id = R.dimen.padding_x_small)
                     )
             )
-//            println("category = ${categoryScreenState.categoryList}")
-//            println("catIndex = $catIndex")
-//            println("categoryScreenState.categoryList.size = ${categoryScreenState.categoryList.size}")
-//            println("categoryScreenState.isLoading = ${categoryScreenState.isLoading}")
 
             if (catIndex >= categoryScreenState.categoryList.size - 1 && !categoryScreenState.isLoading) {
-//                println("should Fire")
                 onEvent(CategoryScreenEvents.OnPaginate())
             }
         }

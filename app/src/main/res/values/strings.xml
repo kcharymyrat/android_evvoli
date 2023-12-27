@@ -1,22 +1,8 @@
 <resources>
     <string name="app_name">EvvoliTm</string>
+    <string name="about_us">About Us</string>
 
     <!-- TO BE DELETED LATER   -->
-    <string name="evvoli_tvs">TVs</string>
-    <string name="title_1">TV 1</string>
-    <string name="title_2">TV 2</string>
-    <string name="title_3">TV 3</string>
-    <string name="title_4">TV 4</string>
-    <string name="title_5">TV 5</string>
-    <string name="title_6">TV 6</string>
-    <string name="title_7">TV 7</string>
-    <string name="title_8">TV 8</string>
-    <string name="title_9">TV 9</string>
-    <string name="title_10">TV 10</string>
-    <string name="title_11">TV 11</string>
-    <string name="title_12">TV 12</string>
-    <string name="title_13">TV 13</string>
-    <string name="description">Typography plays an important role in giving</string>
     <string name="loading">Image loading</string>
     <string name="loading_failed">Loading data failed!</string>
     <string name="retry">Please retry again!</string>
