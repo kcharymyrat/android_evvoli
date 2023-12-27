@@ -28,6 +28,7 @@
     <string name="close_icon">Иконка Закрыть</string>
 
     <string name="add_to_shopping_cart">Добавить в корзину</string>
+    <string name="your_cart_is_empty">Ваша корзина пуста</string>
     <string name="haven_t_added_anything_to_your_cart_yet">
         Похоже, вы еще ничего не добавили в корзину.
     </string>
@@ -42,6 +43,12 @@
     <string name="success">Успех</string>
     <string name="evvoli_turkmenistan">Evvoli Туркменистан</string>
     <string name="settings">Настройки</string>
+
+    <string name="no_results_found">Результатов поиска не найдено</string>
+    <string name="search_not_found_icon">Значок поиск не найден</string>
+    <string name="couldn_t_find_any_products">
+        Мы не смогли найти ни одного товара, соответствующего вашему запросу.
+    </string>
 
 
 </resources>

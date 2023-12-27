@@ -35,7 +35,7 @@ fun EmptyCartScreen(navController: NavHostController) {
             )
             Spacer(modifier = Modifier.height(24.dp))
             Text(
-                text = "Your cart is empty",
+                text = stringResource(R.string.your_cart_is_empty),
                 style = MaterialTheme.typography.headlineSmall.copy(
                     fontWeight = FontWeight.Bold,
                     fontSize = 20.sp,

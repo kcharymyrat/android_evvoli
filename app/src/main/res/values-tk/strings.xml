@@ -28,6 +28,7 @@
     <string name="close_icon">Ýapyň nyşany</string>
 
     <string name="add_to_shopping_cart">Sebede goşuň</string>
+    <string name="your_cart_is_empty">Siziň sebetiňiz boş</string>
     <string name="haven_t_added_anything_to_your_cart_yet">
         Arabaňyza entek hiç zat goşmadyk ýaly.
     </string>
@@ -42,5 +43,11 @@
     <string name="success">Sargyt</string>
     <string name="evvoli_turkmenistan">Evvoli Türkmenistan</string>
     <string name="settings">Sazlamalar</string>
+
+    <string name="no_results_found">Gözleg harytlary tapylmady</string>
+    <string name="search_not_found_icon">Gözleg tapylmady nyşany</string>
+    <string name="couldn_t_find_any_products">
+        Islegiňize laýyk haryt tapyp bilmedik.
+    </string>
 
 </resources>

@@ -8,6 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -28,12 +29,12 @@ fun NoSearchResultsScreen() {
         ) {
             Icon(
                 imageVector = Icons.Default.SearchOff,
-                contentDescription = "No Results Found",
+                contentDescription = stringResource(R.string.search_not_found_icon),
                 modifier = Modifier.size(120.dp)
             )
             Spacer(modifier = Modifier.height(24.dp))
             Text(
-                text = "No Results Found",
+                text = stringResource(R.string.no_results_found),
                 style = MaterialTheme.typography.headlineSmall.copy(
                     fontWeight = FontWeight.Bold,
                     fontSize = 20.sp,
@@ -42,23 +43,13 @@ fun NoSearchResultsScreen() {
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = "We couldn't find any products matching your search",
+                text = stringResource(R.string.couldn_t_find_any_products),
                 style = MaterialTheme.typography.bodyMedium.copy(
                     fontSize = 16.sp,
                     color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
                 ),
                 textAlign = TextAlign.Center
             )
-//            Spacer(modifier = Modifier.height(24.dp))
-//            Button(
-//                onClick = { /* TODO: Handle a new search or navigation */ },
-//                colors = ButtonDefaults.buttonColors(
-//                    containerColor = MaterialTheme.colorScheme.primary,
-//                    contentColor = MaterialTheme.colorScheme.onPrimary
-//                )
-//            ) {
-//                Text("Try a Different Search")
-//            }
         }
     }
 }

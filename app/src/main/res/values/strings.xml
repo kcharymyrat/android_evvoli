@@ -30,6 +30,7 @@
     <string name="close_icon">Close Icon</string>
 
     <string name="add_to_shopping_cart">Add to shopping cart</string>
+    <string name="your_cart_is_empty">Your cart is empty</string>
     <string name="haven_t_added_anything_to_your_cart_yet">
         Looks like you haven\'t added anything to your cart yet
     </string>
@@ -44,5 +45,11 @@
     <string name="success">Success</string>
     <string name="evvoli_turkmenistan">Evvoli Turkmenistan</string>
     <string name="settings">Settings</string>
+
+    <string name="no_results_found">No Results Found</string>
+    <string name="search_not_found_icon">Search not found icon</string>
+    <string name="couldn_t_find_any_products">
+        We couldn\'t find any products matching your search
+    </string>
 
 </resources>
