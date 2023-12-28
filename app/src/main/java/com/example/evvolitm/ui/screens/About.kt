@@ -4,7 +4,6 @@ import android.content.Intent
 import android.net.Uri
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
@@ -18,11 +17,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.evvolitm.R
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -77,11 +73,13 @@ fun ContactInformation() {
             ) {
                 val latitude: Double = 37.94038485947134
                 val longitude: Double = 58.42375763825806
+                val placeId = "ChIJJ5liW8r9bz8RSsMBKfj7uYw"
                 LocationDetail(
                     icon = Icons.Default.Place,
                     detail = "Hoja Ahmet Yasawy St, Ashgabat 744000, Turkmenistan",
                     latitude = latitude,
                     longitude = longitude,
+                    placeId = placeId
                 )
                 PhoneDetail(Icons.Default.Phone, "+993 65 726468")
                 EmailDetail(Icons.Default.Email, "contact@evvoli.com")
@@ -97,11 +95,13 @@ fun ContactInformation() {
             ) {
                 val latitude: Double = 37.59980287678001
                 val longitude: Double = 61.87317372474693
+                val placeId = "ChIJMckIgryPQT8Rv44UlQUOgNA"
                 LocationDetail(
                     icon = Icons.Default.Place,
                     detail = "HVXF+V7F, Mary, Turkmenistan",
                     latitude = latitude,
                     longitude = longitude,
+                    placeId = placeId,
                 )
                 PhoneDetail(Icons.Default.Phone, "+993 61 004770")
                 EmailDetail(Icons.Default.Email, "contact@evvoli.com")
@@ -109,12 +109,43 @@ fun ContactInformation() {
         }
 
     }
-
 }
 
+@Composable
+fun LocationDetail(
+    icon: ImageVector,
+    detail: String,
+    latitude: Double,
+    longitude: Double,
+    placeId: String
+) {
+    val context = LocalContext.current
+
+    Row(
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        IconButton(
+            onClick = {
+                val gmmIntentUri = Uri.parse(
+                    "https://www.google.com/maps/search/?api=1&query=$latitude,$longitude&query_place_id=$placeId"
+                )
+                val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
+                mapIntent.setPackage("com.google.android.apps.maps")
+                context.startActivity(mapIntent)
+            },
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = detail,
+            )
+        }
+        Spacer(modifier = Modifier.width(8.dp))
+        Text(detail, style = MaterialTheme.typography.bodyMedium)
+    }
+}
 
 @Composable
-fun LocationDetail(icon: ImageVector, detail: String, latitude: Double, longitude: Double) {
+fun LocationLatLongDetail(icon: ImageVector, detail: String, latitude: Double, longitude: Double) {
     val context = LocalContext.current
 
     Row(
