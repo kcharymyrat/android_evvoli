@@ -247,11 +247,13 @@ fun ProductInformation(
                 text = getCategoryProductTitle(product),
                 style = MaterialTheme.typography.titleLarge,
             )
-            Text(
-                text = getCategoryProductType(product),
-                style = MaterialTheme.typography.titleLarge,
-                color = MaterialTheme.colorScheme.primary
-            )
+            if (product.type != null) {
+                Text(
+                    text = getCategoryProductType(product),
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
         }
 
 

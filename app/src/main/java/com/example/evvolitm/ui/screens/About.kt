@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.evvolitm.R
@@ -55,8 +56,7 @@ fun CompanyLogo() {
 @Composable
 fun CompanyDescription() {
     Text(
-        text = "Evvoli Technology is a leading provider of innovative tech solutions. " +
-                "Our mission is to enhance the digital experience with cutting-edge products and services.",
+        text = stringResource(R.string.evvoli_company_description),
         style = MaterialTheme.typography.bodyLarge
     )
 }

@@ -278,11 +278,13 @@ fun ProductDetailInformation(
                 text = getProductDetailTitle(productDetail),
                 style = MaterialTheme.typography.titleLarge,
             )
-            Text(
-                text = getProductDetailType(productDetail),
-                style = MaterialTheme.typography.titleLarge,
-                color = MaterialTheme.colorScheme.primary
-            )
+            if (productDetail.type != null) {
+                Text(
+                    text = getProductDetailType(productDetail),
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
         }
 
         Spacer(modifier = Modifier.height(8.dp))

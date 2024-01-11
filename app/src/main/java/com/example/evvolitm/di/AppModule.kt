@@ -22,7 +22,7 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
-    private val baseUrl = "http://192.168.1.14:8000/"
+    private val baseUrl = "http://192.168.1.15:8000/"
 
     // Create a logging interceptor
     private val loggingInterceptor = HttpLoggingInterceptor().apply {

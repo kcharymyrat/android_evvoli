@@ -41,7 +41,7 @@ interface EvvoliTmApi {
     suspend fun createOrder(@Body orderDto: OrderDto): Response<Unit>
 
     companion object {
-        const val BASE_URL = "http://192.168.1.14:8000/"
-        const val IMAGE_BASE_URL = "http://192.168.1.14:8000/"
+        const val BASE_URL = "http://192.168.1.15:8000/"
+        const val IMAGE_BASE_URL = "http://192.168.1.15:8000/"
     }
 }
