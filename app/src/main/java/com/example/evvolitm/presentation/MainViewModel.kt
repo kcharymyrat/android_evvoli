@@ -85,6 +85,14 @@ class MainViewModel @Inject constructor(
         println("event = $event")
         when (event) {
             is ProductScreenEvents.Refresh -> {
+                _productScreenState.update { currentState ->
+                    currentState.copy(
+                        isLoading = true,
+                        page = 1,
+                        hasError = false,
+                        productList = emptyList(),
+                    )
+                }
                 loadCategoryProducts(categoryId = categoryId, forceFetchFromRemote = true)
             }
 
@@ -193,7 +201,11 @@ class MainViewModel @Inject constructor(
                 page = productScreenState.value.page
             ).collect { result ->
                 when (result) {
-                    is Resource.Error -> Unit
+                    is Resource.Error -> {
+                        _productScreenState.update { currentState ->
+                            currentState.copy(isLoading = false, hasError = true)
+                        }
+                    }
                     is Resource.Success -> {
 
                         result.data?.let { productList ->

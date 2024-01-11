@@ -60,6 +60,7 @@ class CategoryRepositoryImpl @Inject constructor(
             if (isRefresh) {
 //                categoryDao.deleteAllCategories()
                 currentPage = 1
+                nextUrl = null
             }
 
             val remoteCategoryList: List<CategoryDto>? = try {

@@ -1,6 +1,7 @@
 package com.example.evvolitm.ui.screens
 
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -19,6 +20,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.rounded.ImageNotSupported
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -53,6 +55,7 @@ import com.example.evvolitm.domain.model.Category
 import com.example.evvolitm.domain.model.Product
 import com.example.evvolitm.domain.model.ProductDetail
 import com.example.evvolitm.presentation.CartScreenState
+import com.example.evvolitm.presentation.CategoryScreenEvents
 import com.example.evvolitm.presentation.ProductScreenEvents
 import com.example.evvolitm.presentation.ProductScreenState
 import com.example.evvolitm.ui.theme.Shapes
@@ -86,7 +89,25 @@ fun CategoryProductsScreen(
     modifier: Modifier = Modifier,
 ) {
 
-    if (productScreenState.productList.isEmpty()) {
+    if (productScreenState.hasError) {
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.ic_connection_error),
+                contentDescription = stringResource(R.string.connection_error),
+            )
+            Text(
+                text = stringResource(R.string.error_loading_data_please_refresh),
+                modifier = Modifier.padding(16.dp)
+            )
+            Button(onClick = { onScreenProductEvent(ProductScreenEvents.Refresh, categoryId) }) {
+                Text(stringResource(R.string.refresh))
+            }
+        }
+    } else if (productScreenState.productList.isEmpty()) {
         Box(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center

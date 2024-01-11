@@ -19,6 +19,7 @@ import javax.inject.Singleton
 class ProductRepositoryImpl  @Inject constructor(
     private val evvoliTmApi: EvvoliTmApi,
 ): ProductRepository {
+    private var nextUrl: String? = null
 
     override suspend fun getProducts(
         categoryId: String,
@@ -32,10 +33,16 @@ class ProductRepositoryImpl  @Inject constructor(
             var currentPage = page
             if (isRefresh) {
                 currentPage = 1
+                nextUrl = null
             }
 
             val remoteProductList: List<ProductDto>? = try {
-                evvoliTmApi.getCategoryProductList(categoryId = categoryId, page = currentPage).results
+                if (nextUrl != null || page == 1) {
+                    val categoryProductsResponse = evvoliTmApi
+                        .getCategoryProductList(categoryId = categoryId, page = currentPage)
+                    nextUrl = categoryProductsResponse.next
+                    categoryProductsResponse.results
+                } else { null }
             } catch (e: IOException) {
                 e.printStackTrace()
                 emit(Resource.Error("Couldn't load products"))

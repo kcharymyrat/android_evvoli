@@ -29,6 +29,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
@@ -67,14 +68,14 @@ fun CategoriesScreen(
         ) {
             Image(
                 painter = painterResource(id = R.drawable.ic_connection_error),
-                contentDescription = "connection error",
+                contentDescription = stringResource(R.string.connection_error),
             )
             Text(
-                text = "Error loading data. Please refresh.",
+                text = stringResource(R.string.error_loading_data_please_refresh),
                 modifier = Modifier.padding(16.dp)
             )
             Button(onClick = { onEvent(CategoryScreenEvents.Refresh) }) {
-                Text("Refresh")
+                Text(stringResource(R.string.refresh))
             }
         }
     } else if (categoryScreenState.categoryList.isEmpty()) {
