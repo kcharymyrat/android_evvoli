@@ -62,6 +62,14 @@ class MainViewModel @Inject constructor(
         println("event = $event")
         when (event) {
             is CategoryScreenEvents.Refresh -> {
+                _categoryScreenState.update { currentState ->
+                    currentState.copy(
+                        isLoading = true,
+                        page = 1,
+                        hasError = false,
+                        categoryList = emptyList(),
+                    )
+                }
                 loadCategories(forceFetchFromRemote = true)
             }
 
@@ -124,6 +132,7 @@ class MainViewModel @Inject constructor(
                 createCartScreenState()
             }
 
+            println("_categoryScreenState.value = ${_categoryScreenState.value}")
             _categoryScreenState.update {
                 it.copy(isLoading = true)
             }
@@ -134,7 +143,11 @@ class MainViewModel @Inject constructor(
                 page = categoryScreenState.value.page
             ).collectLatest { result ->
                 when (result) {
-                    is Resource.Error -> Unit
+                    is Resource.Error -> {
+                        _categoryScreenState.update { currentState ->
+                            currentState.copy(isLoading = false, hasError = true)
+                        }
+                    }
                     is Resource.Success -> {
                         result.data?.let { categoryList ->
                             _categoryScreenState.update {

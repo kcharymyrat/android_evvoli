@@ -5,6 +5,7 @@ import android.net.Uri
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
@@ -32,7 +33,7 @@ fun AboutScreen() {
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
+            .padding(horizontal = 16.dp, vertical = 4.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         item {
@@ -47,8 +48,14 @@ fun AboutScreen() {
 
 @Composable
 fun CompanyLogo() {
+    val logoImage = if (isSystemInDarkTheme()) {
+        painterResource(id = R.drawable.evvoli_logo_w1) // Image for dark theme
+    } else {
+        painterResource(R.drawable.evvoli_logo_b1) // Image for light theme
+    }
+
     Image(
-        painter = painterResource(id = R.drawable.evvoli_logo_b1),
+        painter = logoImage,
         contentDescription = "Company Logo",
         modifier = Modifier.size(100.dp)
     )

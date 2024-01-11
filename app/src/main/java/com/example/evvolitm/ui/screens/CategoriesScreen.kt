@@ -1,6 +1,7 @@
 package com.example.evvolitm.ui.screens
 
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -58,7 +59,25 @@ fun CategoriesScreen(
     modifier: Modifier = Modifier
 ) {
 
-    if (categoryScreenState.categoryList.isEmpty()) {
+    if (categoryScreenState.hasError) {
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.ic_connection_error),
+                contentDescription = "connection error",
+            )
+            Text(
+                text = "Error loading data. Please refresh.",
+                modifier = Modifier.padding(16.dp)
+            )
+            Button(onClick = { onEvent(CategoryScreenEvents.Refresh) }) {
+                Text("Refresh")
+            }
+        }
+    } else if (categoryScreenState.categoryList.isEmpty()) {
         Box(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
@@ -218,22 +237,6 @@ fun CategoryButton(
 }
 
 
-
-///**
-// * The home screen displaying the loading message.
-// */
-//@Composable
-//fun LoadingScreen(navController: NavHostController, modifier: Modifier = Modifier) {
-//    Image(
-//        modifier = modifier.size(200.dp),
-//        painter = painterResource(R.drawable.loading_img),
-//        contentDescription = stringResource(R.string.loading)
-//    )
-//}
-//
-///**
-// * The home screen displaying error message with re-attempt button.
-// */
 //@Composable
 //fun ErrorScreen(navController: NavHostController, retryAction: () -> Unit, modifier: Modifier = Modifier) {
 //    Column(
@@ -250,3 +253,22 @@ fun CategoryButton(
 //        }
 //    }
 //}
+
+
+
+///**
+// * The home screen displaying the loading message.
+// */
+//@Composable
+//fun LoadingScreen(navController: NavHostController, modifier: Modifier = Modifier) {
+//    Image(
+//        modifier = modifier.size(200.dp),
+//        painter = painterResource(R.drawable.loading_img),
+//        contentDescription = stringResource(R.string.loading)
+//    )
+//}
+//
+///**
+// * The home screen displaying error message with re-attempt button.
+// */
+

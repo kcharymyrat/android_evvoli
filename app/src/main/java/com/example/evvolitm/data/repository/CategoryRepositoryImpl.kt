@@ -1,5 +1,6 @@
 package com.example.evvolitm.data.repository
 
+import androidx.compose.runtime.saveable.rememberSaveable
 import com.example.evvolitm.data.local.EvvoliTmDatabase
 import com.example.evvolitm.data.local.category.CategoryEntity
 import com.example.evvolitm.data.remote.EvvoliTmApi
@@ -22,6 +23,7 @@ class CategoryRepositoryImpl @Inject constructor(
     evvoliTmDb: EvvoliTmDatabase
 ): CategoryRepository {
     private val categoryDao = evvoliTmDb.categoryDao
+    private var nextUrl: String? = null
 
     override suspend fun updateCategoryItem(category: Category) {
         categoryDao.updateCategoryItem(category.toCategoryEntity())
@@ -61,7 +63,11 @@ class CategoryRepositoryImpl @Inject constructor(
             }
 
             val remoteCategoryList: List<CategoryDto>? = try {
-                evvoliTmApi.getCategories(page = currentPage).results
+                if (nextUrl != null || page == 1) {
+                    val categoriesResponse = evvoliTmApi.getCategories(page = currentPage)
+                    nextUrl = categoriesResponse.next
+                    categoriesResponse.results
+                } else { null }
             } catch (e: IOException) {
                 e.printStackTrace()
                 emit(Resource.Error("Couldn't load data"))

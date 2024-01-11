@@ -2,6 +2,7 @@ package com.example.evvolitm.ui.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -47,6 +48,11 @@ fun EvvoliTopBar(
     currentRoute: String?,
     modifier: Modifier = Modifier,
 ) {
+    val logoImage = if (isSystemInDarkTheme()) {
+        painterResource(id = R.drawable.evvoli_logo_w1) // Image for dark theme
+    } else {
+        painterResource(R.drawable.evvoli_logo_b1) // Image for light theme
+    }
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier
@@ -60,7 +66,7 @@ fun EvvoliTopBar(
             modifier = Modifier.fillMaxSize(),
         ) {
             Image(
-                painter = painterResource(R.drawable.evvoli_logo_b1),
+                painter = logoImage,
                 contentDescription = stringResource(R.string.evvoli_logo),
                 modifier = Modifier
                     .size(dimensionResource(R.dimen.logo_size))
