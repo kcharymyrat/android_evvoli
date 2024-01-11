@@ -88,7 +88,7 @@ fun CategoryProductsScreen(
     onUpdateCartAndItsState: (CartItemProduct, Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-
+    println("productScreenState.hasError = ${productScreenState.hasError}")
     if (productScreenState.hasError) {
         Column(
             modifier = Modifier.fillMaxSize(),

@@ -65,7 +65,7 @@ fun Navigation(
 
             LaunchedEffect(categoryId) {
                 if (categoryId != null && categoryId != mainViewModel.productCategoryId) {
-                    println("In - LaunchedEffect(categoryId)")
+                    println("In - LaunchedEffect(categoryId = $categoryId)")
                     productScreenState.productList = emptyList()
                     productScreenState.page = 1
                     mainViewModel.loadCategoryProducts(categoryId = categoryId, true)

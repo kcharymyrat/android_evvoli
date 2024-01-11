@@ -41,7 +41,13 @@ class ProductRepositoryImpl  @Inject constructor(
                     val categoryProductsResponse = evvoliTmApi
                         .getCategoryProductList(categoryId = categoryId, page = currentPage)
                     nextUrl = categoryProductsResponse.next
-                    categoryProductsResponse.results
+                    val results = categoryProductsResponse.results
+                    if (results.isEmpty() && page == 1) {
+                        emit(Resource.Error("No products for this category"))
+                        null
+                    } else {
+                        results
+                    }
                 } else { null }
             } catch (e: IOException) {
                 e.printStackTrace()

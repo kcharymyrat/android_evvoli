@@ -67,7 +67,13 @@ class CategoryRepositoryImpl @Inject constructor(
                 if (nextUrl != null || page == 1) {
                     val categoriesResponse = evvoliTmApi.getCategories(page = currentPage)
                     nextUrl = categoriesResponse.next
-                    categoriesResponse.results
+                    val results = categoriesResponse.results
+                    if (results.isEmpty() && page == 1) {
+                        emit(Resource.Error("Sorry but there is no categories yet!"))
+                        null
+                    } else {
+                        results
+                    }
                 } else { null }
             } catch (e: IOException) {
                 e.printStackTrace()

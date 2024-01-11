@@ -161,7 +161,8 @@ class MainViewModel @Inject constructor(
                             _categoryScreenState.update {
                                 it.copy(
                                     categoryList = categoryScreenState.value.categoryList
-                                            + categoryList
+                                            + categoryList,
+                                    hasError = false
                                 )
                             }
                         }
@@ -169,7 +170,10 @@ class MainViewModel @Inject constructor(
 
                     is Resource.Loading -> {
                         _categoryScreenState.update {
-                            it.copy(isLoading = result.isLoading)
+                            it.copy(
+                                isLoading = result.isLoading,
+                                hasError = false
+                            )
                         }
                     }
                 }
@@ -194,33 +198,38 @@ class MainViewModel @Inject constructor(
                 it.copy(isLoading = true)
             }
 
+//            println("_productScreenState.value = ${_productScreenState.value}")
             productRepository.getProducts(
                 categoryId = categoryId,
                 fetchFromRemote = forceFetchFromRemote,
                 isRefresh = isRefresh,
                 page = productScreenState.value.page
             ).collect { result ->
+//                println("result.data in viewmodel = ${result.data}")
                 when (result) {
                     is Resource.Error -> {
+                        println("is Resource.Error")
                         _productScreenState.update { currentState ->
                             currentState.copy(isLoading = false, hasError = true)
                         }
                     }
                     is Resource.Success -> {
-
+                        println("is Resource.Success")
                         result.data?.let { productList ->
                             _productScreenState.update {
                                 it.copy(
                                     productList = productScreenState.value.productList
-                                            + productList
+                                            + productList,
+                                    hasError = false,
                                 )
                             }
                         }
                     }
 
                     is Resource.Loading -> {
+                        println("is Resource.Loading")
                         _productScreenState.update {
-                            it.copy(isLoading = result.isLoading)
+                            it.copy(isLoading = result.isLoading, hasError = false)
                         }
                     }
                 }
