@@ -126,6 +126,7 @@ fun Navigation(
             }
 
             ProductDetailScreen(
+                navController = navController,
                 productDetailScreenState = productDetailScreenState,
                 cartScreenState = cartScreenState,
                 onUpdateCartAndItsState = mainViewModel::updateCart,

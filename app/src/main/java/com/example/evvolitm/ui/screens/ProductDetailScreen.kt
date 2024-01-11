@@ -3,6 +3,7 @@ package com.example.evvolitm.ui.screens
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -24,13 +25,10 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.KeyboardArrowLeft
-import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.rounded.ImageNotSupported
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -66,6 +64,7 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
+import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
@@ -73,11 +72,12 @@ import coil.request.ImageRequest
 import com.example.evvolitm.R
 import com.example.evvolitm.data.remote.EvvoliTmApi
 import com.example.evvolitm.domain.model.CartItemProduct
-import com.example.evvolitm.domain.model.Product
 import com.example.evvolitm.domain.model.ProductDetail
 import com.example.evvolitm.presentation.CartScreenState
 import com.example.evvolitm.presentation.ProductDetailScreenState
 import com.example.evvolitm.ui.theme.Shapes
+import com.example.evvolitm.util.Screen
+import kotlinx.coroutines.delay
 
 fun getProductDetailTitle(productDetail: ProductDetail): String {
     return when (AppCompatDelegate.getApplicationLocales()[0]?.language) {
@@ -106,11 +106,15 @@ fun getProductDetailType(productDetail: ProductDetail): String {
 
 @Composable
 fun ProductDetailScreen(
+    navController: NavHostController,
     productDetailScreenState: ProductDetailScreenState,
     cartScreenState: CartScreenState,
     onUpdateCartAndItsState: (CartItemProduct, Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    var showRedirectButton by remember {
+        mutableStateOf(false)
+    }
 
     val productDetail: ProductDetail? = productDetailScreenState.productDetail
 
@@ -129,6 +133,8 @@ fun ProductDetailScreen(
     // Update the current item index based on the LazyRow scroll state
     LaunchedEffect(listState.firstVisibleItemIndex) {
         currentItemIndex.intValue = listState.firstVisibleItemIndex
+        delay(5000) // Delay of 5 seconds
+        showRedirectButton = true
     }
 
     if (productDetail == null) {
@@ -136,7 +142,27 @@ fun ProductDetailScreen(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
-            CircularProgressIndicator()
+            if (!showRedirectButton) {
+                CircularProgressIndicator()
+            } else {
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.ic_connection_error),
+                        contentDescription = stringResource(R.string.connection_error),
+                    )
+                    Text(
+                        text = "Seem that there is an error with the this product!",
+                        modifier = Modifier.padding(16.dp)
+                    )
+                    Button(onClick = { navController.navigate(Screen.CategoriesScreen.route)}) {
+                        Text("Home Screen")
+                    }
+                }
+            }
         }
     } else {
 
