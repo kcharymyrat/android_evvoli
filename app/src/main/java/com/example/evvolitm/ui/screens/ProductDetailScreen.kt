@@ -133,6 +133,10 @@ fun ProductDetailScreen(
     // Update the current item index based on the LazyRow scroll state
     LaunchedEffect(listState.firstVisibleItemIndex) {
         currentItemIndex.intValue = listState.firstVisibleItemIndex
+    }
+
+    // Handle the delayed action separately
+    LaunchedEffect(key1 = Unit) {
         delay(5000) // Delay of 5 seconds
         showRedirectButton = true
     }
