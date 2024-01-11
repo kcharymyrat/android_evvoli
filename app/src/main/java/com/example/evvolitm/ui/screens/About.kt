@@ -4,6 +4,7 @@ import android.content.Intent
 import android.net.Uri
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
@@ -120,15 +121,15 @@ fun LocationDetail(
     placeId: String
 ) {
     val context = LocalContext.current
+    val gmmIntentUri = Uri.parse(
+        "https://www.google.com/maps/search/?api=1&query=$latitude,$longitude&query_place_id=$placeId"
+    )
 
     Row(
         verticalAlignment = Alignment.CenterVertically
     ) {
         IconButton(
             onClick = {
-                val gmmIntentUri = Uri.parse(
-                    "https://www.google.com/maps/search/?api=1&query=$latitude,$longitude&query_place_id=$placeId"
-                )
                 val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
                 mapIntent.setPackage("com.google.android.apps.maps")
                 context.startActivity(mapIntent)
@@ -140,9 +141,92 @@ fun LocationDetail(
             )
         }
         Spacer(modifier = Modifier.width(8.dp))
-        Text(detail, style = MaterialTheme.typography.bodyMedium)
+        Text(
+            detail,
+            style = MaterialTheme.typography.bodyMedium,
+            modifier = Modifier.clickable {
+                val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
+                mapIntent.setPackage("com.google.android.apps.maps")
+                context.startActivity(mapIntent)
+            }
+        )
     }
 }
+
+
+@Composable
+fun PhoneDetail(icon: ImageVector, detail: String) {
+    val context = LocalContext.current
+
+    Row(
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        IconButton(
+            onClick = {
+                val intent = Intent(Intent.ACTION_DIAL).apply {
+                    data = Uri.parse("tel:$detail")
+                }
+                context.startActivity(intent)
+            },
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = detail,
+            )
+        }
+        Spacer(modifier = Modifier.width(8.dp))
+        Text(
+            detail,
+            style = MaterialTheme.typography.bodyMedium,
+            modifier = Modifier.clickable {
+                val intent = Intent(Intent.ACTION_DIAL).apply {
+                    data = Uri.parse("tel:$detail")
+                }
+                context.startActivity(intent)
+            }
+        )
+    }
+}
+
+
+@Composable
+fun EmailDetail(icon: ImageVector, detail: String) {
+    val context = LocalContext.current
+
+    Row(
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        IconButton(
+            onClick = {
+                val intent = Intent(Intent.ACTION_SENDTO).apply {
+                    data = Uri.parse("mailto:$detail")
+                }
+                if (intent.resolveActivity(context.packageManager) != null) {
+                    context.startActivity(intent)
+                }
+            },
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = detail,
+            )
+        }
+        Spacer(modifier = Modifier.width(8.dp))
+        Text(
+            detail,
+            style = MaterialTheme.typography.bodyMedium,
+            modifier = Modifier.clickable {
+                val intent = Intent(Intent.ACTION_SENDTO).apply {
+                    data = Uri.parse("mailto:$detail")
+                }
+                if (intent.resolveActivity(context.packageManager) != null) {
+                    context.startActivity(intent)
+                }
+            }
+        )
+    }
+}
+
 
 @Composable
 fun LocationLatLongDetail(icon: ImageVector, detail: String, latitude: Double, longitude: Double) {
@@ -171,58 +255,6 @@ fun LocationLatLongDetail(icon: ImageVector, detail: String, latitude: Double, l
     }
 }
 
-@Composable
-fun PhoneDetail(icon: ImageVector, detail: String) {
-    val context = LocalContext.current
-
-    Row(
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        IconButton(
-            onClick = {
-                val intent = Intent(Intent.ACTION_DIAL).apply {
-                    data = Uri.parse("tel:$detail")
-                }
-                context.startActivity(intent)
-            },
-        ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = detail,
-            )
-        }
-        Spacer(modifier = Modifier.width(8.dp))
-        Text(detail, style = MaterialTheme.typography.bodyMedium)
-    }
-}
-
-
-@Composable
-fun EmailDetail(icon: ImageVector, detail: String) {
-    val context = LocalContext.current
-
-    Row(
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        IconButton(
-            onClick = {
-                val intent = Intent(Intent.ACTION_SENDTO).apply {
-                    data = Uri.parse("mailto:$detail")
-                }
-                if (intent.resolveActivity(context.packageManager) != null) {
-                    context.startActivity(intent)
-                }
-            },
-        ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = detail,
-            )
-        }
-        Spacer(modifier = Modifier.width(8.dp))
-        Text(detail, style = MaterialTheme.typography.bodyMedium)
-    }
-}
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
