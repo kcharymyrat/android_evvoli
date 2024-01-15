@@ -55,8 +55,9 @@ fun LanguageSelectionScreen(navController: NavHostController) {
             if (navController.previousBackStackEntry != null) {
                 navController.popBackStack() // Navigate back if there's a previous entry
             } else {
-                navController.navigate(Screen.CategoriesScreen.route)
-                // Navigate to CategoriesScreen if it's the first screen
+                navController.navigate(Screen.EvvoliAndVelutoScreen.route) { // Navigate to CategoriesScreen if it's the first screen
+                    popUpTo(Screen.SettingsScreen.route) { inclusive = true } // Removes LanguageSelectionScreen from the stack
+                }
             }
         }
         LanguageOption(
@@ -68,7 +69,9 @@ fun LanguageSelectionScreen(navController: NavHostController) {
             if (navController.previousBackStackEntry != null) {
                 navController.popBackStack()
             } else {
-                navController.navigate(Screen.CategoriesScreen.route)
+                navController.navigate(Screen.EvvoliAndVelutoScreen.route) {
+                    popUpTo(Screen.SettingsScreen.route) { inclusive = true }
+                }
             }
         }
         LanguageOption(
@@ -80,7 +83,9 @@ fun LanguageSelectionScreen(navController: NavHostController) {
             if (navController.previousBackStackEntry != null) {
                 navController.popBackStack()
             } else {
-                navController.navigate(Screen.CategoriesScreen.route)
+                navController.navigate(Screen.EvvoliAndVelutoScreen.route) {
+                    popUpTo(Screen.SettingsScreen.route) { inclusive = true }
+                }
             }
         }
     }

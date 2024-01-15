@@ -25,7 +25,7 @@ import com.example.evvolitm.presentation.ProductScreenState
 import com.example.evvolitm.ui.screens.AboutScreen
 import com.example.evvolitm.ui.screens.CartItemsScreen
 import com.example.evvolitm.ui.screens.CategoryProductsScreen
-import com.example.evvolitm.ui.screens.LanguageChangeScreen
+import com.example.evvolitm.ui.screens.EvvoliVelutoScreen
 import com.example.evvolitm.ui.screens.LanguageSelectionScreen
 import com.example.evvolitm.ui.screens.OrderForm
 import com.example.evvolitm.ui.screens.ProductDetailScreen
@@ -37,6 +37,7 @@ import com.example.evvolitm.util.Screen
 fun Navigation(
     navController: NavHostController,
     mainViewModel: MainViewModel,
+    startDestination: String,
     categoryScreenState: CategoryScreenState,
     productScreenState: ProductScreenState,
     searchProductScreenState: ProductScreenState,
@@ -46,7 +47,14 @@ fun Navigation(
 ) {
     var query by remember { mutableStateOf("") }
 
-    NavHost(navController = navController, startDestination = Screen.CategoriesScreen.route) {
+    NavHost(navController = navController, startDestination = startDestination) {
+
+        composable(route = Screen.EvvoliAndVelutoScreen.route) {
+            EvvoliVelutoScreen(
+                navController = navController,
+                modifier = Modifier
+            )
+        }
 
         composable(route = Screen.CategoriesScreen.route) {
             CategoriesScreen(

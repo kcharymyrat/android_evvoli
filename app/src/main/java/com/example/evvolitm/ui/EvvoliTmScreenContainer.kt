@@ -23,6 +23,7 @@ import com.example.evvolitm.util.Screen
 fun EvvoliTmScreenContainer(
     mainViewModel: MainViewModel,
     navController: NavHostController,
+    startDestination: String,
 ) {
     val categoryScreenState = mainViewModel.categoryScreenState.collectAsState().value
     val productScreenState = mainViewModel.productScreenState.collectAsState().value
@@ -58,6 +59,7 @@ fun EvvoliTmScreenContainer(
         ) {
             Navigation(
                 navController = navController,
+                startDestination = startDestination,
                 mainViewModel = mainViewModel,
                 categoryScreenState = categoryScreenState,
                 productScreenState = productScreenState,

@@ -16,6 +16,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.evvolitm.presentation.MainViewModel
 import com.example.evvolitm.ui.EvvoliTmScreenContainer
 import com.example.evvolitm.ui.theme.EvvoliTmTheme
+import com.example.evvolitm.util.Screen
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -23,6 +24,15 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val prefs = getSharedPreferences("com.example.evvolitm", MODE_PRIVATE)
+        val isFirstLaunch = prefs.getBoolean("isFirstLaunch", true)
+        println("isFirstLaunch = $isFirstLaunch")
+
+        if (isFirstLaunch) {
+            prefs.edit().putBoolean("isFirstLaunch", false).apply()
+        }
+
         setContent {
             EvvoliTmTheme {
                 // A surface container using the 'background' color from the theme
@@ -32,8 +42,16 @@ class MainActivity : AppCompatActivity() {
                 ) {
                     val mainViewModel = hiltViewModel<MainViewModel>()
                     val navController: NavHostController = rememberNavController()
+
+                    val startDestination = if (isFirstLaunch) {
+                        Screen.SettingsScreen.route
+                    } else {
+                        Screen.EvvoliAndVelutoScreen.route
+                    }
                     EvvoliTmScreenContainer(
-                        mainViewModel = mainViewModel, navController = navController
+                        mainViewModel = mainViewModel,
+                        navController = navController,
+                        startDestination = startDestination
                     )
                 }
             }
