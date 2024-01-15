@@ -28,10 +28,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.os.LocaleListCompat
+import androidx.navigation.NavHostController
 import com.example.evvolitm.R
 
 @Composable
-fun LanguageSelectionScreen() {
+fun LanguageSelectionScreen(navController: NavHostController) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -50,6 +51,7 @@ fun LanguageSelectionScreen() {
             Icons.Default.Language
         ){
             AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags("en"))
+            navController.popBackStack() // Navigate back
         }
         LanguageOption(
             "Русский",
@@ -57,6 +59,7 @@ fun LanguageSelectionScreen() {
             Icons.Default.Language
         ) {
             AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags("ru"))
+            navController.popBackStack() // Navigate back
         }
         LanguageOption(
             "Türkmen",
@@ -64,6 +67,7 @@ fun LanguageSelectionScreen() {
             Icons.Default.Language
         ) {
             AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags("tk"))
+            navController.popBackStack() // Navigate back
         }
     }
 }
@@ -111,9 +115,9 @@ fun LanguageOption(
 
 
 
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun LangApp() {
-    LanguageSelectionScreen()
-}
+//@Preview(showBackground = true, showSystemUi = true)
+//@Composable
+//fun LangApp() {
+//    LanguageSelectionScreen(nav)
+//}
 

@@ -51,7 +51,7 @@
     <string name="couldn_t_find_any_products">
         Мы не смогли найти ни одного товара, соответствующего вашему запросу.
     </string>
-    <string name="evvoli_company_description">Evvoli Technology is a leading provider of innovative tech solutions. Our mission is to enhance the digital experience with cutting-edge products and services.</string>
+    <string name="evvoli_company_description">Evvoli - ведущий поставщик инновационных технологических решений. Наша миссия - расширять возможности цифровых технологий с помощью передовых продуктов и услуг.</string>
     <string name="refresh">Refresh</string>
     <string name="error_loading_data_please_refresh">Error loading data. Please refresh.</string>
     <string name="connection_error">connection error</string>

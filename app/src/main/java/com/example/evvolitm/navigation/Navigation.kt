@@ -173,7 +173,7 @@ fun Navigation(
         composable(
             route = Screen.SettingsScreen.route
         ) {
-            LanguageSelectionScreen()
+            LanguageSelectionScreen(navController = navController)
         }
     }
 }

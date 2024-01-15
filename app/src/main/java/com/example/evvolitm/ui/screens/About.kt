@@ -24,7 +24,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.evvolitm.R
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AboutScreen() {
     println(AppCompatDelegate.getApplicationLocales())
@@ -89,6 +88,21 @@ fun ContactInformation() {
                     longitude = longitude,
                     placeId = placeId
                 )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    IconButton(
+                        onClick = {},
+                    ) {
+
+                    }
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        "Gundogar Bazar D3, Ashgabat 744000, Turkmenistan",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+
                 PhoneDetail(Icons.Default.Phone, "+993 65 726468")
                 EmailDetail(Icons.Default.Email, "contact@evvoli.com")
             }
