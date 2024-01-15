@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.os.LocaleListCompat
 import androidx.navigation.NavHostController
 import com.example.evvolitm.R
+import com.example.evvolitm.util.Screen
 
 @Composable
 fun LanguageSelectionScreen(navController: NavHostController) {
@@ -51,7 +52,12 @@ fun LanguageSelectionScreen(navController: NavHostController) {
             Icons.Default.Language
         ){
             AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags("en"))
-            navController.popBackStack() // Navigate back
+            if (navController.previousBackStackEntry != null) {
+                navController.popBackStack() // Navigate back if there's a previous entry
+            } else {
+                navController.navigate(Screen.CategoriesScreen.route)
+                // Navigate to CategoriesScreen if it's the first screen
+            }
         }
         LanguageOption(
             "Русский",
@@ -59,7 +65,11 @@ fun LanguageSelectionScreen(navController: NavHostController) {
             Icons.Default.Language
         ) {
             AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags("ru"))
-            navController.popBackStack() // Navigate back
+            if (navController.previousBackStackEntry != null) {
+                navController.popBackStack()
+            } else {
+                navController.navigate(Screen.CategoriesScreen.route)
+            }
         }
         LanguageOption(
             "Türkmen",
@@ -67,7 +77,11 @@ fun LanguageSelectionScreen(navController: NavHostController) {
             Icons.Default.Language
         ) {
             AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags("tk"))
-            navController.popBackStack() // Navigate back
+            if (navController.previousBackStackEntry != null) {
+                navController.popBackStack()
+            } else {
+                navController.navigate(Screen.CategoriesScreen.route)
+            }
         }
     }
 }
