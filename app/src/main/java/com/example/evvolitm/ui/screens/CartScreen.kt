@@ -268,7 +268,6 @@ fun CartItemProductInfo(product: CartItemProductEntity, modifier: Modifier = Mod
             Text(
                 text = "%.2f".format(product.price) + " m.",
                 style = MaterialTheme.typography.labelMedium,
-                color = Color.DarkGray,
                 textDecoration = TextDecoration.LineThrough
             )
             Spacer(modifier = Modifier.width(2.dp))
@@ -378,7 +377,6 @@ fun CartProductDetailQty(
     Text(
         text = cartProductQty.toString(),
         modifier = modifier,
-        color = Color.DarkGray,
         style = MaterialTheme.typography.bodyLarge
     )
 }
@@ -405,10 +403,7 @@ fun CartProductPlusClickable(
         onClick = {
             println("in PlusClickable onClick: product.id = ${product.id}")
             onUpdateCartAndItsState(newCartItemProduct, false)
-        },
-        colors = IconButtonDefaults.iconButtonColors(
-            contentColor = Color.DarkGray
-        )
+        }
     ) {
         Icon(Icons.Default.Add, contentDescription = "Decrease")
     }
@@ -437,10 +432,7 @@ fun CartProductMinusClickable(
         onClick = {
             println("in MinusClickable onClick: product.id = ${product.id}")
             onUpdateCartAndItsState(newCartItemProduct, true)
-        },
-        colors = IconButtonDefaults.iconButtonColors(
-            contentColor = Color.DarkGray
-        )
+        }
     ) {
         Icon(Icons.Default.Remove, contentDescription = "Increase")
     }
