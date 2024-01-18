@@ -11,7 +11,7 @@ import javax.inject.Singleton
 class OrderRepositoryImpl @Inject constructor(
     private val evvoliTmApi: EvvoliTmApi,
 ): OrderRepository {
-    override suspend fun createOrder(orderDto: OrderDto): Response<Unit> {
+    override suspend fun createOrder(orderDto: OrderDto):  Response<Any> {
         return evvoliTmApi.createOrder(orderDto)
     }
 }

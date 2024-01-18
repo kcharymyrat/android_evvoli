@@ -63,6 +63,10 @@ import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
+enum class PaymentOption(val value: String) {
+    CASH("cash"),
+    CARD_TERMINAL("card terminal")
+}
 
 @Composable
 fun OrderForm(
@@ -285,13 +289,11 @@ fun OrderForm(
                 Button(
                     onClick = {
                         isValid = validateForm(customerName, phone, address, selectedDate)
-                        println("$customerName, $phone, $address, $selectedDate")
-                        println("isValid = $isValid")
 
                         val paymentOption = if (selectedPaymentOption == paymentOptions[0]) {
-                            "cash"
+                            PaymentOption.CASH.value
                         } else {
-                            "card terminal"
+                            PaymentOption.CARD_TERMINAL.value
                         }
 
                         if (isValid) {
@@ -333,6 +335,7 @@ fun OrderForm(
                 Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
                 resetOrderStatus() // Reset the status after handling
             }
+            navController.navigate(Screen.CartScreen.route)
         }
 
         else -> { /* Idle state, do nothing */

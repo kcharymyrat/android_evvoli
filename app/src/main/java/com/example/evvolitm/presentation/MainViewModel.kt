@@ -1,7 +1,6 @@
 package com.example.evvolitm.presentation
 
 import android.app.Application
-import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.evvolitm.data.remote.respond.order_dtos.OrderDto
@@ -19,6 +18,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import org.json.JSONException
+import org.json.JSONObject
 import javax.inject.Inject
 
 
@@ -59,7 +60,6 @@ class MainViewModel @Inject constructor(
     // -----------------------------STATE EVENTS LOGIC ------------------------------------
 
     fun onCategoryScreenEvent(event: CategoryScreenEvents) {
-        println("event = $event")
         when (event) {
             is CategoryScreenEvents.Refresh -> {
                 _categoryScreenState.update { currentState ->
@@ -82,7 +82,6 @@ class MainViewModel @Inject constructor(
     }
 
     fun onProductScreenEvent(event: ProductScreenEvents, categoryId: String) {
-        println("event = $event")
         when (event) {
             is ProductScreenEvents.Refresh -> {
                 _productScreenState.update { currentState ->
@@ -105,7 +104,6 @@ class MainViewModel @Inject constructor(
     }
 
     fun onSearchProductScreenEvent(event: ProductScreenEvents, query: String) {
-        println("event = $event")
         when (event) {
             is ProductScreenEvents.Refresh -> {
                 loadSearchProducts(q = query, forceFetchFromRemote = true)
@@ -120,7 +118,6 @@ class MainViewModel @Inject constructor(
     }
 
     fun onProductDetailScreenEvent(event: ProductDetailScreenEvents, productId: String) {
-        println("event = $event")
         when (event) {
             is ProductDetailScreenEvents.Refresh -> {
                 loadProductDetail(productId = productId, forceFetchFromRemote = true)
@@ -140,7 +137,6 @@ class MainViewModel @Inject constructor(
                 createCartScreenState()
             }
 
-            println("_categoryScreenState.value = ${_categoryScreenState.value}")
             _categoryScreenState.update {
                 it.copy(isLoading = true)
             }
@@ -198,23 +194,19 @@ class MainViewModel @Inject constructor(
                 it.copy(isLoading = true)
             }
 
-//            println("_productScreenState.value = ${_productScreenState.value}")
             productRepository.getProducts(
                 categoryId = categoryId,
                 fetchFromRemote = forceFetchFromRemote,
                 isRefresh = isRefresh,
                 page = productScreenState.value.page
             ).collect { result ->
-//                println("result.data in viewmodel = ${result.data}")
                 when (result) {
                     is Resource.Error -> {
-                        println("is Resource.Error")
                         _productScreenState.update { currentState ->
                             currentState.copy(isLoading = false, hasError = true)
                         }
                     }
                     is Resource.Success -> {
-                        println("is Resource.Success")
                         result.data?.let { productList ->
                             _productScreenState.update {
                                 it.copy(
@@ -227,7 +219,6 @@ class MainViewModel @Inject constructor(
                     }
 
                     is Resource.Loading -> {
-                        println("is Resource.Loading")
                         _productScreenState.update {
                             it.copy(isLoading = result.isLoading, hasError = false)
                         }
@@ -340,8 +331,6 @@ class MainViewModel @Inject constructor(
         isMinus: Boolean = false
     ) {
         viewModelScope.launch {
-//            println("in updateCart: _cartScreenState.value = ${_cartScreenState.value}")
-
             val quantity = if (isMinus) -1 else 1
 
             var cartId = _cartScreenState.value.id
@@ -374,19 +363,13 @@ class MainViewModel @Inject constructor(
 
                 // Update the state
                 _cartScreenState.value = newCartState
-
-//                println("_cartScreenState.value = ${_cartScreenState.value}")
-
             }
-
-//            println("in updateCart: _cartScreenState.value = ${_cartScreenState.value}")
         }
     }
 
 
     fun createCartScreenState() {
         viewModelScope.launch {
-//            println("in createCartScreenState: _cartScreenState.value = ${_cartScreenState.value}")
             val cartEntity =
                 cartRepository.getLatestCartEntity() ?: cartRepository.createEmptyCartEntity()
             cartEntity?.let {
@@ -405,7 +388,6 @@ class MainViewModel @Inject constructor(
                     )
                 }
             }
-//            println("in createCartScreenState: _cartScreenState.value = ${_cartScreenState.value}")
         }
     }
 
@@ -420,25 +402,92 @@ class MainViewModel @Inject constructor(
     fun createOrder(orderDto: OrderDto) {
         viewModelScope.launch {
             val response = orderRepository.createOrder(orderDto)
-//            println("response = $response")
-//            println("response.isSuccessful = ${response.isSuccessful}")
-//            println("response.body = ${response.body()}")
-//            println("response.message = ${response.message()}")
+
             if (response.isSuccessful) {
                 // Order creation successful, navigate to success page
                 _orderStatus.value = OrderStatus.Success("Order Placed Successfully")
                 deleteAllCarts()
+                return@launch
             } else {
-                // Handle error
-                _orderStatus.value = OrderStatus.Error("Failed to place order. Please try again.")
+                val errorResponse = response.errorBody()?.string()
+                val errorMessage = parseError(errorResponse)
+
+                if (errorMessage == null) {
+                    _orderStatus.value = OrderStatus.Error( "Failed to place order. Please try again.")
+                    return@launch
+                }
+
+                val detail = errorMessage.first
+                val productId = errorMessage.second
+
+                if (detail == null || productId == null) {
+                    _orderStatus.value = OrderStatus.Error( "Failed to place order. Please try again.")
+                    return@launch
+                } else {
+                    try {
+                        val cartId = _cartScreenState.value.id ?: cartRepository.getLatestCartEntity()?.id
+                        if (cartId == null) {
+                            _orderStatus.value = OrderStatus.Error(
+                                "Nothing was added to cart, Please add product to your cart first!"
+                            )
+                            return@launch
+                        }
+
+                        val cartEntity = cartRepository.getCartById(id = cartId)
+                        if (cartEntity == null) {
+                            _orderStatus.value = OrderStatus.Error(
+                                "No cart with given id was found"
+                            )
+                            return@launch
+                        }
+
+                        // Get CartItemEntity
+                        val cartItemEntity = cartRepository.getCartItemByProductIdAndCartId(productId = productId, cartId = cartId)
+                        if (cartItemEntity == null) {
+                            _orderStatus.value = OrderStatus.Error(
+                                "No such cart item!"
+                            )
+                            return@launch
+                        }
+
+                        // Delete CartItemEntity
+                        cartRepository.deleteCartItem(cartItemId = cartItemEntity.id)
+
+                        // Delete CartItemProductEntity
+                        cartRepository.deleteCartItemProductById(productId = productId)
+
+                        // Re-fetch the CartEntity
+                        val updateCartEntityWithCartItemProduct = cartRepository.getCartWithItemsAndProducts(cartId = cartId)
+                        val updateCartEntity = updateCartEntityWithCartItemProduct.cart
+
+                        val cartItems = updateCartEntityWithCartItemProduct.cartItems
+
+                        // Update cartState UI
+                        updateCartEntity.let { cart ->
+                            _cartScreenState.value = _cartScreenState.value.copy(
+                                id = cart.id,
+                                cartItems = cartItems,
+                                cartQty = cartItems.sumOf { item -> item.cartItem.quantity },
+                                cartTotalPrice = cartItems
+                                    .sumOf { item ->
+                                        item.cartItem.quantity * (item.product.salePrice ?: 0.00)
+                                    }
+                            )
+                        }
+                        _orderStatus.value = OrderStatus.Error(
+                            "Product in your cart are no longer available for purchase. It will be removed from your cart!"
+                        )
+                    } catch(e: Exception)  {
+                        _orderStatus.value = OrderStatus.Error(
+                            "Unexpected error occurred!"
+                        )
+                    }
+                }
             }
         }
     }
 
     fun resetOrderStatusAndCartState() {
-//        println("_orderStatus.value = ${_orderStatus.value }")
-//        println("_cartScreenState.value = ${_cartScreenState.value }")
-
         _orderStatus.value = OrderStatus.Idle
         _cartScreenState.update {
             it.copy(
@@ -449,9 +498,19 @@ class MainViewModel @Inject constructor(
                 cartTotalPrice = 0.00
             )
         }
+    }
 
-//        println("_cartScreenState.value = ${_cartScreenState.value }")
-//        println("_orderStatus.value = ${_orderStatus.value }")
-
+    private fun parseError(response: String?): Pair<String?, String?>? {
+        response?.let {
+            try {
+                val json = JSONObject(it)
+                val detail = json.getString("detail")
+                val productId = json.getString("product_id")
+                return Pair(detail, productId)
+            } catch (e: JSONException) {
+                e.printStackTrace()
+            }
+        }
+        return null
     }
 }

@@ -32,6 +32,4 @@ interface CartItemDao {
 
     @Delete
     suspend fun deleteCartItem(cartItem: CartItemEntity)
-
-
 }

@@ -37,6 +37,10 @@ class CartRepositoryImpl  @Inject constructor(
         return cartDao.getCartById(id = cartId)
     }
 
+    override suspend fun getCartById(id: Long): CartEntity? {
+        return cartDao.getCartById(id = id)
+    }
+
     override suspend fun getCartWithItemsAndProducts(cartId: Long): CartWithCartItemsAndProducts {
         return cartDao.getCartWithItemsAndProducts(cartId)
     }
@@ -97,6 +101,29 @@ class CartRepositoryImpl  @Inject constructor(
 
     override suspend fun deleteAllCarts() {
         cartDao.deleteAllCarts()
+    }
+
+    override suspend fun getCartItemByProductIdAndCartId(
+        productId: String,
+        cartId: Long
+    ): CartItemEntity? {
+        return cartItemDao.getCartItemByProductIdAndCartId(productId = productId, cartId = cartId)
+    }
+
+
+    override suspend fun deleteCartItem(cartItemId: Long) {
+        withContext(Dispatchers.IO) {
+            try {
+                cartItemDao.deleteCartItemById(cartItemId)
+            } catch (e: Exception) {
+                // Handle exceptions, e.g., log error or rethrow a custom exception
+                println("Error in deleteCartItem: $e")
+            }
+        }
+    }
+
+    override suspend fun deleteCartItemProductById(productId: String) {
+        cartItemProductDao.deleteCartItemProductById(productId = productId)
     }
 
 }

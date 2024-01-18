@@ -38,7 +38,7 @@ interface EvvoliTmApi {
     ): ProductDetailDto
 
     @POST("api/v1/create-order/")
-    suspend fun createOrder(@Body orderDto: OrderDto): Response<Unit>
+    suspend fun createOrder(@Body orderDto: OrderDto): Response<Any>
 
     companion object {
         const val BASE_URL = "http://192.168.1.15:8000/"
